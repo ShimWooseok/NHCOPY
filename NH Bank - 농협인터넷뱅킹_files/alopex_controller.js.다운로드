@@ -1,0 +1,2217 @@
+//Alopex UI Version. 2.1.38
+//generated at 2014-02-11 02:07 PM, by SKCCADMIN
+/*!
+* Copyright (c) 2012 SK C&C Co., Ltd. All rights reserved.
+*
+* This software is the confidential and proprietary information of SK C&C.
+* You shall not disclose such confidential information and shall use it
+* only in accordance with the terms of the license agreement you entered into
+* with SK C&C.
+*
+* Alopex UI Javascript Storage, Navigation, Http APIs
+*
+* Author : 한상훈
+*
+* This code includes json2.js by Douglas Crockford. json2 is Public Domain.
+*/var JSON;if (!JSON) {JSON = {};}(function() {'use strict';function f(n) {return n < 10 ? '0' + n : n;}if (typeof Date.prototype.toJSON !== 'function') {Date.prototype.toJSON = function(key) {return isFinite(this.valueOf()) ? this.getUTCFullYear() + '-' + f(this.getUTCMonth() + 1) + '-' + f(this.getUTCDate()) + 'T' + f(this.getUTCHours()) + ':' + f(this.getUTCMinutes()) + ':' + f(this.getUTCSeconds()) + 'Z' : null;};String.prototype.toJSON = Number.prototype.toJSON = Boolean.prototype.toJSON = function(key) {return this.valueOf();};}var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g, escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g, gap, indent, meta = {'\b': '\\b', '\t': '\\t', '\n': '\\n', '\f': '\\f', '\r': '\\r', '"': '\\"', '\\': '\\\\'}, rep;function quote(string) {escapable.lastIndex = 0;return escapable.test(string) ? '"' + string.replace(escapable, function(a) {var c = meta[a];return typeof c === 'string' ? c : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);}) + '"' : '"' + string + '"';}function str(key, holder) {var i, k, v, length, mind = gap, partial, value = holder[key];if (value && typeof value === 'object' && typeof value.toJSON === 'function') {value = value.toJSON(key);}if (typeof rep === 'function') {value = rep.call(holder, key, value);}switch (typeof value) {case'string': return quote(value);case'number': return isFinite(value) ? String(value) : 'null';case'boolean': case'null': return String(value);case'object': if (!value) {return'null';}gap += indent;partial = [];if (Object.prototype.toString.apply(value) === '[object Array]') {length = value.length;for (i = 0; i < length; i += 1) {partial[i] = str(i, value) || 'null';}v = partial.length === 0 ? '[]' : gap ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']' : '[' + partial.join(',') + ']';gap = mind;return v;}if (rep && typeof rep === 'object') {length = rep.length;for (i = 0; i < length; i += 1) {if (typeof rep[i] === 'string') {k = rep[i];v = str(k, value);if (v) {partial.push(quote(k) + (gap ? ': ' : ':') + v);}}}}else {for (k in value) {if (Object.prototype.hasOwnProperty.call(value, k)) {v = str(k, value);if (v) {partial.push(quote(k) + (gap ? ': ' : ':') + v);}}}}v = partial.length === 0 ? '{}' : gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}' : '{' + partial.join(',') + '}';gap = mind;return v;}}if (typeof JSON.stringify !== 'function') {JSON.stringify = function(value, replacer, space) {var i;gap = '';indent = '';if (typeof space === 'number') {for (i = 0; i < space; i += 1) {indent += ' ';}}else if (typeof space === 'string') {indent = space;}rep = replacer;if (replacer && typeof replacer !== 'function' && (typeof replacer !== 'object' || typeof replacer.length !== 'number')) {throw new Error('JSON.stringify');}return str('', {'': value});};}if (typeof JSON.parse !== 'function') {JSON.parse = function(text, reviver) {var j;function walk(holder, key) {var k, v, value = holder[key];if (value && typeof value === 'object') {for (k in value) {if (Object.prototype.hasOwnProperty.call(value, k)) {v = walk(value, k);if (v !== undefined) {value[k] = v;}else {delete value[k];}}}}return reviver.call(holder, key, value);}text = String(text);cx.lastIndex = 0;if (cx.test(text)) {text = text.replace(cx, function(a) {return'\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);});}if (/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {j = eval('(' + text + ')');return typeof reviver === 'function' ? walk({'': j}, '') : j;}throw new SyntaxError('JSON.parse');};}}());
+
+(function($, window) {
+  /****************************************
+   * Common Utils
+   ****************************************/
+  var exportProperty = function(obj, name, value) {
+    obj[name] = value;
+  };
+  var functionWrapper = function(handler) {
+    return function() {
+      if (handler) {
+        return handler.apply(this, arguments);
+      }
+    };
+  };
+  var formToObject = function(form) {
+    var o = {};
+    var jf = $(form);
+    if (form && jf.length > 0 && jf[0].tagName == 'FORM') {
+      $.each(jf.serializeArray(), function(i, v) {
+        if (o[v.name] !== undefined) {
+          if (!o[v.name].push) {
+            o[v.name] = [o[v.name]];
+          }
+          o[v.name].push(v.value || '');
+        } else {
+          o[v.name] = v.value || '';
+        }
+      });
+    }
+    return o;
+  };
+  
+  var qualifyUrl = function(url) {
+    var a = document.createElement('a');
+    a.href = url;
+    return a.href;
+  };
+  var rscript = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+  var rstyle = /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi;
+  var rlink = /<link(?:"[^"]*"['"]*|'[^']*'['"]*|[^'">])+>/gi;
+
+  /****************************************
+   * Storage API
+   ****************************************/
+  var storageInterface = {}, storagekey = 'alopexpersist',
+      useJSON = !!JSON;
+  
+  storageInterface.type = null; //localStorage, sessionStorage, userData, memory
+  storageInterface.localStorage = null;
+  storageInterface.sessionStorage = null;
+  storageInterface.userData = null;
+  storageInterface.memory = null;
+
+  var string2json = function(v) {
+    if (useJSON) {
+      return JSON.parse(decodeURIComponent(v));
+    } else {
+      return v;
+    }
+  };
+  var json2string = function(v) {
+    if (useJSON) {
+      return encodeURIComponent(JSON.stringify(v));
+    } else {
+      return v;
+    }
+  };
+
+  //HTML5 Storage API인터페이스. localStorage/sessionStorage
+  //https://developer.mozilla.org/en-US/docs/DOM/Storage
+  //localStorage   : Chrome 5+, Firefox 3.5+, IE 8+, Opera 10.5+,
+  //                 Safari 4+, Android 2.2+, iOS 2+
+  //sessionStorage : Chrome 5+, Firefox 2+  , IE 8+, Opera 10.5+,
+  //                 Safari 4+, Android 2.1+, iOS 2+
+  $.each(['localStorage', 'sessionStorage'], function(i, v) {
+    //만일 Storage API를 지원하지 않을 경우에는 정의하지 않는다.
+    try {
+    if ((!window[v]) || !(window[v].getItem)) {
+      return true;
+    }
+    } catch(err) { return true; }
+    storageInterface[v] = {};
+    storageInterface.type = v;
+    storageInterface[v].get = function(key) {
+      return window[v].getItem(storagekey + key);
+    };
+    storageInterface[v].getKeys = function() {
+      var keyarr = [];
+      for (var i = 0; i < window[v].length; i++) {
+        var key = window[v].key(i);
+        if (key.indexOf(storagekey) == -1) {
+          continue;
+        }
+        keyarr.push(key.slice(storagekey.length));
+      }
+      return keyarr;
+    };
+    storageInterface[v].set = function(key, value) {
+      window[v].setItem(storagekey + key, value);
+    };
+    storageInterface[v].clear = function(key) {
+      if (key) {
+        window[v].removeItem(storagekey + key);
+      } else {
+        var delitems = [];
+        for (var i = 0; i < window[v].length; i++) {
+          if (window[v].key(i).indexOf(storagekey) != -1) {
+            delitems.push(window[v].key(i));
+          }
+        }
+        for (var i = 0; i < delitems.length; i++) {
+          window[v].removeItem(delitems[i]);
+        }
+      }
+    };
+  });
+
+  //localStorage나 sessionStorage가 정의되지 않은 경우에만 userData를 사용한다.
+  // http://msdn.microsoft.com/en-us/library/ms531424(VS.85).aspx
+  //IE 5-7
+  try {
+    if (!window.localStorage && !window.sessionStorage) {
+      var div = $("<div style='display:none;'></div>").appendTo('head')[0];
+      try {
+        div.addBehavior('#default#userData');
+        div.load(storagekey);
+        storageInterface.userData = {};
+        storageInterface.userData.get = function(key) {
+          return div.getAttribute(key);
+        };
+        storageInterface.userData.getKeys = function() {
+          var attrs = div.XMLDocument.documentElement.attributes,
+              keyarr = [];
+          for (var i = attrs.length - 1; i >= 0; i--) {
+            keyarr.push(attrs[i].name);
+          }
+          return keyarr;
+        };
+        storageInterface.userData.set = function(key, value) {
+          div.setAttribute(key, value);
+          div.save(storagekey);
+        };
+        storageInterface.userData.clear = function(key) {
+          if (key) {
+            div.removeAttribute(key);
+          } else {
+            var attrs = div.XMLDocument.documentElement.attributes;
+            for (var i = attrs.length - 1; i >= 0; i--) {
+              div.removeAttribute(attrs[i].name);
+            }
+          }
+          div.save(storagekey);
+        };
+        storageInterface.type = 'userData';
+      } catch (err) {
+        $(div).remove();
+        storageInterface.userData = null;
+      }
+    }
+  } catch (er) {
+    
+  }
+
+  //StorageInterface, userData behavior 그중 아무것도 지원되지 않으면 메모리를 사용.
+  //그러나 persist하지 않으므로 효용가치가 없다.
+  if (!storageInterface.localStorage && !storageInterface.sessionStorage &&
+      !storageInterface.userData) {
+    var tempstorage = {};
+    storageInterface.memory = {};
+    storageInterface.type = 'memory';
+    storageInterface.memory.get = function(key) {
+      return tempstorage[key];
+    };
+    storageInterface.memory.getKeys = function() {
+      var retarr = [];
+      for (var prop in tempstorage) {
+        retarr.push(prop);
+      }
+      return retarr;
+    };
+    storageInterface.memory.set = function(key, value) {
+      tempstorage[key] = value;
+    };
+    storageInterface.memory.clear = function(key) {
+      if (key) {
+        delete tempstorage[key];
+      } else {
+        tempstorage = {};
+      }
+    };
+  }
+
+  /**
+   * Store에 값을 저장한다.
+   *
+   * store.set("myvariable", "storedvalue");
+   * store.set("myvariable") 은 store.clear("myvariable")과 동일하다.
+   *
+   * @param {String} key storage 키.
+   * @param {Number|String|Boolean|Object} value 저장할 값.
+   * @return {Object|Number|String|Boolean} value.
+   */
+  storageInterface.set = function(key, value) {
+    var type = storageInterface.type;
+    if (value === undefined) {
+      return storageInterface[type].clear(key);
+    }
+    var setvalue = {timestamp: new Date().getTime(),
+                    value: value};
+    do {
+      try {
+        storageInterface[type].set(key, json2string(setvalue));
+        break;
+      } catch (err) {
+        //storage full
+        var keyset = storageInterface[type].getKeys();
+        if (keyset.length) {
+          keyset.sort(function(a, b) {
+            var at = storageInterface[type].get(a).timestamp;
+            var bt = storageInterface[type].get(b).timestamp;
+            return at > bt;
+            });
+          storageInterface[type].clear(keyset[0]);
+        } else {
+          return null;
+        }
+      }
+    } while (true);
+    return value;
+  };
+  /**
+   * Store로 부터 값을 가져온다.
+   *
+   * var v1 = store.get("myvariable");
+   *
+   * @param {String} key 저장된 key값.
+   * @return {Number|String|Boolean|Object} key에 저장되어 있던 값.
+   */
+  storageInterface.get = function(key) {
+    var type = storageInterface.type;
+    var retrieved = null;
+    try {
+      retrieved = string2json(storageInterface[type].get(key)).value;
+    } catch (err) {}
+    return retrieved;
+  };
+  /**
+   * store에 저장된 key목록을 가져온다.
+   */
+  storageInterface.getKeys = function() {
+    var type = storageInterface.type;
+    return storageInterface[type].getKeys();
+  };
+  /**
+   * Store에 저장된 값 또는 전체를 삭제한다.
+   *
+   * store.clear("myvariable");
+   * store.clear();
+   *
+   * @param {String} key 저장된 key 값.
+   */
+  storageInterface.clear = function(key) {
+    var type = storageInterface.type;
+    return storageInterface[type].clear(key);
+  };
+
+  //window에 api object 지정.
+  window.store = storageInterface;
+
+  /****************************************
+   * HashChange Event
+   ****************************************/
+  var supportHashChange = ('onhashchange' in window) &&
+      !(document.documentMode && (document.documentMode <= 7));
+  if (!supportHashChange) {
+    var previousHash = window.location.hash, currentHash = window.location.hash;
+    var ifprevHash = window.location.hash, ifcurrHash = window.location.hash;
+    var hashTimer = null;
+    var hashTimerInterval = 50;
+    var hn = function(str) {
+      var fromslice = 0;
+      if (str.indexOf('#') === 0) {
+        fromslice = 1;
+      }
+      return str.slice(fromslice);
+    };
+    var iframe = null;
+
+    var hashTimerFunction = function() {
+      currentHash = window.location.hash;
+      ifcurrHash = iframe[0].contentWindow.document.location.hash;
+      if (hn(previousHash) !== hn(currentHash)) {
+        previousHash = currentHash;
+        if (hn(ifcurrHash) !== hn(currentHash)) {
+          ifprevHash = ifcurrHash = currentHash;
+          iframe[0].contentWindow.document.open();
+          iframe[0].contentWindow.document.close();
+          iframe[0].contentWindow.document.location.hash = currentHash;
+        }
+        $(window).trigger('hashchange');
+      } else if (hn(ifcurrHash) !== hn(ifprevHash)) {
+        ifprevHash = ifcurrHash;
+        window.location.hash = ifcurrHash;
+      }
+    };
+
+    $.event.special['hashchange'] = {
+      setup: function(data, namespaces, eventHandle) {
+        iframe = $('<iframe></iframe>');
+        iframe.appendTo('body');
+        iframe.css('display', 'none');
+        iframe[0].contentWindow.document.open();
+        iframe[0].contentWindow.document.close();
+        if (currentHash) {
+          iframe[0].contentWindow.document.location.hash = currentHash;
+        }
+        if (this === window && !hashTimer) {
+          hashTimer = window.setInterval(hashTimerFunction, hashTimerInterval);
+        }
+      },
+      teardown: function(namespaces) {
+        if (hashTimer) {
+          window.clearInterval(hashTimer);
+          hashTimer = null;
+        }
+      }
+    };
+  }
+
+  $.fn['hashchange'] = function(handler) {
+    return handler ? this.bind('hashchange', handler) :
+      this.trigger('hashchange');
+  };
+
+  /*******************************************
+   * Navigate & HTTP API
+   *******************************************/
+  //실제 프로젝트에서는 웹/모바일런타임 검출을 공통부에서 수행하고
+  //그 부분에서 분기를 타서 generateUrl, generateFragmentUrl등을 따로 작성케
+  //하는게 옳지 않은가 생각됨..
+  //모바일 런타임의 구조에 대한 대 변혁/또는 현재 웹프레임워크와의 구조 통일화 이전에는
+  //양쪽을 모두 충족시키는 시스템을 만들 수 없을것으로 생각한다.
+  //모바일런타임의 경우 웹뷰스택과 함께 병행되는 screenid
+  //웹의경우 url base로 가기때문에 API로 커버하기에는 관점이 아예 다름.
+  var platformtype = 'web';
+  if (window.Alopex && window.AlopexController && window.Http &&
+      window.httpObjects && window.httpObjects.push) {
+    platformtype = 'alopex';
+  }
+  var ajaxDelegatorList = {};
+  var defineAjaxDelegator = function(type, processor) {
+    ajaxDelegatorList[type] = processor;
+  };
+  //alopex runtime과의 정상적인 연동을 위해서는 alopex runtime script다음에
+  //본 controller script가 포함되어야 한다.
+  var ajaxDelegator = function(settings) {
+    if (!settings) { return; }
+    return ajaxDelegatorList[platformtype](settings);
+  };
+  ajaxDelegator();
+
+  defineAjaxDelegator('web', function(setup) {
+    return $.ajax(setup);
+  });
+  defineAjaxDelegator('alopex', function(setup) {
+    var dfd = $.Deferred();
+    var http = new Http();
+    var entity = {};
+    //if (setup.cipLegacy) {
+    //  entity.url = CIP_URL;
+    //  http.setRequestHeader('service', setup.url);
+    //}
+    entity.url = setup.url;
+    entity.method = setup.type || 'POST';
+    if (entity.method == 'POST') {
+      entity.onBody = true;
+      entity.content = setup.data;
+    } else {
+      entity.onBody = false;
+      if (typeof setup.data == typeof '' && setup.data.length !== undefined) {
+        //String일경우 url에.
+        entity.url = entity.url + '?' + setup.data;
+      } else {
+        //그외의 경우는 object로 간주하고 parameters에 넣는다.
+        entity.parameters = setup.data;
+      }
+    }
+    if (setup.headers && typeof setup.headers == typeof {}) {
+      for (var prop in setup.headers) {
+        http.setRequestheader(prop, setup.headers[prop]);
+      }
+    }
+    var success = function(httpdata) {
+      http.responseText = httpdata.response;
+      http.status = 200;
+      http.statusText = 'success';
+      dfd.resolve(httpdata.response, 'success', http);
+    };
+    var error = function(httpdata) {
+      http.responseText = httpdata.response;
+      http.status = null;
+      http.statusText = 'error';
+      dfd.reject(http, 'error', {error: httpdata.error,
+        errorMessage: httpdata.errorMessage});
+    };
+    http.request(entity, success, error);
+    return dfd;
+  });
+  
+  
+  /**********************************************
+   * Overlay & Progress API
+   * 화면에 단순한 형태의 progress indicator을 center로 표시할 수 있다
+   * 특정 엘리먼트 내부의 center에 progress indicator를 표시할 수 있다.
+   **********************************************/
+
+  var defaultOverlayOption = {
+      bgColor  : '#fff',
+      duration : 0,
+      durationOff : 200,
+      opacity  : 0.7,
+      progress : false,
+      createProgress : null,
+      resizeProgress : null,
+      removeProgress : null,
+      appendIn : false,
+      complete : null
+  };
+
+  //해당 element에 맞는 크기의 overlay용 div를 만들어서 리턴한다.
+  var AlopexOverlay = function(elem, option){
+    if(!elem) {
+      return null;
+    }
+    this.option = $.extend({}, defaultOverlayOption, option);
+    if(elem == document || elem == document.body) {
+      this.option.appendIn = true;
+    }
+    this.target = elem == document ? document.body : elem;
+    this.overlay = null;
+    this.ptimer = null;
+    this.progress = null;
+    this.on = false;
+    
+    this.init = function(complete) {
+      this.remove();
+      this.on = true;
+      var css = {};
+      var jelem = $(this.target);
+      if(jQuery.support.opacity) {
+         css['opacity'] = this.option.opacity;
+      } else {
+        css['filter'] = 'Alpha(opacity=' + (this.option.opacity * 100) + ')';
+      }
+      css['background-color'] = this.option.bgColor;
+      css['z-index'] = 99990;
+      css['position'] = 'absolute';
+      css['border-radius'] = jelem.css('border-radius');
+      css = $.extend(css, this.generateSize());
+      
+      this.overlay = $('<div></div>').css(css).addClass('alopex_overlay')[0];
+      var cfunc = complete || this.option.complete;
+      jelem[this.option.appendIn ? 'append' : 'after']( $(this.overlay).fadeIn(
+          this.option.duration,
+          function() {
+            if(typeof cfunc == 'function') {
+              cfunc();
+            }
+          }) );
+      if(this.option.progress) {
+        if(typeof this.option.createProgress == 'function') {
+          //내부 함수에서는 this.target과 this.overlay를 가지고 제어를 할 수 있게 된다.
+          //custom progress는 생성한 progress element의 root를 리턴한다. 
+          //타이머 사용시 this.ptimer를 사용하도록 한다. 
+          //생성한 프로그레스 element는 alopex_progress클래스를 가지도록 한다.
+          this.option.createProgress.call(this);
+        }
+      }
+      return this;
+    };
+    this.extendOption = function(option) {
+      if(option) {
+        this.option = $.extend({}, this.option, option);
+      }
+    };
+    this.generateSize = function() {
+      var css = {};
+      var jelem = $(this.target);
+      if(this.target == document || this.target == document.body) {
+        this.target = document.body;
+        jelem = $(document.body);
+        css['width'] = css['height'] = '100%';
+        css['top'] = css['left'] = 0;
+        css['position'] = 'fixed';
+      } else if(jelem.css('position') == 'relative' && this.option.appendIn) {
+        css['width'] = css['height'] = '100%';
+        css['top'] = css['left'] = 0;
+      } else {
+        var relparent = false;
+        $(this.target).parents().each(function(i,el) {
+          if($(this).css('position') == 'relative') {
+            relparent = true;
+          }
+        });
+        if(relparent) {
+          var poffset = $(this.target.parentElement).offset();
+          css['width'] = jelem.outerWidth();
+          css['height'] = jelem.outerHeight();
+          css['top'] = jelem.offset().top - poffset.top;
+          css['left'] = jelem.offset().left - poffset.left;
+        } else {
+          css['width'] = jelem.outerWidth();
+          css['height'] = jelem.outerHeight();
+          css['top'] = jelem.offset().top;
+          css['left'] = jelem.offset().left;
+        }
+      }
+      return css;
+    };
+    this.resize = function() {
+      //this.overlay.animate(this.generateSize());
+      $(this.overlay).css(this.generateSize());
+      if(this.option.progress) {
+        if(typeof this.option.resizeProgress == 'function') {
+          this.option.resizeProgress.call(this);
+        }
+      }
+      return this;
+    };
+    this.remove = function(complete) {
+      var dur = this.option.durationOff;
+      this.on = false;
+      if(typeof this.option.removeProgress == 'function') {
+        this.option.removeProgress.call(this);
+      }
+      $(this.target).find('.alopex_progress').remove();
+      $(this.target).find('.alopex_overlay').add(this.overlay)
+      .fadeOut(dur, function() {
+        if(typeof complete == 'function') {
+          complete();
+        }
+        $(this).remove();
+      });
+      return this;
+    };
+    this.init();
+  };
+  AlopexOverlay.defaultOption = defaultOverlayOption;
+  
+  var defaultOverlayProgress = function() {
+    var dur = this.option.duration;
+    var pcss = {
+      position:'absolute',
+      margin:'0 auto',
+      //overflow:'hidden',
+      display:'inline-block',
+      '*display':'inline',
+      zoom:1,
+      'text-align':'center',
+      'z-index':99991
+    };
+    var bcss = {
+      display:'block',
+      float:'left',
+      width:'12px',
+      height:'12px',
+      margin:'4px',
+      'border-radius':'3px'
+    };
+    var p = this.progress = $('<div></div>').css(pcss)
+      .addClass('alopex_progress');
+    var b = [];
+    var blocknum = 3;
+    for(var i=0; i<blocknum; i++) {
+      b.push($('<div></div>').css(bcss).addClass('alopex_progress_block'));
+      p.append(b[i]);
+    }
+    //this.progress.insertAfter(this.overlay);
+    this.progress.fadeIn(dur).insertAfter(this.overlay);
+    p.css('left', this.generateSize().left + $(this.overlay).innerWidth()/2 - p.width()/2);
+    p.css('top', this.generateSize().top + $(this.overlay).innerHeight()/2 - p.height()/2);
+    var pcolor = ['#68838B', '#BFEFFF', '#BFEFFF'];
+    var intervalFunc = function() {
+      for(var i=0; i<b.length; i++) {
+        b[i].css('background-color', pcolor[i]);
+      }
+      pcolor.unshift(pcolor.pop());
+    };
+    intervalFunc();
+    this.ptimer = setInterval(intervalFunc,150);
+    return p;
+  };
+  var defaultOverlayProgressResize = function() {
+    var p = this.progress, size = this.generateSize();
+    p.css('left', size.left + $(this.overlay).innerWidth()/2 - p.width()/2);
+    p.css('top', size.top + $(this.overlay).innerHeight()/2 - p.height()/2);
+  };
+  var defaultOverlayProgressRemove = function() {
+    var dur = this.option.durationOff;
+    var that = this;
+    if(this.progress) {
+      $(this.progress).fadeOut(dur, function() {
+        if(that.ptimer) {
+          clearInterval(that.ptimer);
+          that.ptimer = null;
+        }
+        $(that.progress).remove();
+        that.progress = null;
+      });
+    }
+  };
+  
+  defaultOverlayOption['createProgress'] = defaultOverlayProgress;
+  defaultOverlayOption['resizeProgress'] = defaultOverlayProgressResize;
+  defaultOverlayOption['removeProgress'] = defaultOverlayProgressRemove;
+  defaultOverlayOption['stepProgress'] = null;
+  
+  exportProperty(window, 'AlopexOverlay', AlopexOverlay);
+  $.each(['progress', 'overlay'], function(i,v) {
+    $.fn[v] = function(op) {
+      if(!this.length) {
+        return;
+      }
+      var overlay = $(this[0]).data('alopexOverlay');
+      var option = $.extend({progress:(v=='progress')}, op);
+      if(!overlay || !overlay.on) {
+        overlay = new AlopexOverlay(this[0], option);
+        $(this[0]).removeData('alopexOverlay');
+        $(this[0]).data('alopexOverlay', overlay);
+      }
+      overlay.extendOption(op);
+      return overlay;
+    };
+  });
+  
+  //deferred wrapper
+  var DeferredWrapper = function(dfd) {
+    this.deferred = dfd;
+    this.userDone = [];
+    this.userFail = [];
+    this.userAlways = [];
+    this.defaultUserDone = null;
+    this.defaultUserFail = null;
+    this.defaultUserAlways = null;
+  };
+  DeferredWrapper.prototype.done = function(callback, isDefault) {
+    var state = this.deferred.state();
+    if(isDefault) {
+      this.defaultUserDone = callback;
+    } else if(state == 'pending') {
+      this.userDone.push(callback);
+    } else if(state == 'resolved' && !this.defaultUserDone){
+      callback();
+    }
+    return this;
+  };
+  DeferredWrapper.prototype.fail = function(callback, isDefault) {
+    var state = this.deferred.state();
+    if(isDefault) {
+      this.defaultUserFail = callback;
+    } else if(state == 'pending') {
+      this.userFail.push(callback);
+    } else if (state == 'rejected' && !this.defaultUserFail){
+      callback();
+    }
+    return this;
+  };
+  DeferredWrapper.prototype.always = function(callback, isDefault) {
+    var state = this.deferred.state();
+    if(isDefault) {
+      this.defaultUserAlways = callback;
+    } else if(state == 'pending') {
+      this.userAlways.push(callback);
+    } else if(!this.defaultUserAlways){
+      callback();
+    }
+    return this;
+  };
+  DeferredWrapper.prototype.register = function(dfd) {
+    var userdfd = this;
+    dfd = dfd || this.deferred;
+    this.deferred = dfd;
+    $.each([['done','userDone','defaultUserDone'],
+            ['fail','userFail','defaultUserFail'],
+            ['always','userAlways','defaultUserAlways']], function(i,api) {
+      dfd[api[0]](function(){
+        var arg = arguments;
+        if(userdfd[api[1]].length) {
+          $.each(userdfd[api[1]], function(idx,el) { el.apply(this, arg); });
+        } else if(userdfd[api[2]]){
+          //사용자 지정 콜백이 없고 default 사용자 콜백만 옵션으로 지정되어 있었다면 
+          //이때엔 해당 defaultUserCallback만 호출하도록 한다.
+          userdfd[api[2]].apply(this, arg);
+        }
+      });
+    });
+  };
+  
+  
+  /**********************************************
+   * Navigate API
+   **********************************************/
+  var navOptions = {};
+  navOptions['generateUrl'] = null;
+  navOptions['generateFragmentUrl'] = null;
+  navOptions['fragmentJSONRequest'] = null;
+  navOptions['parseScreenId'] = null;
+  navOptions['alopexRefresh'] = null;
+  navOptions['defaultMethod'] = null;
+  navOptions['commonHeaders'] = {};
+  navOptions['validateResponse'] = null;
+  navOptions['forceFragmentLoad'] = null;
+  navOptions['startProgress'] = null;
+  navOptions['endProgress'] = null;
+  navOptions['useProgress'] = null;
+  navOptions['defaultSuccess'] = null;
+  navOptions['defaultError'] = null;
+  navOptions['commonSuccess'] = null;
+  navOptions['commonError'] = null;
+  navOptions['alopexRefreshPreprocessor'] = null;
+  navOptions['additionalParam'] = {};
+  navOptions['timeout'] = 120*1000;
+
+  //navigate 호출 즉시 progress함수가 호출되며, complete는
+  //progress/overlay표시 후에 실행되는 것을 가정한다. 
+  //navigate내부 구현에서는 부분네비에 대해 ajax request를 async로 보낸 직후
+  //progress를 표시하며, 프로그레스 표시 완료 후 수신된 데이터를 부분영역에 뿌리도록 한다.
+  //resolve와 동시에 hideNavigateProgress가 호출이 된다. 
+  //complete가 없다면 progress 표시 시작과 동시에 함수의 임무는 끝. 
+  var showNavigateProgress = function(frag, option, complete) {
+    if(!option['useProgress']) {
+      if(typeof complete == 'function') {
+        complete();
+      }
+      return;
+    }
+    if(typeof option['startProgress'] == typeof function(){}) {
+      return option['startProgress'](frag, complete);
+    }
+  };
+  var hideNavigateProgress = function(frag, option, complete) {
+    if(!option['useProgress']) {
+      if(typeof complete == 'function') {
+        complete();
+      }
+      return;
+    }
+    if(typeof option['endProgress'] == typeof function(){}) {
+      return option['endProgress'](frag, complete);
+    }
+  };
+
+  var defaultProgress = null;
+  var defaultStartProgress = function(frag, complete) {
+    defaultProgress = new AlopexOverlay(!frag ? document.body :
+         frag && frag.length ? frag[0] : frag,
+         {
+           progress:true,
+           appendIn:false,
+           opacity:0.8,
+           duration: 100,
+           complete : complete,
+           createProgress : defaultOverlayProgress,
+           resizeProgress : defaultOverlayProgressResize,
+           removeProgress : defaultOverlayProgressRemove
+         });
+  };
+  var defaultEndProgress = function(frag, complete) {
+    defaultProgress.resize();
+    defaultProgress.remove(complete);
+  };
+  
+  var navigateConfigCore = function(option, value) {
+    if (!option) {
+      return;
+    }
+    if(typeof option == typeof '') {
+      var key = option;
+      option = {};
+      option[key] = value;
+    }
+    if (typeof option == typeof {}) {
+      for (var prop in navOptions) {
+        value = option[prop];
+        if (value !== undefined) {
+          if(prop == 'additionalParam') {
+            if(value) {
+              for(var name in value) {
+                navOptions[prop][name] = value[name];
+              }
+            } else {
+              navOptions[prop] = {};
+            }
+          } else if(prop == 'commonHeaders') {
+            if(value) {
+              for(var name in value) {
+                navOptions[prop][name] = value[name];
+              }
+            } else {
+              navOptions[prop] = {};
+            }
+          }else {
+            navOptions[prop] = value;
+          }
+        }
+      }
+    }
+  };
+
+  var navigateCore = function(path, param, option, loadto) {
+    var dfd = $.Deferred();
+    var userdfd = new DeferredWrapper(dfd);
+    var currentOption = {};
+    var fragload = $(navOptions['alopexRefresh']);
+    var url = '';
+    var dopost = false;
+    var headers = {};
+    var _param = null; //param이 form이었을 경우, 기존의 form을 저장.
+
+    if (loadto) {
+      fragload = $(loadto);
+    }
+
+    //옵션처리.
+    for (var prop in navOptions) {
+      currentOption[prop] = navOptions[prop];
+    }
+    if (option && option['method']) {
+      //전송시 사용할 method를 지정함.
+      currentOption['defaultMethod'] = option['method'].toUpperCase();
+    }
+    if (option && option['nofrag'] && !loadto) {
+      //navigate API를 호출하되 부분네비를 옵션으로 off시킴.
+      fragload = $(null);
+    }
+    if (option && option['forceFragmentLoad']) {
+      currentOption['forceFragmentLoad'] = option['forceFragmentLoad'];
+    }
+
+    $.each(['startProgress', 'endProgress', 'preProcessor', 'postProcessor','useProgress'],function(idx,val){
+      if (option && option[val] !== undefined) {
+        currentOption[val] = option[val];
+      }
+    });
+    //부분네비게이션 처리시 post body를 JSON으로 할 것인지 query string으로 할 것인지 옵션
+    if (option && option['fragmentJSONRequest'] !== undefined) {
+      currentOption['fragmentJSONRequest'] = option['fragmentJSONRequest'];
+    }
+    if(option && option['additionalParam']) {
+      $.each(option['additionalParam'], function(key,value) {
+        currentOption['additionalParam'][key] = value;
+      });
+    }
+    
+    //option에서 timeout 설정.
+    if(option && option['timeout']) {
+      currentOption['timeout'] = option['timeout'];
+    }
+    
+    //사용자가 httpSend 호출 시 headers에 넘긴 내용 설정
+    if (option && option['headers']) {
+      for (var prop in option['headers']) {
+        headers[prop] = option.headers[prop];
+      }
+    }
+    
+    //사용자 지정 콜백 등록. 사용자가 deferred외에 API호출시 명시적으로 callback을 등록하지
+    //않았다면, 이때엔 defaultSuccess/defaultError로 콜백을 대체한다.
+    userdfd.register(); //deferred wrapper를 통해 done, fail, always에 사용자 콜백을 우선 호출하도록 등록.
+    if (option && option['success']) {
+      userdfd.done(option['success']);
+    } else if( typeof currentOption['defaultSuccess'] == 'function') {
+      userdfd.done(currentOption['defaultSuccess'],true);
+    }
+    if (option && option['error']) {
+      userdfd.fail(option['error']);
+    } else if( typeof currentOption['defaultError'] == 'function') {
+      userdfd.fail(currentOption['defaultError'],true);
+    }
+    //common 콜백 처리
+    if( typeof currentOption['commonSuccess'] == "function" ) {
+      dfd.done(currentOption['commonSuccess']);
+    }
+    if( typeof currentOption['commonError'] == "function" ) {
+      dfd.fail(currentOption['commonError']);
+    }
+    
+    if (currentOption['defaultMethod'] == 'POST') {
+      dopost = true;
+    }
+
+    //form submit, ajax load등을 사용할 때 서버에 전송할 header준비.
+    //defaultHeader를 사용하게 될 경우 반드시 query string으로 넘어가거나
+    //post request가 되므로 주의.
+    $.each(['commonHeaders', 'headers'], function(idx, val) {
+      if (typeof currentOption[val] == typeof {}) {
+        for (var prop in currentOption[val]) {
+          if (!headers) {
+            headers = {};
+          }
+          headers[prop] = currentOption[val][prop];
+        }
+      }
+    });
+
+    //param이 form일경우 object화 한다.
+    if (param && $(param).length > 0 && $(param)[0].tagName == 'FORM') {
+      _param = param;//기존의 param을 저장.
+      param = formToObject(param);
+    }
+    
+    //추가 parameter를 merge한다.
+    if(currentOption['additionalParam']) {
+      $.each(currentOption['additionalParam'], function(key, value) {
+        param = param || {};
+        param[key] = value;
+        if(_param) {
+          $(_param).find('[name='+ key+ ']').remove();
+          if($.isArray(value)) {
+            $.each(value, function(i,el) {
+              var input = $('<input type="hidden" name="'+key+'" class="additionalParam"/>');
+              input.val(el);
+              $(_param).append(input);
+            });
+          } else {
+            var input = $('<input type="hidden" name="'+key+'" class="additionalParam"/>');
+            input.val(value);
+            $(_param).append(input);
+          }
+        }
+      });
+    }
+//    if(!navOptions['useProgress']) {
+//      fragload.empty();
+//    }
+    //showNavigateProgress(fragload.length ? fragload : null, currentOption);
+    if(currentOption['preProcessor']) {
+      currentOption['preProcessor'].apply(this, arguments);
+    };
+    dfd.always(function() {
+      hideNavigateProgress(fragload.length ? fragload : null, currentOption);
+      if(currentOption['postProcessor']) {
+        currentOption['postProcessor'].apply(this, arguments);
+      };
+    }).always(function(){
+      if(_param) { //전송 완료 후에는 추가파라메터를 제거한다.
+        $(_param).find('input.additionalParam').remove();
+      }
+      if($.alopex && $.alopex.start) {
+        $(function(){$.alopex.start();});
+      }
+    });
+    if (fragload.length > 0) {
+      //부분 화면 전환
+      //loadto 없이 alopexRefresh영역에 의한 부분로드를 수행할 때엔 full url로 이동?
+      //url = navOptions[loadto ? 'generateFragmentUrl' : 'generateUrl'](path);
+      url = currentOption['generateFragmentUrl'](path);
+
+      var setup = {
+          url: url,
+          type: currentOption['defaultMethod'] || 'GET',
+          dataType: 'html text', //받는 데이터의 타입
+          headers: headers,//헤더로 보낼 데이터
+          timeout: currentOption['timeout']//ajax timeout
+        };
+      if (param) {
+        if (dopost && currentOption['fragmentJSONRequest'] && !_param) {
+          //JSON as POST body. param is not FORM.
+          setup.contentType = 'application/json; charset=utf-8';
+          setup.processData = false;
+          setup.data = JSON.stringify(param);
+        } else {
+          //Form encoding
+          setup.contentType = 'application/x-www-form-urlencoded; charset=utf-8';
+          setup.processData = true;
+          setup.data = _param ? $(_param).serialize() : param;
+        }
+      }
+      setup.beforeSend = function(xhr, settings) {
+        if(!loadto && fragload && navOptions['alopexRefreshPreprocessor']) {
+          navOptions['alopexRefreshPreprocessor'](xhr, settings);
+        }
+      };
+      
+      //frag navigate의 target element를 설정.
+      setup.targetElement = fragload;
+      
+      var xhr = $.ajax(setup);
+      showNavigateProgress(fragload.length ? fragload : null, currentOption, function() {
+        xhr.done(function(data, status, jqxhr) {
+          //정상 response를 판별하는 함수가 있을경우 사용한다.
+          if (currentOption['validateResponse']) {
+            //parsing하지 않은 raw data를 건냄. parsing은 validateResponse의 몫임.
+            if (currentOption['validateResponse'].call(this, data, status, jqxhr) ===
+              false) {
+              dfd.reject(data, status, jqxhr);
+            }
+          }
+          if (dfd.state() !== 'rejected' || currentOption['forceFragmentLoad']) {
+            var appendhtml = data.replace(rscript, '')
+                .replace(rstyle,'').replace(rlink,'');
+            var regscr;
+            var match;
+            //IE에서 중첩된 css를 link하는 경우 selector의 사용에 따라 
+            //효과가 엉뚱하게 적용되는 현상이 관측됨. 중첩되는 css를 link하지 않는다.
+            //그외에는 script보다 먼저 append되도록 유도한다.
+            regscr = new RegExp(rlink);
+            var links = $('link[rel="stylesheet"]');
+            while(match = regscr.exec(data)) {
+              var node = match[0];
+              if(/rel="stylesheet"/.test(node)) {
+                var href = qualifyUrl(node.match(/href="([^"]+)"/)[1]);
+                var passnode = false;
+                links.each(function(idx,elem) {
+                  if(qualifyUrl($(elem).attr('href')) === href ) {
+                    passnode = true;
+                  }
+                });
+                if(passnode) {
+                  continue;
+                }
+              }
+              appendhtml = node + appendhtml;
+            }
+            
+            regscr = new RegExp(rstyle);
+            while(match = regscr.exec(data)) {
+              appendhtml = match[0] + appendhtml;
+            }
+            regscr = new RegExp(rscript);
+            var scripts = $('script[type="text/javascript"]');
+            while(match = regscr.exec(data)) {
+              //script 중복 삽입 배제.
+              var node = match[0];
+              if(/src=/.test(node)) {
+                var src = qualifyUrl(node.match(/src="([^"]+)"/)[1]);
+                var passnode = false;
+                scripts.each(function(idx, elem) {
+                  if(qualifyUrl($(elem).attr('src')) === src) {
+                    //passnode = true; 20130322 중복로드가 허용되어야 한다는 요청 접수.
+                  }
+                });
+                if(passnode) {
+                  continue;
+                }
+              }
+              //android 2.3에서 .html()로 script가 있는 text를 바로 넣을 경우
+              //처리가 되지 않는다. script tag를 찾아서 수동으로 node에 붙여넣는것으로
+              //스크립트를 실행시킬 수 있다. 스크립트는 가장 마지막에 넣는다.
+              //script는 dom에 붙었을 때 효력을 발휘한다. 중간 생성한 
+              //node에 붙였을때엔 실행없이 사라지거나 IE에서는 권한없음 에러가 발생함.
+              appendhtml += match[0];
+            }
+            
+            //IE9 bug(ajax로 대량의 table cell markup을 수신 시 cell이 밀리는 현상)
+            //<td>사이의 공백이나 개행 문자가 있을 경우 발생함.
+            if(navigator.appVersion.indexOf("MSIE 9.")!=-1) {
+              appendhtml = appendhtml.replace(/td>\s+<td/g,'td><td');
+              appendhtml = appendhtml.replace(/tr>\s+<td/g,'tr><td');
+              appendhtml = appendhtml.replace(/td>\s+<tr/g,'td><tr');
+            }
+            
+            //reject후의 resolve는 아무 효력을 가지지 못한다.
+            fragload.html(appendhtml);
+            dfd.resolve(data, status, jqxhr);
+            
+          }
+        });
+        xhr.fail(function(jqxhr, status, error) {
+          dfd.reject(jqxhr.responseText, status, jqxhr, error);
+        });
+      });//progress complete
+    } else {
+      //전체 화면 전환
+      showNavigateProgress(document.body, currentOption);
+      url = navOptions['generateUrl'](path);
+      //사용자 지정 method가 없고, navigate시 전송할 param도 없고, header도 없음.
+      if (!currentOption['defaultMethod'] && !param) {// && !headers) {
+        window.location.href = url;
+      } else {
+        //사용자 지정 method가 존재하거나, 또는 param이 있음.
+        //defaultMethod가 없는 경우 dopost변수는 false. 자동적으로 get request 사용.
+        var formclass = 'alopexhiddenform';
+        $('head > form.' + formclass).remove();//기존 사용한 form 삭제.
+        var form = $('<form class="' + formclass +
+            '" style="display:none;"></form>').appendTo('head');
+        form.attr('method', dopost ? 'POST' : 'GET');
+        form.attr('action', url);
+        
+        //.view의 option에 target 지정이 되어있을 경우.
+        if (option && option['target']) {
+          form.attr('target', option['target']);
+        }
+        
+        //$.each([param, headers], function(idx, val) {
+        if (_param) {
+          //param으로 form이 들어왔을 경우, form의 attribute와
+          //children을 옮겨온다.
+          //html 레이아웃으로 들어가 있는 form에 action, method등의 값을
+          //javascript가 변경하지 않도록 이런 루틴으로 작성.
+          $.each(['action', 'enctype', /*'method',*/'acceptCharset', 'target'],
+              function(i,v) {
+                if(v == 'action' && path) {
+                //만일 navigate로 이동해야 될 경로가 명시되었다면
+                //form의 action값을 가져오지 않는다.
+                  return;
+                }
+                if($(_param)[0][v] && $(_param)[0][v] != "null") {
+                  form.attr(v, $(_param)[0][v]);
+                }
+              }
+          );
+        }
+        if (_param && $(_param).length > 0 && $(_param)[0].tagName == 'FORM') {
+          var sa = $(_param).serializeArray();
+          for(var i=0; i<sa.length; i++) {
+            var el = sa[i];
+            $('<input type="hidden" name="' + el.name + '"/>').val(el.value)
+              .appendTo(form);
+          }
+          //serialize()는 file을 유실시키므로 별도 처리를 하도록 함.
+          var file = $(_param).find('input[type="file"]');
+          file.each(function(idx, elem) {
+            //$(elem).clone().appendTo(form);
+            var mark = $('<div style="position:absolute;display:none;">').insertBefore(elem);
+            $(elem).appendTo(form);
+            dfd.always(function(){
+              //$(elem).appendTo(_param);
+              $(elem).insertAfter(mark);
+              mark.remove();
+            });
+          });
+        }
+        else if (param && typeof param == typeof {}) {
+          //navigate param으로 object(key-value store)를 넘긴 경우
+          //input 태그를 생성하여 post요청 수행
+          for (var prop in param) {
+            var item = param[prop];
+            if($.isArray(item)) {
+              $.each(item, function(i,value) {
+                $('<input type="hidden" name="' + prop + '"/>').val(value)
+                  .appendTo(form);
+              });
+            } else {
+              $('<input type="hidden" name="' + prop + '"/>').val(item)
+                .appendTo(form);
+            }
+          }
+        }
+        //IE7에서 form.submit()으로 호출시 이벤트 trigger, 이때 onsubmit
+        //핸들러가 없을경우 "null"스트링이 생성됨. "null"을 true로 인식하고
+        //"null"() 과 같이 함수실행을 시도하면서 예외 발생. 이벤트 사용치 않도록 함.
+        form[0].submit();
+      }
+      dfd.resolve();
+    }
+    return userdfd;
+  };
+
+  var navigateFnWrapper = function(path, param, option) {
+    if (this.length) {
+      return navigateCore.call(this, path, param, option, this);
+    } else {
+      return $.Deferred().reject();
+    }
+  };
+
+  var navigateWrapper = function(path, param, option) {
+    return navigateCore(path, param, option);
+  };
+
+  var navigateInit = function() {
+    exportProperty(window, 'navigate', functionWrapper(navigateWrapper));
+    exportProperty(window, 'navigateConfig',
+        functionWrapper(navigateConfigCore));
+    exportProperty($.fn, 'navigate', functionWrapper(navigateFnWrapper));
+    //Default 구현 입력
+    navigateConfigCore({
+      'generateUrl' : function(targetpath) {
+        return targetpath;
+      },
+      'generateFragmentUrl' : function(targetpath) {
+        return targetpath;
+      },
+      'parseScreenId' : function(url) {
+
+      },
+      'alopexRefresh' : '[data-alopexrefresh="true"]',
+      'defaultMethod' : 'POST',
+      'validateResponse' : null
+    });
+    navigateConfigCore('useProgress', false);
+    navigateConfigCore('startProgress', defaultStartProgress);
+    navigateConfigCore('endProgress', defaultEndProgress);
+    navigateConfigCore('fragmentJSONRequest', true);//default는 JSON을 허용.
+  };
+
+  navigateInit();
+
+  /**********************************************
+   * CIP HTTP Request API
+   **********************************************/
+  var riOSJSON = /(\n\r|\r\n|\n|\\n\\r|\\r\\n|\\n)/gi;
+  var httpOptions = {};
+  httpOptions['generateUrl'] = null;
+  httpOptions['applicationId'] = null;
+  httpOptions['validateResponse'] = null;
+  httpOptions['defaultOnStart'] = null;
+  httpOptions['defaultOnEnd'] = null;
+  httpOptions['async'] = null;
+  httpOptions['timeout'] = 120*1000;
+  httpOptions['useProgress'] = null;
+  httpOptions['startProgress'] = null;
+  httpOptions['endProgress'] =  null;
+  httpOptions['commonHeaders'] = {};
+  httpOptions['defaultSuccess'] = null;
+  httpOptions['defaultError'] = null;
+  httpOptions['commonSuccess'] = null;
+  httpOptions['commonError'] = null;
+  httpOptions['additionalParam'] = {};
+
+  var showHttpProgress = function(option, complete) {
+    if(!option['useProgress']) {
+      if(typeof complete == 'function') {
+        complete();
+      }
+      return;
+    }
+    if(typeof option['startProgress'] == typeof function(){}) {
+      return option['startProgress'](complete);
+    }
+  };
+  var hideHttpProgress = function(option, complete) {
+    if(!option['useProgress']) {
+      if(typeof complete == 'function') {
+        complete();
+      }
+      return;
+    }
+    if(typeof option['endProgress'] == typeof function(){}) {
+      return option['endProgress'](complete);
+    }
+  };
+  var defaultHttpProgress = null;
+  var defaultHttpStartProgress = function(complete) {
+    if(!defaultHttpProgress) {
+      defaultHttpProgress = new AlopexOverlay(document.body,
+         {
+           progress:true,
+           appendIn:false,
+           opacity:0.8,
+           duration: 0,
+           complete : complete,
+           createProgress : defaultOverlayProgress,
+           resizeProgress : defaultOverlayProgressResize,
+           removeProgress : defaultOverlayProgressRemove
+         });
+    } else {
+      defaultHttpProgress.init(complete);
+    }
+  };
+  var defaultHttpEndProgress = function(complete) {
+    defaultHttpProgress.resize();
+    defaultHttpProgress.remove(complete);
+  };
+  
+  var httpConfigCore = function(option, value) {
+    if (!option) {
+      return;
+    }
+    if(typeof option == typeof '') {
+      var key = option;
+      option = {};
+      option[key] = value;
+    }
+    if (typeof option == typeof {}) {
+      for (var prop in httpOptions) {
+        value = option[prop];
+        if (value !== undefined) {
+          if(prop == 'additionalParam') {
+            if(value) {
+              for(var name in value) {
+                httpOptions[prop][name] = value[name];
+              }
+            } else {
+              httpOptions[prop] = {};
+            }
+          } else if(prop == 'commonHeaders') {
+            if(value) {
+              for(var name in value) {
+                httpOptions[prop][name] = value[name];
+              }
+            } else {
+              httpOptions[prop] = {};
+            }
+          }else {
+            httpOptions[prop] = value;
+          }
+        }
+      }
+    }
+  };
+
+  var httpSendCore = function(service, content, option) {
+    var dfd = $.Deferred();
+    var userdfd = new DeferredWrapper(dfd);
+    var currentOption = {};
+    var headers = {};
+    var setup = {};
+    //var _content = null;
+
+    for (var prop in httpOptions) {
+      currentOption[prop] = httpOptions[prop];
+    }
+    
+    $.each(['useProgress'],function(idx,val){
+      if (option && option[val] !== undefined) {
+        currentOption[val] = option[val];
+      }
+    });
+
+    if (content && $(content).length > 0 && $(content)[0].tagName == 'FORM') {
+      //_content = content;//기존의 param을 저장.
+      content = formToObject(content);
+    }
+    
+    if(option && option['additionalParam']) {
+      $.each(option['additionalParam'], function(key,value) {
+        currentOption['additionalParam'][key] = value;
+      });
+    }
+
+    if(currentOption['additionalParam']) {
+      $.each(currentOption['additionalParam'], function(key,value) {
+        content = content || {};
+        content[key] = value;
+      });
+    }
+    
+    //option에서 timeout 설정.
+    if(option && option['timeout']) {
+      currentOption['timeout'] = option['timeout'];
+    }
+    
+    //사용자 지정 콜백 등록. 사용자가 deferred외에 API호출시 명시적으로 callback을 등록하지
+    //않았다면, 이때엔 defaultSuccess/defaultError로 콜백을 대체한다.
+    userdfd.register();
+    if (option && option['success']) {
+      userdfd.done(option['success']);
+    } else if( typeof currentOption['defaultSuccess'] == 'function') {
+      userdfd.done(currentOption['defaultSuccess'],true);
+    }
+    if (option && option['error']) {
+      userdfd.fail(option['error']);
+    } else if( typeof currentOption['defaultError'] == 'function') {
+      userdfd.fail(currentOption['defaultError'],true);
+    }
+    //common 콜백 처리
+    if( typeof currentOption['commonSuccess'] == "function" ) {
+      dfd.done(currentOption['commonSuccess']);
+    }
+    if( typeof currentOption['commonError'] == "function" ) {
+      dfd.fail(currentOption['commonError']);
+    }
+    
+    //onstart/onend
+    if (option && typeof option.onstart == typeof function() {}) {
+      option.onstart();
+    } else if (typeof currentOption['defaultOnStart'] == typeof function() {}) {
+      currentOption['defaultOnStart']();
+    }
+    if (option && typeof option.onend == typeof function() {}) {
+      dfd.always(option.onend);
+    } else if (typeof currentOption['defaultOnEnd'] == typeof function() {}) {
+      dfd.always(currentOption['defaultOnEnd']);
+    }
+    if ( currentOption['async'] === false ) {
+      setup.async = false;
+    } 
+    if( option && option.async === false ) {
+      setup.async = false;
+    } else if( option && option.async === true ) {
+      setup.async = true;
+    }
+
+    //application id 헤더 설정
+    if(currentOption['applicationId']) {
+      headers['app_id'] = currentOption['applicationId'];
+    }
+    
+    //default에 설정되어 있는 common headers의 내용 설정
+    if (currentOption['commonHeaders']) {
+      for (var prop in currentOption['commonHeaders']) {
+        headers[prop] = currentOption['commonHeaders'][prop];
+      }
+    }
+
+    //사용자가 httpSend 호출 시 headers에 넘긴 내용 설정
+    if (option && option.headers) {
+      for (var prop in option.headers) {
+        headers[prop] = option.headers[prop];
+      }
+    }
+
+    if (currentOption['generateUrl']) {
+      setup.url = currentOption['generateUrl'](service);
+    } else {
+      setup.url = service;
+    }
+    setup.headers = headers;
+    setup.type = 'POST';
+    if (content) {
+      setup.data = JSON.stringify(content);
+    }
+    setup.contentType = 'application/json; charset=utf-8';
+    setup.dataType = 'text';
+    setup.timeout = currentOption['timeout'];
+    
+    //for initech
+    if(option && option["setFormContentType"] != undefined && option["setFormContentType"] != null){
+      //Form encoding
+      setup.contentType = 'application/x-www-form-urlencoded; charset=utf-8';
+      setup.processData = true;
+      setup.data = content;
+    }
+
+    var xhrdone = function(responseText, status, jqxhr) {
+      //iOS JSON parsing error대비.
+      var data = $.trim(responseText).replace(riOSJSON, '\\n');
+      try{
+        data = JSON.parse(data);
+      } catch(err) {
+        dfd.reject(responseText, status, jqxhr);
+      }
+      if (currentOption['validateResponse']) {
+        //parsing하지 않은 raw data를 건냄. parsing은 validateResponse의 몫임.
+        if (currentOption['validateResponse'](data, status, jqxhr) === false) {
+          dfd.reject(data, 'error', jqxhr);
+        }
+      }
+      if (dfd.state() !== 'rejected') {
+        dfd.resolve(data, status, jqxhr);
+      }
+    };
+    var xhrfail = function(jqxhr, status, error) {
+      var data = {};
+      if (jqxhr.responseText) {
+        try {
+          var rawdata = $.trim(jqxhr.responseText).replace(riOSJSON, '\\n');
+          data = JSON.parse(rawdata);
+        } catch (err) {
+          data = jqxhr.responseText;
+        }
+      }
+      dfd.reject(data, 'error', jqxhr);
+    };
+    if(setup.async !== false) {
+      var xhr = $.ajax(setup);
+      showHttpProgress(currentOption, function() {
+        xhr.done(xhrdone);
+        xhr.fail(xhrfail);
+        xhr.always(function() {
+          hideHttpProgress(currentOption);
+        });
+      });
+    } else {
+      setup.success = xhrdone;
+      setup.error = xhrfail;
+      showHttpProgress(currentOption);
+      $.ajax(setup);
+      hideHttpProgress(currentOption);
+    }
+    
+
+    return userdfd;
+  };
+
+  var httpSendCoreWrapper = function(service, content, success, error, option) {
+    if (success && typeof success == typeof function() {}) {
+      if (!option) {
+        option = {};
+      }
+      option.success = success;
+    }
+    if (error && typeof error == typeof function() {}) {
+      if (!option) {
+        option = {};
+      }
+      option.error = error;
+    }
+    return httpSendCore(service, content, option);
+  };
+
+  var httpRequestInit = function() {
+    exportProperty(window, 'httpSendConfig', functionWrapper(httpConfigCore));
+    exportProperty(window, 'httpSend', functionWrapper(httpSendCoreWrapper));
+    httpConfigCore('generateUrl', function(service) {
+      return service + '.cmd';
+    });
+    //httpConfigCore('applicationId', 'nexcore');
+    httpConfigCore('async', true);
+    httpConfigCore('useProgress', false);
+    httpConfigCore('startProgress', defaultHttpStartProgress);
+    httpConfigCore('endProgress', defaultHttpEndProgress);
+  };
+
+  httpRequestInit();
+
+})(jQuery, window);
+
+/**
+ * Validator Plugin
+ */
+(function($,window) {
+  var Validator = function(element, config) {
+    this.target = element;
+	this.$target = $(element);
+    this.init(config);
+  };
+
+  var eventHandler = {};
+  eventHandler['keyup'] = function(event) {
+    $(this).validator().validate();
+  };
+  eventHandler['change'] = function(event) {
+    $(this).validator().validate();
+  };
+  eventHandler['blur'] = function(event) {
+    $(this).validator().validate();
+  };
+  eventHandler['submit'] = function(event) {
+
+    if(event.data && event.data.submitHandler) {
+      return event.data.submitHandler.apply(this, arguments);
+    }
+    if(!$(this).validate()) {
+      var v = $(this).validator();
+      if(this.tagName == 'FORM' && v.option && v.option.onsubmitFocus) {
+        var emsg = v.getErrorMessage();
+        for(var prop in emsg) {
+          var elem = $(this).find('[name="'+prop+'"]');
+          if(elem.length) {
+            $(elem)[0].focus();
+            break;
+          }
+        }
+      }
+      event.preventDefault();
+    }
+  };
+
+  var $v = Validator;
+
+  $.extend(Validator, {
+	instances : {},
+	generateKey : function() {
+		return "alopexvalidator" + new Date().getTime().toString().slice(-4) + "" + Math.random().toString().split(".").pop();
+	},
+    addMethod : function() {
+
+    },
+    defaultOption : {
+      onsubmit : true,
+      onkeyup : true,
+      onblur : true,
+      onclick : true,
+      onchange : true,
+      oninit : false,
+      validClass : null,
+      invalidClass : null,
+      validMessageClass : 'valid',
+      invalidMessageClass : 'invalid',
+      messageToLabel : false,
+      messageToDatafor : true,
+      messageToDataforgroup : false,
+      onsubmitFocus : false
+    },
+    //input/select들에 대해서 지정된 함수를 실행하고, name에 따라 결과를 모아서 리턴함. 
+    distributeFunction : function(elems, func, arg) {
+      var result = {};
+      $(elems).each(function(i,el) {
+        var name = $(el).attr('name');
+        result[name] = func.apply($(el).validator(), arg);
+      });
+      return result;
+    },
+    message : {
+      required : '반드시 입력해야 하는 항목입니다.',
+      required_select : '반드시 선택해야 하는 항목입니다.',
+      minlength : '최소 {0}글자 이상 입력하십시오.',
+      maxlength : '최대 {0}글자까지 입력 가능합니다.',
+      rangelength : '{0}에서 {1} 글자 사이로 입력하십시오.',
+      fixedlength : '반드시 {0} 글자로 입력하십시오.',
+      min : '최소 입력가능 값은 {0}입니다.',
+      max : '최대 입력가능 값은 {0}입니다.',
+      range : '{0}에서 {1} 사이의 값을 입력해 주십시오.',
+      email : '이메일 형식에 맞게 입력해 주십시오.',
+      url : 'url 형식에 맞게 입력해 주십시오.',
+      date : '날짜를 YYYY/MM/DD 형식에 맞게 입력해 주십시오.',
+      number : '정수를 입력해 주십시오.',
+      digits : '숫자만 입력 가능합니다.',
+      alphabet : '알파벳만 입력 가능합니다.',
+      equalTo : '{0}과 같은 값만 가능합니다.',
+      numalpha : '숫자 또는 영문자만 입력 가능합니다.',
+      nospace : '스페이스는 입력할 수 없습니다.',
+      hangul : '한글만 입력 가능합니다.',
+      numhan : '숫자 또는 한글만 입력 가능합니다.',
+      alphabethan : '한글 또는 영문만 입력 가능합니다.'
+    },
+    setMessage : function( name, message ) {
+      $v.message[name] = message;
+    },
+    getValue : function(elem, value) {
+
+    },
+    getLength : function(elem, value) {
+	  var $elem = $(elem);
+      if(elem.tagName == 'SELECT') {
+        return ($elem.find("option:selected").val()||'').length;
+      }
+      if(elem.tagName == 'INPUT' && ($elem.attr('type') == 'radio' || $elem.attr('type') == 'checkbox')) {
+        var inputs = $elem.validator().locateForm().find('input[name="'+$(elem).attr('name')+'"]');
+        return inputs.filter(':checked').length;
+      }
+      if(!value) {
+        value = $elem.val() || '';
+      }
+      return value.length;
+    },
+    method : {
+      //test대상 element, element의 값, 해당 element의 rule에 지정된 method의 parameter 값.
+      required : function(elem, value, param) {
+        if(param === true && $v.getLength(elem)) {
+          return true;
+        }
+        if(param === false) {
+          return true;
+        }
+        if(typeof param == typeof '' && $v.getLength($(param)[0])) {
+          return true;
+        }
+        return false;
+      }, 
+      minlength : function(elem, value, param) {
+        if($v.getLength(elem, value) < param) {
+          return false;
+        }
+        return true;
+      },
+      maxlength : function(elem, value, param) {
+        if($v.getLength(elem, value) > param) {
+          return false;
+        }
+        return true;
+      },
+      rangelength : function(elem, value, param) {
+        if($v.getLength(elem, value) < param[0] || $v.getLength(elem, value) > param[1]) {
+          return false;
+        }
+        return true;
+      },
+      fixedlength : function(elem, value, param) {
+        if($v.getLength(elem, value) != param) {
+          return false;
+        }
+        return true;
+      },
+      min : function(elem, value, param) {
+        if(value < param) {
+          return false;
+        }
+        return true;
+      },
+      max : function(elem, value, param) {
+        if(value > param) {
+          return false;
+        }
+        return true;
+      },
+      range : function(elem, value, param) {
+        if(value <= param[1] && value >= param[0]) {
+          return true;
+        }
+        return false;
+      },
+      email : function(elem, value, param) {
+        return /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(value);
+      },
+      url : function(elem, value, param) {
+        var urlreg = new RegExp('(http|ftp|https)://[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?');
+        return urlreg.test(value);
+      },
+      date : function(elem, value, param) {
+        return /^\d{4}[\/\-](0?[1-9]|1[012])[\/\-](0?[1-9]|[12][0-9]|3[01])$/.test(value);
+      },
+      number : function(elem, value, param) {
+        return /^\s*(\+|-)?\d+\s*$/.test(value);
+      },
+      digits : function(elem, value, param) {
+        return /^\s*\d+\s*$/.test(value);
+      },
+      alphabet : function(elem, value, param) {
+        return /^[a-zA-Z]*$/.test(value);
+      },
+      equalTo : function(elem, value, param) {
+        var comp = param;
+        if($(param).length) {
+          comp = $(param).val();
+        }
+        if(comp == value) {
+          return true;
+        }
+        return false;
+      },
+      numalpha : function(elem, value, param) {
+        return /^[0-9a-zA-Z]*$/.test(value);
+      },
+      nospace : function(elem, value, param) {
+        return !/\s/g.test(value);
+      },
+      hangul : function(elem, value, param) {
+        return /^[ㄱ-힣]*$/.test(value);
+      },
+      numhan : function(elem, value, param) {
+        return /^[0-9ㄱ-힣]*$/.test(value);
+      },
+      alphabethan : function(elem, value, param) {
+        return /^[a-zA-Zㄱ-힣]*$/.test(value);
+      }
+    },
+    //메소드 관리 함수
+    addMethod : function( name, handler ) {
+      $v.method[name] = handler;
+    }
+  });
+
+  //Instance
+  $.extend(Validator, { prototype : {
+    init : function(config) {
+      this.updateConfig(config);
+      this.target.validator = this;
+    },
+    getErrorMessage : function() {
+      if(this.target.tagName == 'FORM') {
+        return this.getFormErrorMessage.apply(this, arguments);
+      }
+      var _this = this.correctValidator();
+	  var $target = this.$target;
+      var result = true;
+      var errors = [];
+      var messages = {};
+      $.extend(messages, $v.message);
+      $.extend(messages, _this.config.message);
+      for(var prop in _this.config.rule) {
+        //method를 통한 평가. 
+        //만일 필수값이 아니라면 빈 값에 대해서는 평가하지 않아도 된다. 
+        //value가 ''인데 required가 false이거나, 
+        if(!_this.isOption()) {
+          result = $v.method[prop](_this.target, $target.val(), _this.config.rule[prop]);
+        }
+        _this.setMessageClass.call(_this, result);
+        //결과에 따른 텍스트 설정. 
+        if(!result) {
+          if($target[0].tagName.toLowerCase() == "select" && prop == "required"){
+            prop = "required_select";
+          }
+          errors.push(_this.placeMessage(messages[prop], _this.config.rule[prop], false));
+        }
+      }
+      return errors;
+    },
+    //하위 input/select들의 error message를 수집하여 리턴한다. 
+    getFormErrorMessage : function() {
+      var result = true;
+      var errors = {};//{length:0};
+      //$(this.target).find('input,select,textarea').filter('[data-validate-rule]')
+	  $(this.target).find('[data-validate-rule]')
+	  //.not('input[type="submit"]')
+	  .each(function(i,elem) {
+        var name = elem.name;
+        var error = $(elem).validator().getErrorMessage();
+        if(error.length) {
+          errors[name] = error;
+          //errors.length++;
+        }
+      });
+      return errors;
+    },
+    isValid : function() {
+      if(this.target.tagName == 'FORM') {
+        return this.isFormValid.apply(this, arguments);
+      }
+    },
+    isFormValid : function() {
+      //하위 input들의 isValid를 활용하여 결과값 취합하여 리턴. 
+      //var elems = this.$target.find('input,select,textarea').filter('[data-validate-rule]');//.not('input[type="submit"]');
+	  var elems = this.$target.find('[data-validate-rule]');//.not('input[type="submit"]');
+      var results = $v.distributeFunction(elems, this.isValid, arguments);
+      for(var name in results) {
+        //하나라도 false라면 이는 실패임. 
+        if(results[name] === false) {
+          return false;
+        }
+      }
+      return true;
+    },
+    //각종 이벤트 핸들러에 대한 bind 관계를 정리하고, 옵션 상속에 대한 처리 등등. 
+    //만일 자신에게 지정된 rule이 없을 경우 아무것도 수행하지 않고 undefined 리턴. 
+    updateConfig : function(config) {
+      var _this = this;
+      if(_this.target.tagName == 'FORM') {
+        return _this.updateFormConfig.apply(_this, arguments);
+      }
+      _this = this.correctValidator();
+      //기존 설정을 삭제한다.
+      delete _this.config;
+      _this.config = {};
+      _this.jsconfig = config;
+      //default 설정을 가져온다.
+      var formv = _this.locateForm()[0];
+      if(formv && formv.validator && formv.validator.option) {
+        _this.config.option = formv.validator.option;
+      } else {
+        _this.config.option = {};
+      }
+      if(!_this.config.rule) {
+        _this.config.rule = {};
+      }
+      if(!_this.config.message) {
+        _this.config.message = {};
+      }
+      _this.config.option = $.extend(_this.config.option, $v.defaultOption);
+      //attribute config로부터 설정한다.
+      var attrconfig = _this.getAttributeConfig();
+      if(attrconfig) {
+        for(var prop in attrconfig) {
+          //prop은 각각 rule, message, 등등...
+          $.extend(_this.config[prop], _this.normalizeRule(attrconfig[prop]));
+        }
+      }
+	  var $target = _this.$target;
+
+      if(config){
+        if(config.rule) {
+          $target.attr('data-validate-rule', JSON.stringify(config.rule));
+        }
+      }
+
+      //이전에 javascript object로 넘겨받은 config를 설정한다.
+      //새로 넘겨받은 config object로부터 설정한다.
+      if(config || _this.jsconfig) {
+        for(var prop in config || _this.jsconfig) {
+          $.extend(_this.config[prop], _this.normalizeRule((config||_this.jsconfig)[prop]));
+        }
+      }
+      $target.unbind('.alopexValidator');
+      $.each(['keyup', 'change', 'blur'], function(i,v) {
+        if(_this.config.option['on'+v]) {
+          _this.selectGroup().bind(v+'.alopexValidator', eventHandler[v]);
+        }
+      });
+
+
+
+    },
+    updateFormConfig : function(formconfig) {
+      //하위 input element들을  select하고, 개별의 config를 인식해서
+      //하위 input의 validator()를 추출, 여기에서 updateConfig를 수행한다.
+      //config에 option이 있을 경우, 개별 updateConfig호출에 앞서 그 값을 넣어서 호출.
+//      var elems = $(this.target).find('input,select,textarea').filter('[data-validate-rule]').not('input[type="submit"]'); 
+      // 20130816 updateFormConfig 호출 시 변경되어야 할 element 목록이 formconfig['elements']에 정의 됨. 위의 elems 불필요. 
+
+      //$v.distributeFunction(elems, this.updateConfig, config);
+      var userAgent = navigator.userAgent;
+      var msie = (userAgent.indexOf("MSIE") != -1)? true:false;
+      var version = userAgent.charAt(userAgent.indexOf("MSIE") +5);
+	  var $target = this.$target;
+      if(!msie || (msie && version!="7")) {
+        $target.attr('novalidate', 'novalidate'); // 20130816 : jQuery Error in IE10 in IE7 Mode
+      }
+
+      if(!formconfig) {
+        formconfig = {};
+      }
+      if(!this.option) {
+        this.option = {};
+      }
+      this.option = $.extend(this.option, $v.defaultOption, formconfig.option);
+//      var option = formconfig['option'];
+//      if(option) {
+//      this.option = $.extend(this.option, option);
+//      }
+      if(formconfig.option) {
+        this.option = $.extend(this.option, formconfig.option);
+      }
+
+      var doption = eval('('+$target.attr('data-validate-option')+')');
+      this.option = $.extend(this.option, doption);
+
+      if(!formconfig['elements']) {
+        formconfig['elements'] = {};
+      }
+
+      for(var i in formconfig['elements']) {
+
+        var $el = $('#'+i);
+        var name = $el.attr('name');
+        $el.validator().updateConfig(formconfig['elements'][name]);
+      }
+
+      if(this.option['onsubmit']) {
+        var data = {};
+        if(typeof this.option['submitHandler'] == typeof function(){}) {
+          data.submitHandler = this.option.submitHandler;
+        }
+        $target.unbind('.alopexValidator').bind('submit.alopexValidator', data, 
+            eventHandler['submit']);
+      }
+      if(this.option['oninit'] == true) {
+        this.validate();
+      }
+    },
+    //this.target에 지정된 data-validate-rule, data-validate-message등의
+    //data attribute를 읽고, 이것을 config object형태로 변환하여 전달한다. 
+    getAttributeConfig : function() {
+      if(this.target.tagName == 'FORM') {
+        return;
+      }
+	  var $target = this.$target;
+      var rule = eval('('+$target.attr('data-validate-rule')+')');
+      var message = eval('('+$target.attr('data-validate-message')+')');
+      var option = eval('('+$target.attr('data-validate-option')+')');
+      var result = {};
+      if(rule) {
+        result['rule'] = rule;
+      }
+      if(message) {
+        result['message'] = message;
+      }
+      if(option) {
+        result['option'] = option;
+      }
+      return result;
+    },
+    //{ id : 'required', pass : {minlength:10} } 과 같은 config object를
+    //name : {required:true}, pass:{minlength:10} 형태로 표준화한다. 
+    normalizeRules : function(config) {
+      for(var prop in config) {
+        config[prop] = this.normalizeRule(config[prop]);
+      }
+      return config;
+    },
+    // name : 'required', name : {required:true}등에 대해 단일화한 rule로 만들도록 한다.
+    normalizeRule : function(rule) {
+      if(typeof rule == typeof '') {
+        var norm = {};
+        $.each(rule.split(/\s/), function() {
+          norm[this] = true;
+        });
+        rule = norm;
+      }
+      return rule;
+    },
+    //자신이 속한 form을 리턴한다. 
+    locateForm : function() {
+	  if(this.$form) {
+	    return this.$form;
+	  }
+	  var parentform = this.$target.parents('form');
+	  if(parentform.length) {
+	    this.$form = parentform.eq(0);
+	    return this.$form;
+	  }
+	  return this.$target;
+      //return this.$target.add(this.$target.parents()).filter('form').eq(0);
+    },
+    //자신과 연결된 error message tag를 찾는다.
+    locateMessage : function() {
+      //var searchFrom = this.target;
+	  var $target = this.$target;
+	  var searchFrom = $target;
+      var id = $target.attr('id');
+      //var name = $target.attr('name');
+      var grp = $target.attr('data-validate-group');
+      if(this.target.tagName != 'FORM') {
+        //form이 아닌 경우에는 자신의 parent form으로부터 검색한다.
+        searchFrom = $target.parents('form').eq(0);
+        if(!searchFrom || !searchFrom.length) {
+          searchFrom = $(document);
+        }
+      }
+	  var selector = [];
+	  //var ret = $('');
+	  if(this.config.option.messageToLabel) {
+        //ret = ret.add(searchFrom.find('label[for="'+id+'"]'));
+		selector.push('label[for="'+id+'"]');
+      }
+      if(this.config.option.messageToDatafor) {
+        //ret = ret.add(searchFrom.find('[data-for="'+id+'"]'));
+		selector.push('[data-for="'+id+'"]');
+      }
+      if(this.config.option.messageToDataforgroup) {
+        //ret = ret.add(searchFrom.find('[data-forgroup="'+grp+'"]'));
+		selector.push('[data-forgroup="'+grp+'"]');
+	  }
+	  return selector.length ? searchFrom.find(selector.join(',')) : $();
+    },
+    setMessageClass : function(valid) {
+	  var $located = this.locateMessage(); 
+	  if(!$located || !$located.length) {
+	    return;
+	  }
+      if(this.config && this.config.option && this.config.option.validMessageClass) {
+        $located[valid ? 'addClass' : 'removeClass'](this.config.option.validMessageClass);
+      }
+      if(this.config && this.config.option && this.config.option.invalidMessageClass) {
+        $located[!valid ? 'addClass' : 'removeClass'](this.config.option.invalidMessageClass);
+      }
+    },
+    placeMessage : function(message, param, doprint) {
+      var target = this.target;
+	  var $target = this.$target;
+      if(!param) {
+        param = [];
+      }
+      else if(!param.push) {
+        param = [param];
+      }
+      if(typeof message === 'function') {
+        message = message.call(this, this.target);
+      } else {
+        for(var i=0; i<param.length; i++) {
+          message = message.replace('{'+i+'}', param[i]);
+        }
+        message = message.replace(/{attr:([^}]*)}/g, function(a0, a1, a2, a3) {
+          return $target.attr(a1);
+        });
+        if(this.config.option.title) {
+          message = message.replace('{title}', this.config.option.title);
+        }
+      }
+      if(doprint !== false) {
+        $(this.locateMessage()).text(message);
+      } else {
+        return message;
+      }
+    },
+    isOption : function() {
+      var req = this.config.rule.required;
+	  var $target = this.$target
+      if(req !== true && !$target.val()) {
+        return true;
+      }
+	  var type = $target.attr('type');
+	  var $selectgroup = this.selectGroup();
+      if((req !== true && typeof req != typeof '') && type == 'checkbox' && !$selectgroup.filter(':checked').length) {
+        return true;
+      }
+      if((req !== true && typeof req != typeof '') && type == 'radio' && !$selectgroup.filter(':selected').length) {
+        return true;
+      }
+      if(typeof req == typeof '' && $(req).length && !$v.getLength($(req)[0]) ){
+        return true;
+      }
+      return false;
+    },
+    selectGroup : function() {
+      var target = null;
+	  var $form = this.locateForm();
+	  var candi = $form.find('[name="'+this.target.name+'"]');
+      if(candi.length > 1) {
+        target = candi;
+      }
+//      var dgroup = $(this.locateForm()).find('[data-validate-group="'
+//      + $(this.target).attr('data-validate-group') + '"]' );
+//      if( dgroup.length ) {
+//      target = $(target).add(dgroup);
+//      }
+      return target || this.$target;
+    },
+    correctValidator : function() {
+	  var isGroupElem = (this.target.type === 'checkbox' || this.target.type === 'radio');
+	  if(isGroupElem) {
+		var friends = this.locateForm().find('[name="'+this.target.name+'"]');
+		if(friends.length) {
+		  var ret = friends[0].validator;
+		  return ret || this;
+        }		  
+	  }
+	  return this;
+	
+//      var _this = this;
+//	  var $form = this.locateForm();
+//      //checkbox 또는 radio의 경우는 가장 첫번째의 엘리먼트에 validator를 저장한다.
+//      if( (_this.target.type == 'checkbox' || _this.target.type == 'radio')
+//          && $form.find('[name="'+_this.target.name+'"]').length > 1) {
+//        _this = $form.find('[name="'+_this.target.name+'"]')[0].validator;
+//      }
+//      return _this || this;
+    },
+    dependOnMe : function() {
+      var target = null;
+      var _this = this;
+	  var $form = this.locateForm();
+	  var targets = null;//$form.find('input,select,textarea');_c('   -- d filter1 ',_t()-s,'ms');s = _t();
+	  targets = $form.find('[data-validate-rule]');//.not('input[type="submit"]');
+	  
+      targets.each(function(i,elem) {
+        if(elem.validator && elem.validator.config && elem.validator.config.rule
+            && $form.find(elem.validator.config.rule.required)[0] === _this.target) {
+          target = elem;
+        }
+      });
+      return target;
+    },
+    validate : function() {
+      if(this.target.tagName == 'FORM') {
+        return this.formValidate.apply(this, arguments);
+      }
+      var _this = this.correctValidator();
+      var messages = {};
+      $.extend(messages, $v.message);
+      $.extend(messages, _this.config.message);
+      var result = true;
+	  var $target = $(this.target);
+	  var val = $target.val();
+
+      for(var prop in _this.config.rule) {
+        //method를 통한 평가. 
+        //만일 필수값이 아니라면 빈 값에 대해서는 평가하지 않아도 된다. 
+        //value가 ''인데 required가 false이거나, 
+        if(!_this.isOption() && $v.method[prop]) {
+          result = $v.method[prop](_this.target, val, _this.config.rule[prop]) && result;
+        }
+		
+        //결과에 따른 텍스트 설정. 
+        _this.setMessageClass.call(_this, result);
+		
+        if(!result) {
+          _this.placeMessage(messages[prop], _this.config.rule[prop]);
+		  
+          break;
+        }
+        _this.placeMessage('');
+		
+      }
+	  var depend = _this.dependOnMe();
+      if(depend) {
+        _this.dependOnMe().validator.validate();
+      }
+      return result;
+    },
+    formValidate : function() {
+      var result = true;
+	  //var filtered = this.$target.find('input,select,textarea').filter('[data-validate-rule]');e = _t();
+	  var filtered = this.$target.find('[data-validate-rule]');
+	  
+       //.not('input[type="submit"]')
+	  filtered.each(function(i,elem) {
+        result = $(elem).validate() && result;
+      });
+      return result;
+    }
+  }});
+
+  window.Validator = Validator;
+  //validator를 설정한다. form내부의 input/select가 가지고 있는 개별 설정은
+  //default 설정에 우선한다. 
+  $.fn.validator = function(config) {
+
+    if(!this.length) {
+      return;
+    }
+    var validator = this.eq(0).data('alopexValidator');
+    if(!validator) {
+      validator = new Validator(this[0]);
+      this.eq(0).data('alopexValidator', validator);
+    }
+    if(config) {
+      validator.updateConfig(config);
+    }
+    return validator;
+  };
+  //지정된 form 또는 input/select를 validate한다.
+  $.fn.validate = function(config) {
+    if(!this.length) {
+      return;
+    }
+    var validator = this.eq(0).data('alopexValidator');
+    if(!validator) {
+      validator = new Validator(this[0]);
+      this.eq(0).data('alopexValidator', validator);
+    }
+    if(config) {
+      validator.updateConfig(config);
+    }
+	
+    return validator.validate();
+  };
+})(jQuery, window);

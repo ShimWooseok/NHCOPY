@@ -1,0 +1,5451 @@
+/*****************************************************************************************
+* 업무명 : 공통
+* 세부업무명 : 공통
+* 설명 : 공통업무(로그인,우편번호,지점찾기,보안카드/OTP 등) 
+*       솔루션 관련 (가상키패드 등)
+* 작성자 : 공통팀
+* 작성일 : 2013.01.30 
+* -----------------------------------------------------------------------------------------
+*  변경이력 
+* -----------------------------------------------------------------------------------------
+*  No 날짜        작성자  내용
+*  1  2013.01.30  공통팀  최초작성
+*  2  2014.09.24  김민수  보안카드 2자리수로 변경 및 자동커서 on/off 기능 추가
+*  3  2014.10.16  김미헌  권유직원 조회 팝업 호출 기능 추가
+*  4  2014.10.22  김수찬  로딩바 이미지 alt변경 및 메뉴 1Depth 이벤트 추가
+*  5  2014.10.31  정영탁  SuperSign 조회를 위한 Ajax
+*  6  2016.05.16  홍경의  인증서 등록/재발급에서 타행발행 인증서 존재시 메시지(자바에서 처리) 변경 및 [타행/타기관 인증서 등록 바로가기] 버튼 표시
+*  7  2016.06.09  홍경의  당행/타행 스마트OTP 채번 및 검증로직 수정
+******************************************************************************************/
+
+/****************************************************
+ * 공통 업무
+ ****************************************************/
+
+/**
+ * 레이어 팝업 오픈시에 현재 포커스를 저장하기 위한 변수
+ */
+var common_FOCUS_LAYER_ID = null;
+
+var console; if (!console) { console = {}; if (typeof console.log !== 'function') { console.log = function() {}; } }
+
+function common_trans_rec_rexp() {
+	return /[^ㄱ-ㅎㅏ-ㅣ가-힝a-zA-Z0-9 \!\@\#\$\*\(\)\-\|\=\,\.\\\:\;\/\%\^\?\{\}\_\[\]]/gi;
+}
+ 
+/**
+ * <pre>
+ * 보안카드,OTP DIV영역 UI 보여주기 (스마트OTP 거래연동이 실행되는 화면에서 호출)
+ * </pre>
+ * @param localeInfo : 다국어뱅킹 대비 ( ko_KR, en_US ... ) 
+ *                     값이 없을 경우 한국어 뱅킹
+ * @param callback : 콜백 함수
+ */
+function common_cfSecurityCardPageViewTrans( localeInfo, callback ) {
+	common_cfSecurityCardPageViewCall( "IPCNA101S", localeInfo, callback );
+}
+
+/**
+ * <pre>
+ * 보안카드,OTP DIV영역 UI 보여주기 (스마트OTP 거래연동이 실행되는 화면에서 호출):이지뱅킹용
+ * 이지뱅킹
+ * </pre>
+ * @param localeInfo : 다국어뱅킹 대비 ( ko_KR, en_US ... ) 
+ *                     값이 없을 경우 한국어 뱅킹
+ * @param callback : 콜백 함수
+ */
+function common_cfSecurityCardPageViewTrans2( localeInfo, callback ) {
+	common_cfSecurityCardPageViewCall( "IHCNA101S", localeInfo, callback );
+}
+
+/**
+ * <pre>
+ * 보안카드,OTP DIV영역 UI 보여주기 (스마트OTP 거래연동이 실행되지 않는 화면에서 호출)
+ * </pre>
+ * @param localeInfo : 다국어뱅킹 대비 ( ko_KR, en_US ... ) 
+ *                     값이 없을 경우 한국어 뱅킹
+ * @param callback : 콜백 함수
+ */
+function common_cfSecurityCardPageView( localeInfo, callback ) {
+	common_cfSecurityCardPageViewCall( "IPCNA100S", localeInfo, callback );
+}
+
+/**
+ * <pre>
+ * 보안카드,OTP DIV영역 UI 보여주기 (보안매체 공통함수)
+ * </pre>
+ * @param localeInfo : 다국어뱅킹 대비 ( ko_KR, en_US ... ) 
+ *                     값이 없을 경우 한국어 뱅킹
+ * @param callback : 콜백 함수
+ */
+function common_cfSecurityCardPageViewCall( _service_name, localeInfo, callback ) {
+	
+	if($('#PINCERT_USER').size() > 0 && $('#PINCERT_USER').val() == 'Y'){
+		return true;
+	}
+	
+	if($('#MOBILECERT_USER').size() > 0 && $('#MOBILECERT_USER').val() == 'Y'){
+		return true;
+	}
+	
+	/*
+	 * locale 정보 구함
+	 */ 
+	if ( ( localeInfo == null ) || ( util_cfTrim ( localeInfo ) == '' ) ) {
+		localeInfo = 'ko_KR';
+	} 
+	
+	/*
+	 * param Value 설정
+	 */ 
+	var paramValue = { localeInfo : localeInfo , 
+			           IPCNA100S_STEP : "0", // UI보여주기 
+			           CALL_SERVICE_ID : window["SERVICE_ID"]
+			         };
+			
+	/*
+	 * 보안카드/OTP DIV영역 승인서비스 호출 -> 성공하면 가상키패드 관련 스크립트 적용하는 메서드 호출 
+	 */ 
+	$.alopexready(function() {	
+		
+		if ( window["M_WEB"] != "true" ) { // M뱅킹이 아닌 경우
+
+			if(window["G_WEB"] == "true") {
+				_service_name="PGCNA100S";
+			}
+
+			$("#SECURITY_CARD").navigate(_service_name, paramValue, {method:'post', useProgress:false}).done( function() { 
+				//이지뱅킹 2020-11-21 적용
+				var _pathname = document.location.pathname;
+				_pathname = _pathname.substring(_pathname.lastIndexOf('/') + 1, _pathname.length);
+				var _firstPath = _pathname.substring(0,2);
+				
+					if(!(_firstPath == 'IH' || "IH00" == common_cfGetDomainCode())) {	// 이지뱅킹 아닐시
+						$("#SECURITY_CARD").css({
+							'margin' : '31px 0 6px 0'
+						});
+					}
+				
+					var io_ea_rsp_no1 = document.getElementById ( "io_ea_rsp_no1" ) ;
+					var io_ea_rsp_no = document.getElementById ( "io_ea_rsp_no" ) ;
+					
+					
+					if ( io_ea_rsp_no1 != null && io_ea_rsp_no1 != "undefined" ) { // 보안카드인 경우
+						
+						/*
+						 * 숫자만 입력되도록 이벤트 적용
+						 */
+						common_cfCheckAutoCursor();
+						
+						/*
+						 * 물리키보드, 가상키패드 적용
+						 */
+						var $frmObj = $("#io_ea_rsp_no1").parents("form:first") ; // io_ea_rsp_no 가 포함된 form 찾기
+						var formID = $frmObj.attr("id");					
+						
+						if( formID != null && formID != "undefined" ) { // form이 있는 경우	
+							
+							var $secure_view = $frmObj.find("input[name='secure_view']"); // initTransKey 선언했는지여부 파악하는 변수
+							var secure_view_val = $secure_view.val();
+						
+							if( secure_view_val != "Y" ) { // initTransKey를 안한 경우
+						 
+								if(TranskeyCheckboxDivision()){
+									useTransKey = false;
+								} else{
+								 	useTransKey = true;
+								}
+								 
+								setInputTransKey=[
+									{id:"io_ea_rsp_no1",kbd:"number"},  //보안카드 첫번째번호에 가상 키패드 적용
+								 	{id:"io_ea_rsp_no3",kbd:"number"}  //보안카드 세번째번호에 가상 키패드 적용
+								];							 	
+								 	
+								initTransKey();						
+							
+							} else { // initTransKey를 한 경우		
+								addTransKey( document.getElementById("io_ea_rsp_no1"), "on", "number", 0, 0 );
+								addTransKey( document.getElementById("io_ea_rsp_no3"), "on", "number", 0, 0 );
+								
+							}
+						}
+						
+						/*##############################################################*/
+						/* TouchEn nxKey 동적 필드 적용 Start */
+						if(typeof TK_EnqueueList == "function"){
+							$("#io_ea_rsp_no1").attr("data-enc", "on");
+							$("#io_ea_rsp_no3").attr("data-enc", "on");
+							$("#io_ea_rsp_no1").attr("data-dataType", "n");
+							$("#io_ea_rsp_no3").attr("data-dataType", "n");
+							TK_EnqueueList($frmObj.attr("name"), "io_ea_rsp_no1");
+							TK_EnqueueList($frmObj.attr("name"), "io_ea_rsp_no3");
+						}
+						/* TouchEn nxKey 동적 필드 적용 End */
+						/*##############################################################*/
+						
+					} else if ( io_ea_rsp_no != null && io_ea_rsp_no != "undefined" ) { // OTP인 경우
+						/*
+						 * 숫자만 입력되도록 이벤트 적용
+						 */
+						$("#io_ea_rsp_no").on('keydown' , validation_cfOnlyNumber);
+						
+						//숫자체크 blur(포커스를 잃어버렸을때)
+						$("#io_ea_rsp_no").on('blur' , function() {
+							ipcn_fKeyCheck_num1(this);
+						});
+						/*
+						 * 물리키보드, 가상키패드 적용
+						 */ 
+						var $frmObj = $("#io_ea_rsp_no").parents("form:first") ; // io_ea_rsp_no 가 포함된 form 찾기
+						var formID = $frmObj.attr("id");
+						
+						if( formID != null && formID != "undefined" ) { // form이 있는 경우	
+							
+							var $secure_view = $frmObj.find("input[name='secure_view']"); // initTransKey 선언했는지여부 파악하는 변수
+							var secure_view_val = $secure_view.val();
+						
+							if( secure_view_val != "Y" ) { // initTransKey를 안한 경우
+								
+								if(TranskeyCheckboxDivision()){
+							 		useTransKey = false;
+								} else{
+							 		useTransKey = true;
+								}
+							 
+								setInputTransKey=[
+							 		{id:"io_ea_rsp_no",kbd:"number"}];  //pwd2의 항목에 가상 키패드 적용
+								initTransKey();
+							
+							} else { // initTransKey를 한 경우				
+								addTransKey( document.getElementById("io_ea_rsp_no"), "on", "number", 0, 0 );
+							}
+						}
+						/*############################################################*/
+						/* TouchEn nxKey 동적 필드 적용 Start */
+						if(typeof TK_EnqueueList == "function"){
+							$("#io_ea_rsp_no").attr("data-enc", "on");
+							$("#io_ea_rsp_no").attr("data-dataType", "n");
+							TK_EnqueueList($frmObj.attr("name"), "io_ea_rsp_no");
+						}
+						/* TouchEn nxKey 동적 필드 적용 End */
+						/*############################################################*/
+					}
+			}).done(function(data,status,xhr){
+				if (callback != null && callback != undefined && typeof(callback) == 'function') {
+					callback(data,status,xhr);
+				}
+			});
+		
+		} else { // 모바일인 경우
+		
+			/*
+			 * 보안카드/OTP DIV영역 승인서비스 호출 -> 성공하면 가상키패드 관련 스크립트 적용하는 메서드 호출 
+			 */ 
+			$.alopexready(function() {		
+				//$("#SECURITY_CARD").navigate("IPCNA100S", paramValue, {method:'post', useProgress:false}).done(function(data,status,xhr){				
+				$("#SECURITY_CARD").navigate(_service_name, paramValue, {method:'post', useProgress:false}).done(function(data,status,xhr){
+					if (callback != null && callback != undefined && typeof(callback) == 'function') {
+						callback(data,status,xhr);
+					}
+				});
+			});
+			
+		}
+	});		
+}
+
+/**
+ * <pre> 
+ * 보안카드,OTP DIV영역 승인
+ * </pre>
+ * 
+ * @param frmID 검증할 데이터가 있는 폼
+ * @return true/false : 승인여부 
+ */
+function common_cfSecurityCardCheck(frmID, isExecutionDirectly, requestFrom) {
+	
+	if($('#PINCERT_USER').size() > 0 && $('#PINCERT_USER').val() == 'Y'){
+		return true;
+	}
+	if($('#MOBILECERT_USER').size() > 0 && $('#MOBILECERT_USER').val() == 'Y'){
+		return true;
+	}
+	
+	if($('#nhSmartOtpCheck').length > 0) {
+		if(!isExecutionDirectly) {
+			if($('#nhSmartOtpCheck').val() == 'Y') {
+				return true;
+			} else {
+				alert('스마트 OTP 입력 버튼을 클릭하여 스마트 OTP를 입력해주세요.');
+				return false;
+			}
+		}
+	}
+	
+	if (common_cfIsMobileOTPUser() && !isExecutionDirectly) { // 직접호출에 의한 인증처리가 아닌 간접호출에 의한 실행일 경우 인증완료여부검사
+	    if (common_cfIsMobileOTPAuthenticated()) {
+	        return true;
+	    } else {
+	        if(window["G_WEB"]=="true"){ alert(common_cfGetMessage("I0664")); }
+	        else                       { alert("모바일OTP 인증이 완료되지 않았습니다. 인증을 완료해 주시기 바랍니다."); }
+	        return false;
+	    }
+	}
+
+	/*
+	 * 변수값 입력
+	 */ 
+	var checkValue = false; // 보안카드,OTP 승인여부
+	var io_ea_rsp_no1 = $("#io_ea_rsp_no1").val();	
+	var io_ea_rsp_no3 = $("#io_ea_rsp_no3").val();	
+	var io_ea_rsp_no = $("#io_ea_rsp_no").val();
+	var pwCdDs =  $("#PW_CD_DS_1").text() ; // 암호카드구분
+	var pw_cd_ds_view = $("#PW_CD_DS_VIEW").size(); //NH안심보안카드 인증조건구분
+	var pw_cd_ds_yn = $("#PW_CD_DS_YN").val(); //NH안심보안카드 인증여부구분
+	
+	if ( pw_cd_ds_view > 0) { //NH안심보안카드 고객일 경우
+		
+		if ( pw_cd_ds_yn != 'T') { //NH안심보안카드 인증이 완료되지 않았을 경우
+			if(window["G_WEB"]=="true") {
+				alert(common_cfGetMessage("E0435"));
+			}else{
+			alert("NH안심보안카드 인증이 완료되지 않았습니다.");
+			}
+			$('#pw_cd_ds_certifcate').focus();
+			return false;
+		}
+	}
+
+	/*
+	 * Validation Rule
+	 */
+	$('#io_ea_rsp_no1').validator({rule :{required:true,rangelength:[2,2],digits:true}, message:{required:common_cfGetMessage("E0431"), rangelength:common_cfGetMessage("E0431")}}); // 보안카드 비밀번호1 (응답번호1)
+	$('#io_ea_rsp_no3').validator({rule :{required:true,rangelength:[2,2],digits:true}, message:{required:common_cfGetMessage("E0431"), rangelength:common_cfGetMessage("E0431")}}); // 보안카드 비밀번호3 (응답번호3)
+	if(window["G_WEB"]=="true") {
+		$('#io_ea_rsp_no').validator({rule :{required:true,rangelength:[6,6],digits:true,nospace:true}, message:{required:common_cfGetMessage("E0432"), rangelength:common_cfGetMessage("E0432")}}); // OTP 비밀번호
+	} else {		
+		$('#io_ea_rsp_no').validator({rule :{required:true,rangelength:[6,6],digits:true,nospace:true}, message:{required:'OTP 번호(6자리)를 정확히 입력하십시오.', rangelength:'OTP비밀번호는 숫자 6자리입니다.'}}); // OTP 비밀번호
+	}
+	
+	if ( pwCdDs == "1" ) { // 보안카드일 경우
+			if($('#io_ea_rsp_no1').length > 0 && !$('#io_ea_rsp_no1').validate()){
+				if(window["G_WEB"]=="true") {
+					alert(common_cfGetMessage("E0431"));
+				} else {
+					alert("보안카드 비밀번호를 올바르게 입력해주세요.");
+				}
+				$('#io_ea_rsp_no1').focus();
+				return false;		
+			}	
+		
+			if($('#io_ea_rsp_no3').length > 0 && !$('#io_ea_rsp_no3').validate()){
+				if(window["G_WEB"]=="true") {
+					alert(common_cfGetMessage("E0431"));
+				} else {
+					alert("보안카드 비밀번호를 올바르게 입력해주세요.");
+				}
+				$('#io_ea_rsp_no3').focus();
+				return false;		
+			}
+	} else { // OTP일 경우		
+		if($('#io_ea_rsp_no').length > 0 && !$('#io_ea_rsp_no').validate()) {
+			if(window["G_WEB"]=="true") {
+				alert(common_cfGetMessage("E0432"));
+			} else {
+				alert("OTP 번호(6자리)를 정확히 입력하십시오.");
+			}
+			
+			$('#io_ea_rsp_no').focus();
+			return false;
+		}
+	}	
+		
+	/*
+	 * 나만의 주소 캐릭터가 살아있다면 close 한다.
+	 */
+	if(typeof closePersonalizationPage === 'function') closePersonalizationPage();
+	
+	/*
+	 * 보안카드,OTP 승인서비스호출
+	 */ 
+	// form 설정
+	var frmObj =  document.getElementById(frmID);
+	$('<input type="hidden" name="IPCNA100S_STEP" id="IPCNA100S_STEP" value="1"/>').appendTo(frmObj);
+
+	if(requestFrom == 'CA') {
+		if($(frmObj).find('[name=requestFrom]').length == 0)
+			$('<input type="hidden" name="requestFrom" id="requestFrom" value="CA"/>').appendTo(frmObj);
+	}
+
+	httpSend ( "IPCNA100S", 
+			   frmObj, 
+			   function( responseJson ) { // CallBack Success
+			       checkValue = true;
+			       $("#IPCNA100S_STEP").remove();
+
+			       // 입력항목 disable
+			       if ( pwCdDs == "1" ) { // 보안카드일 경우 			   		
+			    	   var obj_io_ea_rsp_no1 = document.getElementById("io_ea_rsp_no1") ;   		
+			    	   var obj_io_ea_rsp_no3 = document.getElementById("io_ea_rsp_no3") ;
+			    	   if ( 'MOBILE' != common_cfGetDeviceType() ) {
+			    		   if($('#io_ea_rsp_no1').length > 0 || $('#io_ea_rsp_no3').length > 0) {
+					    	   var obj_Tk_io_ea_rsp_no1_checkbox = document.getElementById("Tk_io_ea_rsp_no1_checkbox") ;
+					   		   var obj_Tk_io_ea_rsp_no3_checkbox = document.getElementById("Tk_io_ea_rsp_no3_checkbox") ;			    	   
+					    	   obj_io_ea_rsp_no1.disabled = true;
+					    	   obj_io_ea_rsp_no3.disabled = true;
+					    	   obj_Tk_io_ea_rsp_no1_checkbox.disabled = true;	
+					   		   obj_Tk_io_ea_rsp_no3_checkbox.disabled = true;
+			    		   }
+			    	   }
+			   	   } else { // OTP일 경우			   		   
+			   		   var obj_io_ea_rsp_no = document.getElementById("io_ea_rsp_no") ;
+				   		if ( 'MOBILE' != common_cfGetDeviceType() ) {
+			   			   if($('#io_ea_rsp_no').length > 0) {
+					   		   var obj_Tk_io_ea_rsp_no_checkbox = document.getElementById("Tk_io_ea_rsp_no_checkbox") ;
+					   		   obj_io_ea_rsp_no.disabled = true;		
+					   		   obj_Tk_io_ea_rsp_no_checkbox.disabled = true;
+					   		   
+					   		   //스마트 OTP일경우
+					   		   if($('#smartopt_timer_wrapper').size() > 0){
+					   			   if(common_cfSmartOTPTimer && (typeof common_cfSmartOTPTimer.initiateTimerHTML == 'function')){
+						   			common_cfSmartOTPTimer.hidePinLayer();
+						   		   }
+					   		   }
+			   			   }
+				   		}
+			   	   }
+	           }, 
+	           function(data, status, xhr) { // CallBack Fail
+	        	   checkValue = false;
+	   			   $("#IPCNA100S_STEP").remove();
+	   			   var resetField1 = new Array("io_ea_rsp_no1","io_ea_rsp_no3"); //초기화할 보안카드 필드
+	   			   var resetField2 = new Array("io_ea_rsp_no"); //초기화할 OTP 필드
+
+	   			   if ( 'MOBILE' != common_cfGetDeviceType() ) {	
+		   			   // 항목 clear
+				       if ( pwCdDs == "1" ) { // 보안카드일 경우
+				    	   if($('#io_ea_rsp_no1').length > 0 || $('#io_ea_rsp_no3').length > 0) {
+				    		   common_cfResetSecField(resetField1);//보안필드 초기화
+				    	   }
+				   	   } else { // OTP일 경우			   		
+			   			   /*
+				   		    * 2016 e-금융 보안강화 및 서비스 고도화 구축 > START
+				   		    */
+			   			   // 당행 스마트OTP
+				   		if($('#io_ea_rsp_no').length > 0) {
+			   				   common_cfResetSecField(resetField2);//보안필드 초기화	
+			   			   }
+			   			   /*
+			   			    * 2016 e-금융 보안강화 및 서비스 고도화 구축 > END
+			   			    */
+				   	   }
+	   			   }
+	   			   
+	   			   common_cfUserDefinedErrorPop(data, status, xhr);
+	           },  
+	           { async : false } 
+	         );
+	
+	return checkValue;
+}
+
+
+///**
+// * <pre>
+// * 보안카드,OTP 인증용 팝업 보여주기
+// * </pre>
+// * @param checkService : 보안카드,OTP 승인(팝업) 대상 FrontServiceID
+// * @param callBackMethod : CallBack Method
+// * @param localeInfo : 다국어뱅킹 대비 ( ko_KR, en_US ... ) 
+// *                     값이 없을 경우 한국어 뱅킹
+// */
+//function common_cfSecurityCardPopView( checkService, callBackMethod, localeInfo ) {
+//	
+//	/* 
+//	 * 변수선언
+//	 */	
+//	var paramValue1 ; // 보안카드,OTP 승인용 팝업 보여줄지 여부 결정하는 서비스 JSON 파라미터
+//	var paramValue2 ; // 보안카드,OTP 승인용 팝업 서비스 JSON 파라미터
+//	
+//	/* 
+//	 * paramValue 설정
+//	 */
+//	paramValue1 = { checkService : checkService };
+//	
+//	/* 
+//	 * 보안카드,OTP 승인용  팝업 보여줄지 여부 체크한 후 보여주기
+//	 */
+//	httpSend ( "IPCNA121S", 
+//	           paramValue1, 
+//		       function( responseJson ) { // CallBack Success
+//		          				
+//			       if ( responseJson ["SCRTCDOTP_APV_YN"] == "Y" ) {
+//			    	   
+//			    	   // locale 정보 구함
+//			           if ( ( localeInfo == null ) || ( util_cfTrim ( localeInfo ) == '' ) ) {
+//			    	       localeInfo = 'ko_KR';
+//			    	   } 
+//			           
+//			           // paramValue 설정
+//			           paramValue2 = { callBackMethod : callBackMethod , 
+//			        		           localeInfo : localeInfo };
+//			    	   
+//			    	   // 보안카드,OTP 승인용 팝업 보여주기
+//			    	   $('#layerDiv_scrtCdOtpPop').navigate('IPCNA120P', paramValue2 ).done(function(){ 
+//			  	       	   $('#layerDiv_scrtCdOtpPop').open({movable : true});
+//			  	       });
+//			       } else if ( responseJson ["SCRTCDOTP_APV_YN"] == "N" ) {
+//			    	   eval ( callBackMethod + "();" ) ;
+//			       }
+//	           }  , 
+//	           function(data, status, xhr) { // CallBack Fail
+//	        	   common_cfUserDefinedErrorPop(data, status, xhr);
+//	           }, 
+//               { async : false } 
+//	         );
+//}
+
+/**
+* <pre>
+* 보안카드,OTP 승인용 팝업 보여주기 (공과금)
+* </pre>
+* @param checkService : 보안카드,OTP 승인(팝업) 대상 FrontServiceID
+* @param callBackMethod : CallBack Method
+* @param localeInfo : 다국어뱅킹 대비 ( ko_KR, en_US ... ) 
+*                     값이 없을 경우 한국어 뱅킹
+*/
+function common_cfSecurityCardPopView( checkService, callBackMethod, localeInfo ) {
+	
+	var paramValue;
+	var serviceID = 'IPCNA120P';
+	
+	// locale 정보 구함
+    if ( ( localeInfo == null ) || ( util_cfTrim ( localeInfo ) == '' ) ) {
+	       localeInfo = 'ko_KR';
+	} 
+    
+    if(localeInfo != 'ko_KR') serviceID = 'PGCNA120P';
+    
+    // paramValue 설정
+    paramValue = { IPCNA100S_STEP : "1",
+    		       callBackMethod : callBackMethod , 
+ 		           localeInfo : localeInfo };
+	   
+    // 보안카드,OTP 승인용 팝업 보여주기
+    $('#layerDiv_scrtCdOtpPop').navigate( serviceID, paramValue ).done(function(){ 
+  	    $('#layerDiv_scrtCdOtpPop').open({movable : true});
+    });
+}
+
+/**
+ * <pre>
+ * 보안카드,OTP 승인용 팝업 보여주기 (B2B)
+ * </pre>
+ * @parma callBackFunction : CallBack으로 불려질 함수
+ * @param localeInfo : 다국어뱅킹 대비 ( ko_KR, en_US ... ) 
+ *                     값이 없을 경우 한국어 뱅킹
+ */
+function common_cfSecurityCardPopView2( callBackMethod , localeInfo ) {
+	
+	var paramValue;
+					    	   
+	// locale 정보 구함
+	if ( ( localeInfo == null ) || ( util_cfTrim ( localeInfo ) == '' ) ) {
+		localeInfo = 'ko_KR';
+	} 
+   
+    // paramValue 설정
+    paramValue = { IPCNA100S_STEP : "1",
+    		       localeInfo : localeInfo, 
+    		       callBackMethod : callBackMethod.toString() };
+   
+    // 보안카드,OTP 승인용 팝업 보여주기
+    $('#layerDiv_scrtCdOtpPop').navigate('IPCNA125P', paramValue ).done(function(){ 
+    	$('#layerDiv_scrtCdOtpPop').open({movable : true});
+    });
+}
+
+/**
+ * <pre>
+ * 보안카드 질문번호 채번
+ * </pre>
+ * @parma gubun : 0 - 일반, 1 - 팝업
+ */
+function common_cfSecurityCardGetNumber( gubun ) {	
+	
+	if ( gubun == "0" || gubun == null || gubun == undefined ) { // 일반인 경우
+					    	   
+		httpSend ( "IPCNA105R", 
+				   null, // 파라미터 필요없음
+				   function (responseJson) { // 성공시 CallBack 
+				     
+					  var io_ea_rqr_no = responseJson ["io_ea_rqr_no"] ;		
+				
+					  if(window["G_WEB"] == "true") {
+					      $('#SEC_CAD_NO1').text ("#"+io_ea_rqr_no.substring(0,2));					     
+					      $('#SEC_CAD_NO2').text ("#"+io_ea_rqr_no.substring(2,4));
+					  } else {
+						  $('#SEC_CAD_NO1').text (io_ea_rqr_no.substring(0,2) + "번");					     
+					      $('#SEC_CAD_NO2').text (io_ea_rqr_no.substring(2,4) + "번");
+					  }
+				      
+		           } ,
+		           function(responseJson, status, xhr) { // CallBack Fail
+		        	   common_cfUserDefinedErrorPop(responseJson, status, xhr);
+		           }, 
+		           { async : false , useProcess : false } // Sync옵션
+	           );
+		
+	} else if ( gubun == "1" ) { // 팝업인 경우
+		
+		httpSend ( "IPCNA105R", 
+				   null, // 파라미터 필요없음
+				   function (responseJson) { // 성공시 CallBack 
+				     
+					  var io_ea_rqr_no = responseJson ["io_ea_rqr_no"] ;								  
+					  var numID1 = "#num" + util_cfFrontZeroTrim ( io_ea_rqr_no.substring(0,2) ) ;		
+					  var numID2 = "#num" + util_cfFrontZeroTrim ( io_ea_rqr_no.substring(2,4) ) ;
+				      $('#SEC_CAD_NO1').text (io_ea_rqr_no.substring(0,2)+"번");					     
+			          $('#SEC_CAD_NO2').text (io_ea_rqr_no.substring(2,4)+"번");
+			          //$(eval(('+ numID1 + ')).attr('class','posi_num front');
+			          //$(numID2).attr('class','posi_num end');					  
+		           } ,
+		           function (responseJson, status, xhr) { // CallBack Fail    						  
+				       common_cfUserDefinedErrorPop(responseJson, status, xhr);
+				       $('#layerDiv_scrtCdOtpPop').close(); // 레이어팝업 닫기
+		    	   } ,
+		           { async : false , useProgress : false } // Sync옵션
+          );
+	}
+}
+
+/**
+ * <pre>
+ * OTP 질문번호 채번
+ * </pre>
+ */
+function common_cfOTPGetNumber() {	
+	var resetField = new Array("io_ea_rsp_no"); //초기화할 OTP 필드
+	common_cfResetSecField(resetField);//보안필드 초기화		
+	
+	httpSend ( "IPCNA105R", 
+			   null, // 파라미터 필요없음
+			   function (responseJson) { // 성공시 CallBack 			     
+				  var io_ea_rqr_no = responseJson ["io_ea_rqr_no"] ;
+				  $('#OTP_QA').val (io_ea_rqr_no);			      
+	           } ,
+	           function(responseJson, status, xhr) { // CallBack Fail
+	        	   common_cfUserDefinedErrorPop(responseJson, status, xhr);
+	           }, 
+	           { async : false , useProcess : false } // Sync옵션
+           );
+}
+
+/**
+ * <pre>
+ * 스마트OTP O-PIN번호 채번
+ * </pre>
+ */
+function common_cfSmartOTPGetNumber(param) {
+    
+	var requestdata 	= param || {};
+	
+	var resetFieldID	= "io_ea_rsp_no";
+	
+	if(requestdata.inputField){
+		
+		resetFieldID = requestdata.inputField;
+		
+	}
+	
+	if($("#" + resetFieldID).length > 0) {
+		
+		var resetField = new Array(resetFieldID); //초기화할 OTP 필드
+		
+		common_cfResetSecField(resetField);//보안필드 초기화
+	}
+	
+	httpSend ( "IPCNA105R", 
+			requestdata,
+			   function (responseJson) { // 성공시 CallBack
+		
+					common_cfSmartOTPGetNumberCallBack(responseJson , param);
+	           } ,
+	           function(responseJson, status, xhr) { // CallBack Fail
+	        	   
+	        	   common_cfUserDefinedErrorPop(responseJson, status, xhr);
+	           }, 
+	           { async : false , useProcess : false } // Sync옵션
+    );
+}
+/**
+ * 스마트OTP 채번 후처리
+ * @param responseJson
+ * @param param
+ */
+function common_cfSmartOTPGetNumberCallBack(responseJson , param) {
+	
+	/*
+	 * 2016 e-금융 보안강화 및 서비스 고도화 구축 > START
+	 */
+	var io_ea_rqr_no = responseJson ["io_ea_rqr_no"] ;
+	$('#OTP_QA'		).val (io_ea_rqr_no);
+	$('#OTP_QA_DP'	).html (io_ea_rqr_no);
+	$('[name=scrt_cd_qst_no]').val(io_ea_rqr_no);
+	common_cfSmartOTPTimer.initiateTimerHTML(1);
+	common_cfSmartOTPTimer.initiateTimer(param);
+	/*
+	 * 2016 e-금융 보안강화 및 서비스 고도화 구축 > END
+	 */
+}
+var common_cfSmartOTPTimer = {
+	autoSecs 	: 0,
+	autoCd 		: null,
+	startTime 	: 0,
+	currentTime : 0,
+	sessionTime : 60, // 최대 1분(60sec)
+	requestParam: {},
+	
+	initiateTimer : function(param) {
+		common_cfSmartOTPTimer.startTime 	= new Date().getTime();
+		common_cfSmartOTPTimer.autoSecs 	= 0;
+		common_cfSmartOTPTimer.autoCd 		= null;
+		common_cfSmartOTPTimer.currentTime 	= 0;
+		common_cfSmartOTPTimer.requestParam = param || {};
+		common_cfSmartOTPTimer.redo();
+	},
+	initiateTimerHTML : function(type) {
+		var initCase = type || 1;
+		
+		if (initCase == 1) {
+			// 초기화면
+			$('#btn_otp_qa_wrapper'		).hide();
+			$('#btn_otp_qa_wrapper2'		).hide();
+			$('#smartopt_timer_wrapper'	).show();
+			$('#smartopt_err_msg'	).hide();
+		}else if (initCase == 2) {
+			// pin 발급 1분후 재생성 버튼 보이기
+			$('#smartopt_timer_wrapper'	).hide();
+			$('#btn_otp_qa_wrapper').show();
+			$('#btn_otp_qa_wrapper2').show();
+			$('#smartopt_err_msg'	).show();
+		}else{
+			// pin 인증 성공 후 Pin Timer 숨기기
+			$('#smartopt_timer_wrapper'	).hide();
+			$('#btn_otp_qa_wrapper'	).hide();
+			$('#btn_otp_qa_wrapper2'	).hide();
+
+			// mSite 대응
+			$('#smartopt_err_msg'	).hide();
+		}
+		$('#smartopt_timer_inner'	).html('60');
+		
+	},
+
+	redo : function() {
+		common_cfSmartOTPTimer.currentTime = new Date().getTime();
+	 	var diffTime = parseInt((common_cfSmartOTPTimer.currentTime - common_cfSmartOTPTimer.startTime) / 1000 , 10);
+	 	var viewTime = common_cfSmartOTPTimer.sessionTime - diffTime;
+	 	
+	 	common_cfSmartOTPTimer.autoSecs 	= parseInt(viewTime , 10);
+	 	common_cfSmartOTPTimer.autoCd 	= setTimeout(common_cfSmartOTPTimer.redo , 1000);
+	 	if (common_cfSmartOTPTimer.autoSecs <= 0) {
+	 		common_cfSmartOTPTimer.autoSecs = 0;
+	 	}
+	 	// 입력 제한시간 표시
+	 	$('#smartopt_timer_inner').html(common_cfSmartOTPTimer.autoSecs);
+	 	// 에러메시지 표시
+	 	if (common_cfSmartOTPTimer.autoSecs <= 0) {
+	 		// 1분 종료시
+	 		common_cfSmartOTPTimer.timeOver();
+	 	}
+	},
+	timeOver : function() {
+		common_cfSmartOTPTimer.clear();
+		common_cfSmartOTPTimer.setRetryButton();			
+	},
+	setRetryButton : function(){
+		$('#btn_otp_qa').unbind('tap');
+		$('#btn_otp_qa').bind('tap' , function(){
+			common_cfSmartOTPGetNumber(common_cfSmartOTPTimer.requestParam);
+		});
+		common_cfSmartOTPTimer.initiateTimerHTML(2);
+	},
+	clear : function() {
+		clearTimeout(common_cfSmartOTPTimer.autoCd);
+	},
+	hidePinLayer : function(){
+		common_cfSmartOTPTimer.initiateTimerHTML(3);
+		clearTimeout(common_cfSmartOTPTimer.autoCd);
+	}
+};
+
+/**
+ * <pre>
+ * 스마트 OTP 인증요청 팝업(인증결과확인 포함)
+ * 2016 e-금융 보안강화 및 서비스 고도화 구축에서 추가
+ * </pre>
+ * @param param : 
+ */
+function common_cfSmartOTPAuthChkPop(param) {
+
+	var pw_cd_ds_view = $("#PW_CD_DS_VIEW").size(); //NH안심보안카드 인증조건구분
+	var pw_cd_ds_yn = $("#PW_CD_DS_YN").val(); //NH안심보안카드 인증여부구분
+
+	if ( pw_cd_ds_view > 0) { //NH안심보안카드 고객일 경우
+		
+		if ( pw_cd_ds_yn != 'T') { //NH안심보안카드 인증이 완료되지 않았을 경우
+			if(window["G_WEB"]=="true") {
+				alert(common_cfGetMessage("E0435"));
+			}else{
+				alert("NH안심보안카드 인증이 완료되지 않았습니다.");
+			}
+			$('#pw_cd_ds_certifcate').focus();
+			return false;
+		}
+	}
+
+	$('#nhSmartOtpCheck').val('N');
+	$('#nh_smart_otp_uncheck').show();
+	$('#nh_smart_otp_check').hide();
+
+	var option = {additionalParam: {callBackMethod: 'common_cfSmartOTPAuthChkCallBack'}};
+	//var authService = "IPCNA115P";
+	// 2016.06.10일기준으로 요건에 글로벌 없음
+	/*if(global == "1") {
+		authService = "PGCNA115P";
+	}*/
+	
+	//2017년 e금융고도화	
+	var authService = "";
+	if ( window["M_WEB"] != "true" ) { // M뱅킹이 아닌 경우(PC, 태블릿)		
+		authService = "IPCNA115P";
+		
+		if(window["G_WEB"] == "true") { //글로벌
+			authService = "PGCNA115P";
+		}
+	}
+
+	popup_cfLayerSubOpen(authService, param, option);
+	
+	if(window["H_WEB"] == "true") { //큰글
+		$('.modal-dim').css({'z-index': '1000'});
+	}
+}
+
+/**
+ * <pre>
+ * 스마트 OTP 인증결과확인 후 콜백처리
+ * </pre>
+ * 
+ * @param io_ea_rqr_no
+ */
+function common_cfSmartOTPAuthChkCallBack(io_ea_rqr_no) {
+	$('#io_ea_rqr_no').val (io_ea_rqr_no);
+	$('[name=scrt_cd_qst_no]').val(io_ea_rqr_no);
+}
+
+/**
+ * <pre>
+ * 스마트 OTP 인증요청 팝업(인증결과확인 포함)
+ * 2017년 e금융고도화
+ * </pre>
+ * @param param : 
+ */
+function common_cfNonNHSmartOTPAuthChkPop(param) {
+
+	
+
+	$('#nhSmartOtpCheck').val('N');
+	$('#nh_smart_otp_uncheck').show();
+	$('#nh_smart_otp_check').hide();
+
+	var option = {additionalParam: {callBackMethod: 'common_cfNonNHSmartOTPAuthChkCallBack'}};
+	
+	//2017년 e금융고도화
+	var authService = "";
+	if ( window["M_WEB"] != "true" ) { // M뱅킹이 아닌 경우(PC, 태블릿)		
+		authService = "IPCNA116P";
+		
+		if(window["G_WEB"] == "true") { //글로벌
+			authService = "PGCNA116P";
+		}
+	}
+
+	popup_cfLayerSubOpen(authService, param, option);
+	
+	if(window["H_WEB"] == "true") { //큰글
+		$('.modal-dim').css({'z-index': '1000'});
+	}
+	
+}
+
+/**
+ * <pre>
+ * 스마트 OTP 인증결과확인 후 콜백처리
+ * </pre>
+ * 
+ * @param io_ea_rqr_no
+ */
+function common_cfNonNHSmartOTPAuthChkCallBack(io_ea_rqr_no) {
+	$('#io_ea_rqr_no').val (io_ea_rqr_no);
+	$('[name=scrt_cd_qst_no]').val(io_ea_rqr_no);
+}
+
+
+/**
+ * <pre>
+ * 일반계좌, 평생계좌 종류 반환
+ * </pre>
+ * @param sGjaNbr : 계좌번호
+ * @return sReturn : 0(일반계좌), 1(중앙회평생계좌), 2(지역농협평생계좌)
+ */
+function common_cfGetEternalAccount(sGjaNbr) {
+	var sReturn     = "";  // 리턴값
+	var sTempGjaNbr = "";  // 계좌번호 유효성체크
+	var sLastChar   = "";  // 마지막 문자
+
+	// 예외처리(null값변환, "-"값제거, 빈문자열제거
+    if (sGjaNbr == null) sTempGjaNbr = "";
+	else sTempGjaNbr = sGjaNbr;
+    
+    sTempGjaNbr = util_cfRemoveProcess(sTempGjaNbr," ");
+	sTempGjaNbr = util_cfRemoveProcess(sTempGjaNbr,"-");
+
+    if (sTempGjaNbr.length == 10){
+	    sLastChar = sTempGjaNbr.substring(9,10);
+	}else if (sTempGjaNbr.length == 13){
+	    sLastChar = sTempGjaNbr.substring(12,13);
+    }
+	
+    if("8" == sLastChar){
+    	sReturn = "1";
+    }else if("9" == sLastChar){
+	    sReturn = "2";
+	}else{
+	    sReturn = "0";	  }
+
+	return sReturn;
+}
+
+/**
+ * 계좌번호 검증후 계좌번호에 맞는 과목코드를 반환 (허수 3자리로)
+ * @param sAccount : 계좌번호
+ * @return sNewGwamok : 과목코드
+ */
+function common_cfGetNewAccountGwamok(sAccount) {
+	var bValid = false;
+	var sNewGwamok = null;
+	var sCheckVirtual = null;
+	var sFullAccount = null;
+	var iAccountlength = 0;
+	var sNewGwamok = "999";
+
+	sAccount = $.trim(sAccount);
+	if (sAccount.indexOf("-") > 0) sAccount = util_cfRemoveProcess(sAccount, "-");
+	sFullAccount = util_cfFillLeftSpace(util_cfRemoveProcess(sAccount, " "), 15, "0"); // 계좌번호 15자리까지 0으로 Left Padding
+	sCheckVirtual = sAccount.substring(0, 3);
+	iAccountlength = sAccount.length;
+
+	if (validation_cfIsMyAccount(sAccount))
+		return "000";
+
+	if (iAccountlength == 11) {
+			sNewGwamok = "0" + sAccount.substring(3, 5);
+	} else if (iAccountlength == 12) {
+			sNewGwamok = "0" + sAccount.substring(4, 6);
+	} else if (iAccountlength == 13) {
+			sNewGwamok = sAccount.substring(0, 3);
+	} else if (iAccountlength == 14) {
+		if (validation_cfIsVirtualAccount(sAccount)) { // 신계좌체계의 가상계좌는 14자리 3-10-1
+			sNewGwamok = sAccount.substring(0, 3);
+		} else {
+			sNewGwamok = "0" + sAccount.substring(6, 8);
+		}
+	} else if (iAccountlength == 15) {
+			sNewGwamok = sAccount.substring(6, 9);
+	} else if (iAccountlength == 16) {
+			sNewGwamok = sAccount.substring(0, 4);
+	}
+	return common_cfGetMappingGwamok(sNewGwamok);
+}
+
+/**
+ * 기존 코드 변경을 최소화 하기 위해 신계좌 번호로 인해 생겨진 과목 코드를 기존 과목 코드로 리턴 과목을 비교해서 분기처리를 할때
+ * 사용한다. 신계좌 과목중 315,316,456,457,459,790,791,792는 제외한다.
+ * 
+ * @param sGwamok :
+ *            과목코드
+ * @return
+ */
+function common_cfGetMappingGwamok(sGwamok) {
+	var sRetGwamok   = "";
+	if(sGwamok.length == 2) sGwamok = "0" + sGwamok;
+	if("001" == sGwamok || "301" == sGwamok || "501" == sGwamok) sRetGwamok = "001";
+	else if("002" == sGwamok || "302" == sGwamok || "502" == sGwamok) sRetGwamok = "002";
+	else if("003" == sGwamok || "303" == sGwamok) sRetGwamok = "003";
+	else if("004" == sGwamok || "304" == sGwamok) sRetGwamok = "004";
+	else if("005" == sGwamok || "305" == sGwamok || "505" == sGwamok) sRetGwamok = "005";
+	else if("006" == sGwamok || "306" == sGwamok || "506" == sGwamok) sRetGwamok = "006";
+	else if("012" == sGwamok || "312" == sGwamok || "512" == sGwamok) sRetGwamok = "012";
+	else if("017" == sGwamok || "317" == sGwamok || "517" == sGwamok) sRetGwamok = "017";
+	else if("023" == sGwamok || "323" == sGwamok) sRetGwamok = "023";
+	else if("048" == sGwamok || "348" == sGwamok) sRetGwamok = "048";
+	else if("051" == sGwamok || "351" == sGwamok || "551" == sGwamok) sRetGwamok = "051";
+	else if("052" == sGwamok || "352" == sGwamok || "552" == sGwamok) sRetGwamok = "052";
+	else if("053" == sGwamok || "353" == sGwamok) sRetGwamok = "053";
+	else if("055" == sGwamok || "355" == sGwamok || "555" == sGwamok) sRetGwamok = "055";
+	else if("056" == sGwamok || "356" == sGwamok || "556" == sGwamok) sRetGwamok = "056";
+	else if("074" == sGwamok || "374" == sGwamok || "574" == sGwamok) sRetGwamok = "074";
+	else if("010" == sGwamok || "310" == sGwamok) sRetGwamok = "010";
+	else if("014" == sGwamok || "314" == sGwamok) sRetGwamok = "014";
+	else if("021" == sGwamok || "321" == sGwamok) sRetGwamok = "021";
+	else if("044" == sGwamok || "344" == sGwamok) sRetGwamok = "044";
+	else if("047" == sGwamok || "347" == sGwamok) sRetGwamok = "047";
+	else if("045" == sGwamok || "345" == sGwamok) sRetGwamok = "045";
+	else if("049" == sGwamok || "349" == sGwamok) sRetGwamok = "049";
+	else if("054" == sGwamok || "354" == sGwamok) sRetGwamok = "054";
+	else if("059" == sGwamok || "359" == sGwamok) sRetGwamok = "059";
+	else if("060" == sGwamok || "360" == sGwamok) sRetGwamok = "060";
+	else if("076" == sGwamok || "376" == sGwamok) sRetGwamok = "076";
+	else if("084" == sGwamok || "384" == sGwamok) sRetGwamok = "084";
+	else if("094" == sGwamok || "394" == sGwamok) sRetGwamok = "094";
+	else if("098" == sGwamok || "398" == sGwamok) sRetGwamok = "098";
+	else if("025" == sGwamok || "325" == sGwamok) sRetGwamok = "025";
+	else if("033" == sGwamok || "333" == sGwamok) sRetGwamok = "033";
+	else if("034" == sGwamok || "334" == sGwamok) sRetGwamok = "034";
+	else if("045" == sGwamok || "345" == sGwamok) sRetGwamok = "045";
+	else if("058" == sGwamok || "358" == sGwamok) sRetGwamok = "058";
+	else if("073" == sGwamok || "373" == sGwamok) sRetGwamok = "073";
+	else if("068" == sGwamok || "368" == sGwamok) sRetGwamok = "068";
+	else if("069" == sGwamok || "369" == sGwamok) sRetGwamok = "069";
+	else sRetGwamok = sGwamok;
+	return sRetGwamok;
+}
+
+/**
+ * 계좌종류 반환
+ * @param sAccount : 계좌
+ * @return
+ */
+function common_cfGetAccountType(sAccount) {
+    var   sType       = "";
+    var   sGwamok     = "";
+
+    sAccount = $.trim(sAccount);
+    if(sAccount.length == 16) {
+    	return "3";
+    }
+    if( validation_cfIsMyAccount(sAccount) ) {
+    	return "0";
+    }
+    sGwamok = common_cfGetNewAccountGwamok(sAccount);
+    if ( sGwamok == null) {
+        return "999"; // 적용이 안되는 계좌
+    }
+    if( sGwamok == "018" || sGwamok == "019" ) {
+        if("0" ==  sGwamok.substring(0,1)) {
+        	return "6";
+        }
+    }
+
+    switch(1*(sGwamok)) {
+	    case 1: case 2: case 12: case 17: case 40: case 50: case 51: case 52: case 55: case 56: // case 74:
+	    case 301: case 302: case 312: case 317: case 351: case 352: case 355: case 356: // case 374:
+	    case 501: case 502: case 512: case 517: case 551: case 552: case 555: case 556: // case 574:
+	        return "0"; // 요구불
+	    case 5: case 6: case 305: case 505: case 306: case 506:
+	        return "1"; // 요구불 (가,당)
+	    case 3: case 4: case 10: case 14: case 21: case 22: case 24: case 25: case 33: case 34: case 44: case 45: case 47: case 49:
+	    case 53: case 54: case 59: case 60: case 73: case 76: case 80: case 84: case 94: case 98:
+	    case 303: case 304:  case 310: case 314: case 321: case 325: case 333: case 334: case 344: case 345: case 347: case 349: // case 323:
+	    case 353: case 354: case 359: case 360: case 373: case 376: case 384: case 394: case 398:
+	        return "2"; // 저축성
+	    case 28: case 32: case 30: case 31: case 35: case 36: case 38: case 43: case 46: case 77:
+	    case 79: case 81: case 86: case 87: case 88: case 90: case 91: case 92: case 93: case 97:
+	    case 458:
+	    	return "5"; // 펀드 및 신탁
+	    case 62: // 대출 && 특수체계계좌
+	        if (common_cfGetNewJoongJo(sAccount) == "1") {
+	            return "8"; // 중앙회
+	        } else {
+	            return "7"; // 지역
+	        }
+	    case 11: case 20: case 61: case 72: case 75: case 78: case 82: case 83: case 70: case 71:
+	        return "7"; // 대출
+	    case 18: case 19: case 68: case 69: // case 183:
+	        return "6"; // 공제
+        case 451: case 452: case 453: case 454: case 455: case 456: case 457: case 459: // 외화예금
+        case 419: case 431: case 433: // 외화대출
+        case 432: case 434: case 435: // 인터넷서비스 불가 과목
+	        return "9"; // 외환계좌
+	    case 64: case 65: case 66: case 67: case 790: case 791: case 792: // case 793: case 910: case 911: case 912:
+	        return "10"; // 가상계좌
+	    default:
+	        return "999";
+    }
+}
+
+/**
+ * 계좌종류 세부 반환
+ * @param sType : 계좌
+ * @param sGwamok : 계좌
+ * @param sGwamok : 계좌
+ * @return
+ */
+function common_cfGetAccountTypeDtl(sAccount) {
+    sAccount = $.trim(sAccount);
+    var sGwamok = common_cfGetNewAccountGwamok(sAccount);
+    
+    switch(1*(sGwamok)) {
+        case 32: case 30: case 31: case 35: case 36: case 38: case 43: case 46:
+        case 79: case 81: case 86: case 87: case 88: case 90: case 91: case 92: case 93:
+            return "5-1"; // 신탁
+        case 28: case 77: 
+            return "5-2"; // 펀드(원화)
+        case 458: 
+            return "5-3"; // 펀드(외화)
+        case 97:
+            return "5-4"; // ISA
+        default:
+            return "";
+    }
+}
+
+/**
+ * 계좌번호 중조구분 반환
+ * @param sAccount : 계좌번호
+ * @return sNewJoongJo : 중앙회:1, 조합:2, 구축협:3
+*/
+function common_cfGetNewJoongJo(sAccount){
+	
+    sAccount = $.trim(sAccount);
+    sNewJoongJo = "1";
+    
+    if (sAccount.length == 11 || sAccount.length == 12 || sAccount.length == 15) {
+        sNewJoongJo = "1";
+    } else if(sAccount.length == 13 && (sAccount.substring(12)=="1" || sAccount.substring(12)=="2") ) {
+        sNewJoongJo = "1"; // 농협은행
+    } else if(sAccount.length == 13 && (sAccount.substring(12)=="3" || sAccount.substring(12)=="4" || sAccount.substring(12)=="5") ) {
+        sNewJoongJo = "2"; // 조합
+    } else if(sAccount.length == 13 && (sAccount.substring(12)=="6" || sAccount.substring(12)=="7") ) {
+        sNewJoongJo = "3"; // 구축협
+    } else if(sAccount.length == 13 && (sAccount.substring(12)=="8" || sAccount.substring(12)=="9") ) {
+        sNewJoongJo = "4"; // 가상계좌
+    } else if(sAccount.length == 14 && (sAccount.substring(0,3)=="793") ) {
+    	  sNewJoongJo = "4"; // 조합    
+    } else if(sAccount.length == 14) {
+        sNewJoongJo = "2"; // 조합
+    }
+    return sNewJoongJo;
+}
+
+/**********************
+* window.open(arg1,arg2,arg3)  옵션 배열의 갯수를 정확히 넣어줘야 합니다. 값이 필요 없으면 '' 을 넣습니다.
+*  ex :  common_cfOpenWinPop(a.html,"새창임","form 이름",[넓이,높이,x좌표,y좌표,scroll여부,resizable여부,주소창여부,menu var 여부,toolbar 여부,상태바 여부])
+*        common_cfOpenWinPop(act,"popupWin","form2") -> form 데이타를 submit 하면서 일반적인 창 크기
+*        common_cfOpenWinPop("ICCNA000S.view","popupWin","form2",["500","600"]) -> form 데이타를 submit 하면서 팝업 사이즈가 500,600 을 띄울 경우
+*        common_cfOpenWinPop(act,"popupWin"); form 데이타없이 일반적인 크기의 팝업을 띄울경우
+*        common_cfOpenWinPop("ICCNA000S.view?a=1","popupWin","",["500","600"]) -> form 데이타없이 팝업을 띄울 경우
+*        scroll은 default=yes임 , center가 yes로 되어있어도 x,y좌표가 있으면 좌표에 따른다.
+* @param : 주소
+* @param : 윈도우 이름
+* @param : 창관련 옵션(배열 형식)
+* @param : 언어코드
+* @return : void
+* @see
+************************/
+function common_cfOpenWinPop(url, popname , formName , option, localeCode)
+{
+	var sFeatures ="";
+	
+	if(localeCode == undefined || localeCode == ''){
+		localeCode = "KO";
+	}
+	
+    if(option != undefined){
+        var popWidth = option[0] == "" ? "600" : option[0];
+        var popHeight = option[1] == "" ? "450" : option[1];
+        var popLeft = option[2] == "" ? 0 : option[2];
+        var popTop = option[3] == "" ? 0 : option[3];
+        var popScroll = option[4] == "" ? "no" : option[4];
+        var popResize = option[5] == "" ? "yes" : option[5];
+        var popLocation = option[6] == "" ? "no" : option[6];
+        var popMenubar = option[7] == "" ? "no" : option[7];
+        var popToolbar = option[8] == "" ? "no" : option[8];
+        var popStatus = option[9] == "" ? "no" : option[9];
+
+        var xpos = (screen.width - popWidth) / 2;
+        var ypos = (screen.height - popHeight) / 2 ;
+
+        sFeatures = "width="+popWidth;
+        sFeatures += ",height="+popHeight;
+
+        sFeatures += ",left="+xpos;
+        sFeatures += ",top="+ypos;
+
+        sFeatures += ",scrollbars="+popScroll;
+        sFeatures += ",resizable="+popResize;
+        sFeatures += ",location="+popLocation;
+        sFeatures += ",menubar="+popMenubar;
+        sFeatures += ",toolbar="+popToolbar;
+        sFeatures += ",status="+popStatus;
+
+    }
+
+    if(formName != undefined && formName != "") {
+        var newWin = "";
+        
+        newWin = window.open('', popname, sFeatures);
+        
+        var submitform = eval("document."+formName);
+
+        /* submitform 길이가 0일 경우 'POST IS NULL' alert창이 뜨는 문제 방지. */
+        if(submitform.elements.length == 0) {
+            var element = document.createElement('INPUT');
+            element.type = "hidden";
+            submitform.appendChild(element);
+        }
+
+        submitform.action=url;
+        submitform.target=popname;
+        submitform.submit();
+
+    } else {
+    	var newWin = window.open('', popname, sFeatures);
+		
+		var submitform = document.createElement('form');
+
+		if(url.indexOf("?") != -1){
+			var parameters = (url.split("?")[1]).split("&");
+			url = url.split("?")[0];
+			
+			for(var i = 0 ; i < parameters.length ; i++)
+			{
+				varName = parameters[i].split('=')[0];
+				value = parameters[i].split('=')[1];
+				$('<input type="hidden" name="' + varName + '"/>').val(value)
+				.appendTo(submitform);
+			}
+		}
+    	
+    	$(submitform).attr("method", "POST");
+    	document.body.appendChild(submitform);
+    	
+    	submitform.action = url;
+    	submitform.target = popname;
+    	submitform.submit();
+    	document.body.removeChild(submitform);
+	}
+}
+ 
+/**
+ * 우편번호검색 공통팝업 호출
+ * global: 1일경우 글로벌
+ */
+function common_cfZipSearch (formNm, callbackFunction, global) { 
+
+	var submitform = eval("document."+formNm);
+	var zipService = "IPCNA200P";
+	if(global == "1") {
+		zipService = "PGCNA200P";
+	}
+	
+	// 현재 포커스 저장
+	if (common_FOCUS_LAYER_ID == null) {
+		common_FOCUS_LAYER_ID = $('*:focus');
+	}
+
+	var submitform = eval("document."+formNm);
+	if($(submitform).find('#zip_pop_callback').length == 0){
+	    
+	    var element = document.createElement('INPUT');
+	    element.type = "hidden";
+	    element.name = "zip_pop_callback";
+	    element.id = "zip_pop_callback";
+	    element.value = callbackFunction;
+	    submitform.appendChild(element);
+	
+		$('#zipSearchDialog').navigate(zipService, submitform ).done(function(){ 
+	    	 $('#zipSearchDialog').open({movable : true});
+	    	 try {
+			     contentLoadComplete();
+			 } catch (e) {}
+	    });
+	}else{ 
+		$('#zip_pop_callback').val(callbackFunction);
+		$('#zipSearchDialog').navigate(zipService, submitform ).done(function(){ 
+	    	 $('#zipSearchDialog').open({movable : true});
+	    	 try {
+			     contentLoadComplete();
+			 } catch (e) {}
+	    });
+	}	
+}
+
+/**
+ * 지점검색 공통팝업 호출
+ * 마지막 파라미터는 개인 카드용 영업점 검색을 위한 파라미터
+ * 그외 일반 지점검색은 formNm, callbackFunction 만 사용 
+ * @param isCard : 카드서비스여부
+ * @param naacDsc : 1 - 중앙회, 2 - 지역농협
+ * @param global : 글로벌 여부 1 - 글로벌
+ * @param gbn_fr : 1일 경우 외환거래여부(FX_TR_YN) '1' 조건 포함
+ */
+function common_cfBranchSearch(formNm, callbackFunction, isCard, naacDsc, global, gbn_fr) {
+
+	var submitform = eval("document." + formNm);
+	if ($(submitform).find('#br_pop_callback1').length == 0) {
+		var element = document.createElement('INPUT');
+		element.type = "hidden";
+		element.name = "br_pop_callback";
+		element.id = "br_pop_callback1";
+		submitform.appendChild(element);
+		
+		if(isCard != null && (isCard == "cardService" || isCard == "tranService")){
+			var elementCard = document.createElement('INPUT');
+			elementCard.type = "hidden";
+			elementCard.name = "cardService";
+			elementCard.id = "cardService1";
+			submitform.appendChild(elementCard);
+			//submitform.cardService.value=isCard;
+			$("#cardService1").val(isCard);
+		}
+		
+		if(gbn_fr != null && gbn_fr != undefined && gbn_fr == "1") {
+			var elementGbnfr = document.createElement('INPUT');
+			elementGbnfr.type = "hidden";
+			elementGbnfr.name = "gbn_fr";
+			elementGbnfr.id = "gbn_fr1";
+			submitform.appendChild(elementGbnfr);
+			//submitform.gbn_fr.value=gbn_fr;
+			$("#gbn_fr1").val(gbn_fr);
+		}
+		
+		if(naacDsc != null && naacDsc != undefined && 
+		   ( naacDsc == "1" || naacDsc == "2"  )  ) {
+			var elementNaac = document.createElement('INPUT');
+			elementNaac.type = "hidden";
+			elementNaac.name = "naacDsc";
+			elementNaac.id = "naacDsc1";
+			submitform.appendChild(elementNaac);
+			//submitform.naacDsc.value=naacDsc;
+			$("#naacDsc1").val(naacDsc);
+		}
+	}
+	
+	//submitform.br_pop_callback.value = callbackFunction;
+	$("#br_pop_callback1").val(callbackFunction);
+
+	if(global != null && global != undefined && global == "1") {
+		//글로벌
+		//common_cfOpenWinPop("PGCNA205P.view", "popupWin", formNm, [ "668","400","","","yes","no","no","no","no","no" ]);
+		$('#layerDiv_branchSearchDialog').navigate('PGCNA205P', submitform ).done(function(){ 
+			$('#layerDiv_branchSearchDialog').open({movable : true});
+		});
+	} else {
+		//common_cfOpenWinPop("IPCNA205P.view", "popupWin", formNm, [ "668","400","","","yes","no","no","no","no","no" ]);
+		$('#layerDiv_branchSearchDialog').navigate('IPCNA205P', submitform ).done(function(){ 
+			$('#layerDiv_branchSearchDialog').open({movable : true});
+		});
+	}
+	
+	$('#layerDiv_branchSearchDialog').css("top","200px");
+}
+
+/**
+ * 직원정보등록 팝업 오픈
+ */
+function common_cfEmpSearch (naacDsc, callbackFunction){ 
+	// , isCard, gbn_fr, global
+	popup_cfLayerOpen(common_cfGetCurrentGlobalPath('IPCN0501P'), {
+		"naacDsc" : naacDsc,
+		"callback" : callbackFunction
+		}
+	);
+	return false;	
+}
+
+/**
+ * 환전서비스 직원정보등록 팝업 오픈
+ */
+function common_cfExEmpSearch (callbackFunction, naacDsc){ 
+	popup_cfLayerOpen(common_cfGetCurrentGlobalPath('IPCN0513P'), {
+		"naacDsc" : naacDsc,
+		"callback" : callbackFunction
+		}
+	);
+	return false;	
+}
+
+
+/**
+ * jQuery AJAX
+ * @param {String} path : 이동하고자 하는 경로값
+ * @param {Object} param : 페이지 전환시 다음 페이지로 넘기고자 하는 파라메터 값(FORM or JSON)
+ * @param {Function} successFunc
+ * @param {Function} errorFunc
+ */
+function common_cfAjaxCall(path, param, successFunc, errorFunc, option) {
+	if (param && $(param).length > 0 && $(param)[0].tagName == 'FORM') {
+		$.each(['SESSION_TOKEN','TOKEN'], function(i, val) {
+			$(param).find('[name='+val+']').remove();
+		});
+	}
+
+	return $('<div></div>').navigate(path, param, option).done(function(data, status, xhr){
+		if (successFunc && typeof successFunc == 'function') {
+            //IE9 bug(ajax로 대량의 table cell markup을 수신 시 cell이 밀리는 현상)
+            //<td>사이의 공백이나 개행 문자가 있을 경우 발생함.
+			if(navigator.appVersion.indexOf("MSIE 9.")!=-1) {
+            	data = data.replace(/td>\s+<td/g, 'td><td');
+            	data = data.replace(/tr>\s+<td/g, 'tr><td');
+            	data = data.replace(/td>\s+<tr/g, 'td><tr');
+            }
+			successFunc(data, status, xhr);
+		}
+		try {
+			ipcn_cfContentNavigateComplete();
+		} catch(e) {}
+	}).fail(function(data, status, xhr){
+		if (errorFunc && typeof errorFunc == 'function') {
+			errorFunc(data, status, xhr);
+		} else {
+			common_cfUserDefinedErrorPop(data, status, xhr);
+		}
+	});
+}
+
+function showErrorLayerPop(errObject) {
+	var errServiceId = errObject.serviceId;
+	
+	if(errServiceId == undefined || errServiceId == 'undefined' || errServiceId == null || errServiceId == 'null') {
+		errServiceId = "";
+	} else {
+		errServiceId = errObject.serviceId.substring(0,2);
+	}
+	
+	if('MOBILE' == common_cfGetDeviceType() ) {
+		//M사이트의 경우 
+		$('.mask').css("display", "block");
+		var errHTML = getMErrorHTML(errObject); // template가져옴
+		open_m_layer_html(errHTML, 'layerDiv_mErrPop');	
+	} else {
+		if(window.opener != undefined || window.opener != null){
+			var errHTML = getErrorHTMLWinOpen(errObject); // template가져옴
+			open_layer_htmlWinOpen(errHTML, 'layerDiv_errPop_winOpen');
+			
+		}else{
+			var errHTML = getErrorHTML(errObject); // template가져옴
+			open_layer_html(errHTML, 'layerDiv_errPop');	
+		}
+		
+		var errorCode = errObject.errorCode;
+		try {
+		    if(errorCode=="IPCN93002" ) { // 보안매체응답값이 OTP에서'000000' 또는 보안카드'0000'이고 전문실행후응답값이틀릴경우 
+				if(jQuery("#io_ea_rsp_no1").length > 0) {		
+					transkey['Tk_io_ea_rsp_no1'].useTransKey = true;
+					jQuery('#Tk_io_ea_rsp_no1_check').val('transkey');
+					jQuery('#Tk_io_ea_rsp_no1_checkbox').attr({'checked':true, 'disabled':true}).parents('span').addClass('on');
+				}
+				if(jQuery("#io_ea_rsp_no3").length > 0) {
+					transkey['Tk_io_ea_rsp_no3'].useTransKey = true;
+					jQuery('#Tk_io_ea_rsp_no3_check').val('transkey');
+					jQuery('#Tk_io_ea_rsp_no3_checkbox').attr({'checked':true, 'disabled':true}).parents('span').addClass('on');
+				}
+				if(jQuery("#io_ea_rsp_no").length > 0) {
+				    transkey['Tk_io_ea_rsp_no'].useTransKey = true;
+					jQuery('#Tk_io_ea_rsp_no_check').val('transkey');
+					jQuery('#Tk_io_ea_rsp_no_checkbox').attr({'checked':true, 'disabled':true}).parents('span').addClass('on');
+			    }
+			}
+	    } catch(e){}
+	}
+}
+
+function getErrorHTML(errObject) {
+
+	var errorCode = errObject.errorCode;
+	var subErrorCode = "";
+	var guid = errObject.guid;
+	var detailView = "";
+	var rmsSvc = errObject.rmsSvc;
+	var apSvrNm = errObject.apSvrNm;
+	var orgErrorCode = errObject.orgErrorCode;
+	
+	if(errorCode && errorCode.length == 9){
+		subErrorCode = errorCode.substring(4);
+	}
+
+	//LIC에러 처리
+	if ( ( "LIC_7090" == orgErrorCode ) ||
+		 ( "LIC_7091" == orgErrorCode ) ||
+		 ( "LIC_7092" == orgErrorCode ) ||
+		 ( "LIC_7093" == orgErrorCode ) ||
+		 ( "LIC_7094" == orgErrorCode ) ||
+		 ( "LIC_7095" == orgErrorCode ) ||
+		 ( "LIC_7096" == orgErrorCode ) ||
+		 ( "LIC_7097" == orgErrorCode ) ||
+		 ( "LIC_7098" == orgErrorCode ) ) {
+		subErrorCode = orgErrorCode;	
+	}
+	
+	//이니텍에러처리
+	if ( errObject.status != "200" ) {
+	
+		if ( common_cfCheckInitechError ( errObject.status ) ) { // 이니텍 에러일 경우
+			errObject.orgErrorCode = errObject.status;
+		}
+	}
+	
+	if(guid != undefined && guid != null && guid != 'null' && guid.length > 0){
+		guid = " > " + guid;
+	}else{
+		guid = "";
+	}
+	
+	if(rmsSvc != undefined && rmsSvc != null && rmsSvc != 'null' && rmsSvc.length > 0){
+		rmsSvc = rmsSvc + " > ";
+	}else{
+		rmsSvc = "";
+	}
+	
+	if(apSvrNm != undefined && apSvrNm != null && apSvrNm != 'null' && apSvrNm.length > 0){
+		apSvrNm = ", " + apSvrNm;
+	}else{
+		apSvrNm = "";
+	}
+	
+	detailView = rmsSvc + errObject.errPrgName + " > " + errObject.orgErrorCode + " > " + errObject.errPrgLine + guid;
+	
+	var serviceId = errObject.serviceId;
+	
+	var subServiceId = "";
+	
+	var phonNumber = common_cfGetMessage("I0526");
+	
+	//2020e금융고도화 이지뱅킹 2020-11-21 적용 대상
+	var ezBankYn = false; //2020e금융고도화 이지뱅킹 2020-11-21 적용 대상 - 간편뱅킹로그인 후에 이지뱅킹 접속 처리
+	
+	if(serviceId != undefined && serviceId != 'undefined' && serviceId != null && serviceId != 'null' && serviceId.length > 4){
+		subServiceId = serviceId.substring(0,4);
+		//2020e금융고도화 이지뱅킹 2020-11-21 적용 대상 - 간편뱅킹로그인 후에 이지뱅킹 접속 처리
+		if(serviceId.indexOf("IH") > -1) {	ezBankYn = true;	} 
+	}
+	
+		
+	//카드서비스이면....
+	if(subServiceId == "IPCM" || subServiceId == "IPCI" || subServiceId == "IPCF" 
+		|| subServiceId == "IPCC" || subServiceId == "IPCV" || subServiceId == "IPMC"){
+		phonNumber = "(1644-4000)";
+	}
+	
+	var returnServiceId = errObject.returnServiceId;
+	
+	if(returnServiceId != undefined && returnServiceId != null && returnServiceId != 'null' && returnServiceId.length > 0){
+		returnServiceId = returnServiceId;
+	}else{
+		returnServiceId = "null";
+	}
+	
+	var checkFailYn = "N";
+	var message = "";
+	
+	if( (errObject.errMsg == undefined || errObject.errMsg == 'undefined' || errObject.errMsg == null || errObject.errMsg == 'null')
+		&& (subErrorCode == '') && (errObject.errSvrInfo == undefined || errObject.errSvrInfo == 'undefined' || errObject.errSvrInfo == null || errObject.errSvrInfo == 'null') ){
+		
+		checkFailYn = "Y";
+		message = common_cfGetMessage("I0541");
+		
+		//이니텍에러처리
+		if ( errObject.status != "200" ) {
+		
+			if ( common_cfCheckInitechError ( errObject.status ) ) { // 이니텍 에러일 경우
+				message = common_cfGetMessage("E0434");
+			}
+		}
+	}else{
+		message = errObject.errMsg;
+	}
+
+	//간편인증 이용자 타 매체 이동시 오류팝업
+	if(errorCode == 'MCPR98019'){
+		if(!ezBankYn) {//2020e금융고도화 이지뱅킹 2020-11-21 적용 대상 - 간편뱅킹로그인 후에 이지뱅킹 접속 처리
+		checkFailYn = "Y";
+		message = common_cfGetMessage("E0349");
+		}
+	}else if(errorCode == 'MCPR98020'){
+		checkFailYn = "Y";
+		message = common_cfGetMessage("E0350");
+	}else if(errorCode == 'MCPR98030'){
+		checkFailYn = "Y";
+		message = common_cfGetMessage("E0354");
+	}else if(errorCode == 'IPEF00001'){
+		checkFailYn = "Y";
+		message = common_cfGetMessage("E0351");
+	}else if(errorCode == 'MCPR98021'){
+		checkFailYn = "Y";
+		message = common_cfGetMessage("E0353");
+	}else if(errorCode == 'MCOP92637' || errorCode == 'MCOP92638' || errorCode == 'MCOP92639'){
+		checkFailYn = "Y";
+	}
+	
+	if(subErrorCode == '06728') {
+		message = common_cfGetMessage("E0355");
+	}
+	
+    var err_HTML = "";
+    err_HTML += "	<div class='pop_header' data-dialog-movecursor='true'>";
+    err_HTML += "		<h1 class='h1_pop'>"+common_cfGetMessage("I0522")+"</h1>";
+    err_HTML += "	</div>";
+    err_HTML += "	<div class='pop_content'>";
+    err_HTML += "		<!-- 오류 페이지 -->";
+    err_HTML += "		<div class='error'>";
+    err_HTML += "			<div class='desc'>";
+    err_HTML += "				<p>"+message+"</p>";
+    
+    if(errorCode == 'MCPR98005') {    	
+    	err_HTML += "			<p><span class='btn7 more'><a href='https://ibz.nonghyup.com' title='기업인터넷뱅킹'>https://ibz.nonghyup.com</a></span></p>";
+    }
+    
+    if (subErrorCode == '06695' || subErrorCode == '96695' || subErrorCode == '06697' || subErrorCode == '96697' || subErrorCode == '06709') {
+    	err_HTML += "			<p>"+common_cfGetMessage("I0527")+"</p>";
+    }
+    
+    if(errorCode == 'IPCN99A44') {    	
+    	err_HTML += "			<p><span class='btn7 more'><a href='https://help.ahnlab.com/astx/1.0/ko_kr/start.htm#astx_manual_start.htm' target='_blank'>[프로그램 수동시작 안내]</a></span></p>";
+    }
+    
+    /*
+     * 2019 도급운영 > START
+     * - 주택청약종합저축 소득공제 등록/해지 요건
+     * - 연말정산증명서 발급 오류 문구 수정
+     */
+
+    if(errorCode == 'EFNB07841'){
+    	err_HTML += "			<p>(등록 기간 : 해당 과세기간 다음연도 2월말까지 등록 가능)</p>";
+    	err_HTML += "			<p>소득공제 등록은 '<span class='point2'>개인뱅킹>예금>예적금조회>주택청약종합저축 소득공제 등록/해제</span>' 화면에서 처리하시기 바랍니다.</p>";
+    }
+    
+    /*
+     * 2019 도급운영 > END
+     */
+
+    
+    if(checkFailYn == "N"){
+    	err_HTML += "				<div class='gcode'>";
+        err_HTML += "					<span class='code'><strong>"+common_cfGetMessage("I0520")+" : "+subErrorCode+","+ errObject.errSvrInfo + "" + apSvrNm +"</strong></span>";
+        err_HTML += "					<span class='btn7 more'><a href='#none' onClick='viewDetailErr();'>"+common_cfGetMessage("I0521")+"</a></span>";
+        err_HTML += "					<span class='mcode' id='view_code' style='display:none;'>" + detailView + "</span>";
+        err_HTML += "				</div>";	
+    }
+    err_HTML += "			</div>";
+    err_HTML += "			<div class='foot'>";
+    err_HTML += "				<p><span class='info3'>"+common_cfGetMessage("I0523")+"<span>" + phonNumber + "</span>"+common_cfGetMessage("I0524")+"</span></p>";
+    err_HTML += "			</div>";
+    err_HTML += "		</div>";
+    err_HTML += "		<!-- //오류 페이지 -->";
+    err_HTML += "		<div class='btn_area'>";
+
+    /*
+     * 2016 e-금융 보안강화 및 서비스 고도화 구축 > START
+     * - 공인인증서 발급 절차 개선
+     * - 인증서 등록/재발급에서 타행발행 인증서 존재시 [타행/타기관 인증서 등록 바로가기] 버튼 표시
+     */
+    if (subErrorCode == '92513') {
+        err_HTML += "		<span class='btn1'><a href='javascript:closeErrorLayer(\"" + (window["G_WEB"] == "true" ? "PGCA0161I" : "IPCA0161I") + "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", false);'>"+common_cfGetMessage("I0660")+"</a></span>";
+    }
+    /*
+     * 2016 e-금융 보안강화 및 서비스 고도화 구축 > END
+     */
+    
+    // 모바일 OTP 발급안내 처리
+    if (errorCode == 'EACO08145') { 
+    	err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayer(\"" +returnServiceId+ "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", true);'>취소</a></span>";
+    }else if(errorCode != 'MCOP92637' && errorCode != 'MCOP92638' && errorCode != 'MCOP92639'){
+    	err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayer(\"" +returnServiceId+ "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", true);'>"+common_cfGetMessage("I0525")+"</a></span>";
+	}
+    
+    // 오류 해결 안내 버튼 추가
+    var errorLink = common_cfGetDomain('IP00') + "/servlet/content/ip/ec/ipec0303c.thtml?saac=saac";
+    if (errorCode == 'IPCN93A07' || errorCode == 'EACO02206') {    	
+    	if(window["G_WEB"] != "true"){
+    		err_HTML += "		<span class='btn1'><a href='" + errorLink + "'>오류해결 안내</a></span>";
+    	}
+    }
+    
+    if (subErrorCode == '00045' || subErrorCode == '92002') {
+    	if(window["G_WEB"] != "true"){
+        err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayer(\"" + "IPCA1001I" + "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", false);'>"+common_cfGetMessage("I0663")+"</a></span>";
+    	}
+    }
+    
+    /* 웹회원비밀번호 초기화(재설정)링크*/
+    if (subErrorCode == '04440'||subErrorCode == '04960') {
+    	if (common_cfGetDomainCode() == 'IP00' && window['G_WEB'] != 'true'){
+    		err_HTML += "		<span class='btn1'><a href='javascript:navigate(\"" + "IPME0123I" + "\" , {menu_id:\"IPME04010102\"});'>비밀번호초기화(재설정)</a></span>";
+    	}
+    }    
+    if (subErrorCode == '06695' || subErrorCode == '96695' || subErrorCode == '06709') {
+        err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayer(\"" + (window["G_WEB"] == "true" ? "PGAM0491R" : "IPAM0491R") + "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", false);'>"+common_cfGetMessage("I0528")+"</a></span>";
+        err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayer(\"" + (window["G_WEB"] == "true" ? "PGAM0261I" : "IPAM0261I") + "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", false);'>"+common_cfGetMessage("I0529")+"</a></span>";
+    }
+    if (subErrorCode == '06697' || subErrorCode == '96697') {
+        err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayer(\"" + (window["G_WEB"] == "true" ? "PGAM0491R" : "IPAM0491R") + "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", false);'>"+common_cfGetMessage("I0528")+"</a></span>";
+        err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayer(\"" + (window["G_WEB"] == "true" ? "PGAM0261I" : "IPAM0261I") + "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", false);'>"+common_cfGetMessage("I0530")+"</a></span>";
+    }
+    if (subErrorCode == '96698') {
+        err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayer(\"" + "IPAM0401I" + "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", false);'>"+common_cfGetMessage("I0655")+"</a></span>";
+    }
+    if ((common_cfGetDomainCode() == 'IP00' && window['G_WEB'] != 'true') && (subErrorCode == '07201' || subErrorCode == '07202' || subErrorCode == '07203' || subErrorCode == '07204' || subErrorCode == '07205' || subErrorCode == '07206' || subErrorCode == '07207' || subErrorCode == '07208'
+    	|| subErrorCode == '07209' || subErrorCode == '07210' || subErrorCode == '01067')) {    	
+    	
+    	err_HTML += "		<span class='btn1'><a href='javascript:navigate(\"" + "IPAM1801I" + "\" , {menu_id:\"IPZZ0101040304\"});'>OTP시간재설정</a></span>";
+    }
+    
+    if(errorCode == 'MCPR98019' || errorCode == 'MCPR98020'){
+    	err_HTML += "		<span class='btn1'><a id='btnPinCertLoginExit' href='#none'>로그아웃</a></span>";
+    }
+    
+    if(errorCode == 'MCPR98021'){
+      	err_HTML += "		<span class='btn1'><a id='btnFinCertLoginExit' href='#none'>로그아웃</a></span>";
+    }
+    
+    if(errorCode == 'MCPR98030'){
+    	err_HTML += "		<span class='btn1'><a id='btnLoginExit' href='#none'>로그아웃</a></span>";
+    }
+    
+    if(errorCode == 'EACO04757') {    	
+    	err_HTML += "		<span class='btn1'><a href='http://www.nhmembers.co.kr/' target='_blank'>" + common_cfGetMessage("I0666") + "</a></span>";
+    }
+    
+    if(subServiceId == 'IPOB' && errorCode == 'EACO03759'){
+    	err_HTML += "		<span class='btn1'><a href='javascript:navigate(\"" + "IPOB0141I" + "\");'>이체결과조회</a></span>";	
+    }
+    
+    // 모바일 OTP 발급안내 처리
+    if(errorCode == 'EACO08145'){
+    	err_HTML += "		<span class='btn1'><a href='javascript:closeErrorLayer(\"" + "/ip/am/ipam0542c.thtml" + "\", \"\", \"\", false);'>모바일OTP발급안내</a></span>";
+    }
+    
+    /* 금융인증서 발급/재발급 */
+    if(errorCode == 'MCOP92637') {
+    	err_HTML += "		<span class='btn1'><a href='javascript:navigate(\"" + "IPCNA001R" + "\");'>사용하기</a></span>";
+    	err_HTML += "		<span class='btn2'><a href='javascript:fSubmit2(\"REISSUE\");'>재발급</a></span>";
+    }
+    
+    if(errorCode == 'MCOP92638') {
+    	err_HTML += "		<span class='btn1'><a href='javascript:navigate(\"" + "IPCA2021I" + "\");'>타행인증서 등록</a></span>";
+    	err_HTML += "		<span class='btn2'><a href='javascript:fSubmit2(\"OTHERCERT\");'>재발급</a></span>";
+    }
+    
+    if(errorCode == 'MCOP92639') {
+    	err_HTML += "		<span class='btn1'><a href='javascript:navigate(\"" + "IPCNA001R" + "\");'>로그인</a></span>";
+    	err_HTML += "		<span class='btn2'><a href='javascript:fSubmit2(\"OTHERCERT\");'>재발급</a></span>";
+    }
+    
+    err_HTML += "		</div>";
+    err_HTML += "	</div>";
+    err_HTML += "	<div class='pop_footer'>";
+    err_HTML += "		<p class='pop_logo'>NH bank</p>";
+    err_HTML += "		<button class='pop_close close_pop' data-tap='closeErrPop();'>"+common_cfGetMessage("I0525")+"</button>";
+    err_HTML += "	</div>";
+    
+	return err_HTML;
+}	
+
+function getErrorHTMLWinOpen(errObject) {
+
+	var errorCode = errObject.errorCode;
+	var subErrorCode = "";
+	var guid = errObject.guid;
+	var detailView = "";
+	var rmsSvc = errObject.rmsSvc;
+	var apSvrNm = errObject.apSvrNm;
+	var orgErrorCode = errObject.orgErrorCode;
+	
+	if(errorCode && errorCode.length == 9){
+		subErrorCode = errorCode.substring(4);
+	}
+	
+	//LIC에러 처리
+	if ( ( "LIC_7090" == orgErrorCode ) ||
+		 ( "LIC_7091" == orgErrorCode ) ||
+		 ( "LIC_7092" == orgErrorCode ) ||
+		 ( "LIC_7093" == orgErrorCode ) ||
+		 ( "LIC_7094" == orgErrorCode ) ||
+		 ( "LIC_7095" == orgErrorCode ) ||
+		 ( "LIC_7096" == orgErrorCode ) ||
+		 ( "LIC_7097" == orgErrorCode ) ||
+		 ( "LIC_7098" == orgErrorCode ) ) {
+		subErrorCode = orgErrorCode;	
+	}
+	
+	if(guid != undefined && guid != null && guid != 'null' && guid.length > 0){
+		guid = " > " + guid;
+	}else{
+		guid = "";
+	}
+	
+	if(rmsSvc != undefined && rmsSvc != null && rmsSvc != 'null' && rmsSvc.length > 0){
+		rmsSvc = rmsSvc + " > ";
+	}else{
+		rmsSvc = "";
+	}
+	
+	if(apSvrNm != undefined && apSvrNm != null && apSvrNm != 'null' && apSvrNm.length > 0){
+		apSvrNm = ", " + apSvrNm;
+	}else{
+		apSvrNm = "";
+	}
+	
+	detailView = rmsSvc + errObject.errPrgName + " > " + errObject.orgErrorCode + " > " + errObject.errPrgLine + guid;
+	
+	var serviceId = errObject.serviceId;
+	
+	var subServiceId = "";
+	
+	var phonNumber = common_cfGetMessage("I0526");
+	
+	var ezBankYn = false; //2020e금융고도화 이지뱅킹 2020-11-21 적용 대상 - 간편뱅킹로그인 후에 이지뱅킹 접속 처리
+	
+	if(serviceId != undefined && serviceId != 'undefined' && serviceId != null && serviceId != 'null' && serviceId.length > 4){
+		subServiceId = serviceId.substring(0,4);
+		
+		//2020e금융고도화 이지뱅킹 2020-11-21 적용 대상 - 간편뱅킹로그인 후에 이지뱅킹 접속 처리
+		if(serviceId.indexOf("IH") > -1) {	ezBankYn = true;	}
+	}
+	
+		
+	//카드서비스이면....
+	if(subServiceId == "IPCM" || subServiceId == "IPCI" || subServiceId == "IPCF" 
+		|| subServiceId == "IPCC" || subServiceId == "IPCV" || subServiceId == "IPMC"){
+		phonNumber = "(1644-4000)";
+	}
+	
+	var returnServiceId = errObject.returnServiceId;
+	
+	if(returnServiceId != undefined && returnServiceId != null && returnServiceId != 'null' && returnServiceId.length > 0){
+		returnServiceId = returnServiceId;
+	}else{
+		returnServiceId = "null";
+	}	
+	
+	var checkFailYn = "N";
+	var message = "";
+	
+	if( (errObject.errMsg == undefined || errObject.errMsg == 'undefined' || errObject.errMsg == null || errObject.errMsg == 'null')
+		&& (subErrorCode == '') && (errObject.errSvrInfo == undefined || errObject.errSvrInfo == 'undefined' || errObject.errSvrInfo == null || errObject.errSvrInfo == 'null') ){
+		
+		checkFailYn = "Y";
+		message = common_cfGetMessage("I0541");		
+
+		//이니텍에러처리
+		if ( errObject.status != "200" ) {
+		
+			if ( common_cfCheckInitechError ( errObject.status ) ) { // 이니텍 에러일 경우
+				message = common_cfGetMessage("E0434");
+			}
+		}
+		
+	}else{
+		message = errObject.errMsg;
+	}
+	
+	//간편인증 이용자 타 매체 이동시 오류팝업
+	if(errorCode == 'MCPR98019'){
+		if(!ezBankYn) {//2020e금융고도화 이지뱅킹 2020-11-21 적용 대상 - 간편뱅킹로그인 후에 이지뱅킹 접속 처리
+		checkFailYn = "Y";
+		message = common_cfGetMessage("E0349");
+		}
+	}else if(errorCode == 'MCPR98020'){
+		checkFailYn = "Y";
+		message = common_cfGetMessage("E0350");
+	}else if(errorCode == 'MCPR98030'){
+		checkFailYn = "Y";
+		message = common_cfGetMessage("E0354");
+	}else if(errorCode == 'IPEF00001'){
+		checkFailYn = "Y";
+		message = common_cfGetMessage("E0351");
+	}else if(errorCode == 'MCPR98021'){
+		checkFailYn = "Y";
+		message = common_cfGetMessage("E0353");
+	}else if(errorCode == 'MCOP92637' || errorCode == 'MCOP92638' || errorCode == 'MCOP92639'){
+		checkFailYn = "Y";
+	}
+	
+	
+    var err_HTML = "";
+    err_HTML += "	<div class='pop_header' data-dialog-movecursor='true'>";
+    err_HTML += "		<h1 class='h1_pop'>"+common_cfGetMessage("I0522")+"</h1>";
+    err_HTML += "	</div>";
+    err_HTML += "	<div class='pop_content'>";
+    err_HTML += "		<!-- 오류 페이지 -->";
+    err_HTML += "		<div class='error'>";
+    err_HTML += "			<div class='desc'>";
+    //err_HTML += "				<p>"+common_cfGetMessage("I0519")+"</p>";
+    err_HTML += "				<p>"+message+"</p>";
+    if (subErrorCode == '06695' || subErrorCode == '96695' || subErrorCode == '06697' || subErrorCode == '96697' || subErrorCode == '06709') {
+    	err_HTML += "			<p>"+common_cfGetMessage("I0527")+"</p>";
+    }
+    if(checkFailYn == "N"){
+    	err_HTML += "				<div class='gcode'>";
+        err_HTML += "					<span class='code'><strong>"+common_cfGetMessage("I0520")+" : "+subErrorCode+","+ errObject.errSvrInfo + "" + apSvrNm +"</strong></span>";
+        err_HTML += "					<span class='btn7 more'><a href='#none' onClick='viewDetailErr();'>"+common_cfGetMessage("I0521")+"</a></span>";
+        err_HTML += "					<span class='mcode' id='view_code' style='display:none;'>" + detailView + "</span>";
+        err_HTML += "				</div>";	
+    }
+    
+    err_HTML += "			</div>";
+    err_HTML += "			<div class='foot'>";
+    err_HTML += "				<p><span class='info3'>"+common_cfGetMessage("I0523")+"<span>" + phonNumber + "</span>"+common_cfGetMessage("I0524")+"</span></p>";
+    err_HTML += "			</div>";
+    err_HTML += "		</div>";
+    err_HTML += "		<!-- //오류 페이지 -->";
+    err_HTML += "		<div class='btn_area'>";
+
+    /*
+     * 2016 e-금융 보안강화 및 서비스 고도화 구축 > START
+     * - 공인인증서 발급 절차 개선
+     * - 인증서 등록/재발급에서 타행발행 인증서 존재시 [타행/타기관 인증서 등록 바로가기] 버튼 표시
+     */
+    if (subErrorCode == '92513') {
+        err_HTML += "		<span class='btn1'><a href='javascript:closeErrorLayerWinOpen(\"" + (window["G_WEB"] == "true" ? "PGCA0161I" : "IPCA0161I") + "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", false);'>"+common_cfGetMessage("I0660")+"</a></span>";
+    }
+    /*
+     * 2016 e-금융 보안강화 및 서비스 고도화 구축 > END
+     */
+    if(errorCode != 'MCOP92637' && errorCode != 'MCOP92638' && errorCode != 'MCOP92639'){
+    	err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayerWinOpen(\"" +returnServiceId+ "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", true);'>"+common_cfGetMessage("I0525")+"</a></span>";
+	}
+    
+    var errorLink = common_cfGetDomain('IP00') + "/servlet/content/ip/ec/ipec0303c.thtml?saac=saac";
+    if (errorCode == 'IPCN93A07' || errorCode == 'EACO02206') {    	
+    	if(window["G_WEB"] != "true"){
+    		err_HTML += "		<span class='btn1'><a href='" + errorLink + "'>오류해결 안내</a></span>";
+    	}
+    }
+    
+    if (subErrorCode == '00045' || subErrorCode == '92002') {
+    	if(window["G_WEB"] != "true"){
+    		err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayerWinOpen(\"" + "IPCA1001I" + "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", false);'>"+common_cfGetMessage("I0663")+"</a></span>";
+    	}
+    }
+    
+    if (subErrorCode == '06695' || subErrorCode == '96695' || subErrorCode == '06709') {
+        err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayerWinOpen(\"" + (window["G_WEB"] == "true" ? "PGAM0491R" : "IPAM0491R") + "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", false);'>"+common_cfGetMessage("I0528")+"</a></span>";
+        err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayerWinOpen(\"" + (window["G_WEB"] == "true" ? "PGAM0261I" : "IPAM0261I") + "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", false);'>"+common_cfGetMessage("I0529")+"</a></span>";
+    }
+    if (subErrorCode == '06697' || subErrorCode == '96697') {
+        err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayerWinOpen(\"" + (window["G_WEB"] == "true" ? "PGAM0491R" : "IPAM0491R") + "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", false);'>"+common_cfGetMessage("I0528")+"</a></span>";
+        err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayerWinOpen(\"" + (window["G_WEB"] == "true" ? "PGAM0261I" : "IPAM0261I") + "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", false);'>"+common_cfGetMessage("I0530")+"</a></span>";
+    }
+    if (subErrorCode == '96698') {
+        err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayerWinOpen(\"" + "IPAM0401I" + "\", \"" + orgErrorCode + "\", \"" + serviceId + "\", false);'>"+common_cfGetMessage("I0655")+"</a></span>";
+    }
+    
+    if(errorCode == 'MCPR98019' || errorCode == 'MCPR98020'){
+    	err_HTML += "		<span class='btn1'><a id='btnPinCertLoginExit' href='#none'>로그아웃</a></span>";
+    }
+    
+    if(errorCode == 'MCPR98021'){
+      	err_HTML += "		<span class='btn1'><a id='btnFinCertLoginExit' href='#none'>로그아웃</a></span>";
+    }
+    
+    if(errorCode == 'MCPR98030'){
+    	err_HTML += "		<span class='btn1'><a id='btnLoginExit' href='#none'>로그아웃</a></span>";
+    }
+    
+    if(errorCode == 'EACO08145'){
+    	err_HTML += "		<span class='btn2'><a href='javascript:closeErrorLayerWinOpen(\"" + "/ip/am/ipam0542c.thtml" + "\", \"\", \"\", false);'>모바일OTP발급안내</a></span>";
+    }
+    
+    /* 금융인증서 발급/재발급 */
+    if(errorCode == 'MCOP92637') {
+    	err_HTML += "		<span class='btn1'><a href='javascript:navigate(\"" + "IPCNA001R" + "\");'>사용하기</a></span>";
+    	err_HTML += "		<span class='btn2'><a href='javascript:closeErrPopWinOpen();fSubmit2(\"REISSUE\");'>재발급</a></span>";
+    }
+    
+    if(errorCode == 'MCOP92638') {
+    	err_HTML += "		<span class='btn1'><a href='javascript:navigate(\"" + "IPCA2021I" + "\");'>타행인증서 등록</a></span>";
+    	err_HTML += "		<span class='btn2'><a href='javascript:closeErrPopWinOpen();fSubmit2(\"OTHERCERT\");'>재발급</a></span>";
+    }
+    
+    if(errorCode == 'MCOP92639') {
+    	err_HTML += "		<span class='btn1'><a href='javascript:navigate(\"" + "IPCNA001R" + "\");'>로그인</a></span>";
+    	err_HTML += "		<span class='btn2'><a href='javascript:closeErrPopWinOpen();fSubmit2(\"OTHERCERT\");'>재발급</a></span>";
+    }
+    
+    err_HTML += "		</div>";
+    err_HTML += "	</div>";
+    err_HTML += "	<div class='pop_footer'>";
+    err_HTML += "		<p class='pop_logo'>NH bank</p>";
+    err_HTML += "		<button class='pop_close close_pop' data-tap='closeErrPopWinOpen();'>"+common_cfGetMessage("I0525")+"</button>";
+    err_HTML += "	</div>";
+    
+	return err_HTML;
+}
+
+//M사이트 관련 에러레이어
+function getMErrorHTML(errObject) {
+
+	var errorCode = errObject.errorCode;
+	var subErrorCode = "";
+	var guid = errObject.guid;
+	var detailView = "";
+	var rmsSvc = errObject.rmsSvc;
+	var apSvrNm = errObject.apSvrNm;
+	var orgErrorCode = errObject.orgErrorCode;
+	
+	if(errorCode && errorCode.length == 9){
+		subErrorCode = errorCode.substring(4);
+	}
+	
+	//LIC에러 처리
+	if ( ( "LIC_7090" == orgErrorCode ) ||
+		 ( "LIC_7091" == orgErrorCode ) ||
+		 ( "LIC_7092" == orgErrorCode ) ||
+		 ( "LIC_7093" == orgErrorCode ) ||
+		 ( "LIC_7094" == orgErrorCode ) ||
+		 ( "LIC_7095" == orgErrorCode ) ||
+		 ( "LIC_7096" == orgErrorCode ) ||
+		 ( "LIC_7097" == orgErrorCode ) ||
+		 ( "LIC_7098" == orgErrorCode ) ) {
+		subErrorCode = orgErrorCode;	
+	}
+	
+	if(guid != undefined && guid != null && guid != 'null' && guid.length > 0){
+		guid = " > " + guid;
+	}else{
+		guid = "";
+	}
+	
+	if(rmsSvc != undefined && rmsSvc != null && rmsSvc != 'null' && rmsSvc.length > 0){
+		rmsSvc = rmsSvc + " > ";
+	}else{
+		rmsSvc = "";
+	}
+	
+	if(apSvrNm != undefined && apSvrNm != null && apSvrNm != 'null' && apSvrNm.length > 0){
+		apSvrNm = ", " + apSvrNm;
+	}else{
+		apSvrNm = "";
+	}
+	
+	detailView = rmsSvc + errObject.errPrgName + " > " + errObject.orgErrorCode + " > " + errObject.errPrgLine + guid;
+	
+	var serviceId = errObject.serviceId;
+
+	var phonNumber = "(1588-2100/1544-2100, 929번)";
+
+	var returnServiceId = errObject.returnServiceId;
+	
+	if(returnServiceId != undefined && returnServiceId != null && returnServiceId != 'null' && returnServiceId.length > 0){
+		returnServiceId = returnServiceId;
+	}else{
+		returnServiceId = "null";
+	}
+	
+	var checkFailYn = "N";
+	var message = "";
+	
+	if( (errObject.errMsg == undefined || errObject.errMsg == 'undefined' || errObject.errMsg == null || errObject.errMsg == 'null')
+		&& (subErrorCode == '') && (errObject.errSvrInfo == undefined || errObject.errSvrInfo == 'undefined' || errObject.errSvrInfo == null || errObject.errSvrInfo == 'null') ){
+		
+		checkFailYn = "Y";
+		message = common_cfGetMessage("I0541");
+	}else{
+		message = errObject.errMsg;
+	}
+	
+	//2020 e금융고도화 M-SITE 2020-10-17 적용 대상
+    var err_HTML = "";
+	err_HTML += "	<div class='inr'>                                                                                                                                             ";
+	err_HTML += "		<div class='lypopContainer'>                                                                                                                              ";
+	err_HTML += "			<div class='lypopCont lyAlert'>                                                                                                                               ";
+	err_HTML += "				<div class='lypopHeader'>                                                                                                                         ";
+	err_HTML += "					<h2 class='tit'>오류안내</h2>                                                                                                                    ";
+	err_HTML += "				</div>                                                                                                                                            ";
+	err_HTML += "				<div class='lypopBody'>                                                                                                                           ";
+	err_HTML += "					<div class='msgWrap complete'>                                                                                                                ";
+	err_HTML += "                        <strong class='type3'>"+message+"</strong>                                                                                               ";
+	err_HTML += "                    </div>                                                                                                                                       ";
+	if(checkFailYn == "N"){
+		err_HTML += "                    <div class='roundLineBox mt25'>                                                                                                              ";
+		err_HTML += "                        <p class='txt s txC'>안내코드 : "+subErrorCode+","+ errObject.errSvrInfo + "" + apSvrNm +"</p>                                               ";
+		err_HTML += "                    </div>                                                                                                                                       ";
+		err_HTML += "                                                                                                                                                                 ";
+		// 2020-10-06 사업부서 요청으로 상세안내코드 삭제
+		/*err_HTML += "                    <div class='toggletp type02 mt25'>                                                                                                           ";
+		err_HTML += "                        <a href='#toggle-code1' class='tgHead txC jsToggle' role='button' aria-expanded='false'><span class='tgTxt'>상세안내코드/GID보기 취소</span></a>  ";
+		err_HTML += "                        <div id='toggle-code1' class='tgConts jsToggleWrap' aria-hidden='true' tabindex='0'>                                                     ";
+		err_HTML += "                            <p class='txC'>" + detailView + "</p>                                                                                                ";
+		err_HTML += "                        </div>                                                                                                                                   ";
+		err_HTML += "                    </div>                                                                                                                                       ";*/
+	}
+	err_HTML += "                    <div class='noticeWrap mt20'>                                                                                                                ";
+	err_HTML += "                        <ul>                                                                                                                                     ";
+	err_HTML += "                            <li>                                                                                                                                 ";
+	err_HTML += "                                자세한 사항은 농협 고객행복센터"+phonNumber+"에 문의하시기 바랍니다.                                                                         			  ";
+	err_HTML += "                            </li>                                                                                                                                ";
+	err_HTML += "                        </ul>                                                                                                                                    ";
+	err_HTML += "                    </div>                                                                                                                                       ";
+	err_HTML += "				</div>                                                                                                                                            ";
+	err_HTML += "				<div class='lypopFooter'>                                                                                                                         ";
+	err_HTML += "					<div class='btnWrap flex foot'>                                                                                                               ";
+	err_HTML += "						<button type='button' class='btn em' onClick='javascript:closeMErrorLayer(\"" +returnServiceId+ "\", \"" + orgErrorCode + "\", \"" + serviceId + "\");'>확인</button>                                                                                          ";
+	err_HTML += "					</div>                                                                                                                                        ";
+	err_HTML += "				</div>                                                                                                                                            ";
+	err_HTML += "			</div>                                                                                                                                                ";
+	err_HTML += "		</div>                                                                                                                                                    ";
+	err_HTML += "	</div>                                                                                                                                                        ";
+    
+	return err_HTML;
+}	
+
+/* ----------------------------------
+ * 금융인증서 글로벌뱅킹/파트너뱅킹 미지원팝업레이어
+ * ---------------------------------- */
+function getFinErrorLayerPop(path){
+	showErrorLayerPop({errorCode : 'MCPR98021'});
+	path = common_path_navigate(path);
+	$('#btnFinCertLoginExit').tap(function(){
+		httpSend('IPCNA902R', null, function(responseJson){
+			window['navigateOri'](path, null, null);
+		});
+	});
+}
+
+/*
+ * path 의 service id만 축출
+ * */
+function common_path_navigate(path){
+	if(path.indexOf('/') != -1) path = path.substring(path.lastIndexOf('/') + 1);
+	if(path.indexOf('.') != -1) path = path.substring(0, path.lastIndexOf('.'));
+	return path;
+}
+
+function open_layer_html(txt, divObj, width, height, xpos, ypos) {	
+
+	// 현재 포커스 저장
+	if (common_FOCUS_LAYER_ID == null) {
+		common_FOCUS_LAYER_ID = $('*:focus');
+	}
+
+	var inner_html_txt = txt;
+	var obj = document.getElementById(divObj);
+
+	if(obj != null && obj != undefined) {				    	
+		obj.innerHTML = inner_html_txt;
+	}       
+	      
+	$('#layerDiv_errPop').open();
+}
+
+function open_m_layer_html(txt, divObj, width, height, xpos, ypos) {	
+
+	// 현재 포커스 저장
+	if (common_FOCUS_LAYER_ID == null) {
+		//common_FOCUS_LAYER_ID = $('*:focus');
+		common_FOCUS_LAYER_ID = document.activeElement;
+	}
+
+	var inner_html_txt = txt;
+	var obj = document.getElementById(divObj);
+
+	if(obj != null && obj != undefined) {				    	
+		obj.innerHTML = inner_html_txt;
+	}
+	
+	//2020 e금융고도화 M-SITE 2020-10-17 적용 대상
+	$("#"+divObj+"").addClass("show");
+	$("#"+divObj+"").css("display", "block");
+	var popZIndex = '5001'; //M사이트 popup 위에 오류 팝업 띄우기 위해 zIndex 1높힘
+	var $wrap = $('#wrap');
+	var $content = $('.content').add('footer').add('header'); // 웹접근성 대응
+	var $popObj = $("#"+divObj);
+	var $maxPopH = window.innerHeight;
+	if($popObj.length>0){
+		$popObj.css({zIndex:popZIndex++}).show(); 
+		$content.attr('aria-hidden', true);
+		
+		setTimeout(function() {
+			$popObj.addClass('show');
+		}, 300);
+		setTimeout(function() {
+			if($popObj.find('.lypopHeader .tit').length){
+				$popObj.find('.lypopHeader .tit').attr('tabindex', 0).focus();
+			} else{
+				$popObj.find('.lypopCont').attr('tabindex', 0).focus();
+			}
+		}, 300);
+
+		if($wrap.find('.lypopFade').length<1) {
+			$wrap.append('<div class="lypopFade fade"></div>');
+		}
+		
+		var dimIndex = $popObj.css('zIndex') - 1;
+		$('.lypopFade').css({zIndex:dimIndex}).addClass('show');
+
+		$('html').addClass('lypopOpen');
+		
+		if($popObj.find('.lypopCont').outerHeight() > $maxPopH *.6){
+			$popObj.find('.lypopBody').css({'overflowY' : 'scroll', height : $maxPopH *.5});
+		}		
+	
+		if($popObj.hasClass('full')){
+    		var $header = $popObj.find('.lypopHeader').length > 0 ? $popObj.find('.lypopHeader').outerHeight() : 0 ;
+			var $footer = $popObj.find('.lypopFooter').length > 0 ? $popObj.find('.lypopFooter').outerHeight() : 0 ;
+			var $space = 2 * (parseFloat(getComputedStyle(document.body).fontSize)/1.4);
+			$space = Math.floor($space);
+
+			$popObj.find('.lypopBody').css({'overflowY' : 'scroll', height : $maxPopH - ($header + $footer + $space)});
+		}
+		$(".jsClose").on('click', function(){
+			$(this).parents('.lypopWrap').trigger('closePopup');
+			$(".lypopFade").remove();
+			$("#"+divObj+"").remove();
+		});
+	}	
+	  
+    /* 황금돼지 임재흥 2019-09-25 웹접근성 개선 시작 */
+    /*      
+	$('#layerDiv_mErrPop').attr('aria-hidden', 'true');	// 2019 고도화 웹접근성 수정 : 팝업 포커스 처리 위해 추가
+    */
+	$('#layerDiv_mErrPop').attr('aria-hidden', 'false');	// 2019 고도화 웹접근성 수정 : 팝업 포커스 처리 위해 추가
+    /* 황금돼지 임재흥 2019-09-25 웹접근성 개선 끝 */		
+	$('#layerDiv_mErrPop').open();
+	$('#h1_fc').focus();
+}
+
+function open_layer_htmlWinOpen(txt, divObj, width, height, xpos, ypos) {	
+
+	// 현재 포커스 저장
+	if (common_FOCUS_LAYER_ID == null) {
+		common_FOCUS_LAYER_ID = $('*:focus');
+	}
+
+	var inner_html_txt = txt;
+	var obj = document.getElementById(divObj);
+
+	if(obj != null && obj != undefined) {				    	
+		obj.innerHTML = inner_html_txt;
+	}       
+	      
+	$('#layerDiv_errPop_winOpen').open();
+}
+
+function viewDetailErr(){
+	
+	if($(".mcode").css("display") != "block"){
+		$(".mcode").show();
+	}else{
+		$(".mcode").hide();
+	}
+	return false;
+	
+}
+
+function viewMDetailErr(){
+	if($("#view_code").css("display") != "block"){
+		$("#view_code_a").attr("title", "하위메시지 닫기"); // 2019 고도화 웹접근성 수정 : 타이틀 추가
+		$("#view_code").show();
+	}else{
+		$("#view_code_a").attr("title", "하위메시지 열기");	// 2019 고도화 웹접근성 수정 : 타이틀 추가
+		$("#view_code").hide();
+	}
+	return false;
+}
+
+function closeErrPop() {
+	$('#layerDiv_errPop').close();
+	$('#layerDiv_errPop').empty();
+
+	// 저장된 포커스로 이동
+	if (common_FOCUS_LAYER_ID != null) {
+		common_FOCUS_LAYER_ID.focus();
+		common_FOCUS_LAYER_ID = null;
+	}
+}
+
+//2020 e금융고도화 M-SITE 2020-10-17 적용 대상
+function closeMErrPop(svc) {
+    /* 황금돼지 임재흥 2019-09-25 웹접근성 개선 시작 */
+    /*
+	$('#layerDiv_mErrPop').attr('aria-hidden', 'false');	// 2019 고도화 웹접근성 수정 : 팝업 포커스 처리 위해 추가
+    */
+	$('#layerDiv_mErrPop').attr('aria-hidden', 'true');	// 2019 고도화 웹접근성 수정 : 팝업 포커스 처리 위해 추가
+    /* 황금돼지 임재흥 2019-09-25 웹접근성 개선 끝 */	 
+	$('.mask').css("display", "none");
+	$('#layerDiv_mErrPop').close();
+	$('#layerDiv_mErrPop').empty();
+	
+	// Fade영역 제거
+	$(".lypopFade").remove();
+	$('.content').add('footer').add('header').attr('aria-hidden', false); // 웹접근성 대응
+	$('#layerDiv_mErrPop').css("display", "none");
+	// 저장된 포커스로 이동
+	if (common_FOCUS_LAYER_ID != null) {
+		common_FOCUS_LAYER_ID.focus();
+		common_FOCUS_LAYER_ID = null;
+	}
+	
+	if (svc != null && svc != undefined && svc != "") {
+		navigate(svc);
+	}
+}
+
+function closeErrorLayer(returnServiceId, orgErrorCode, cuServiceId, isGlobal){
+
+	if (isGlobal == null || isGlobal == undefined) {
+		isGlobal = true;
+	}
+
+	var subServiceId = "";
+	
+	if(cuServiceId != undefined && cuServiceId != 'undefined' && cuServiceId != null && cuServiceId != 'null' && cuServiceId.length > 4){
+		subServiceId = cuServiceId.substring(0,4);
+	}
+	
+	var serviceId = "";
+	
+	//로그인관련 에러라면 로그인 페이지로 이동.
+	if ('NA11005' == orgErrorCode || 'NA11007' == orgErrorCode || 'NA11009' == orgErrorCode 
+			|| "NC12002" == orgErrorCode || 'NW11101' == orgErrorCode || "NW11102" == orgErrorCode
+			|| "NW11105" == orgErrorCode) {
+		
+		serviceId = "IPCNA001R"; // 뱅킹로그인
+	}else if('NA11010' == orgErrorCode){
+		serviceId = "IPCNA0005R"; // 인증서 로그인
+	}else 
+	
+	//프레임웍에 세팅된 return service가 있으면
+	if(returnServiceId.indexOf(".view") > 0 || returnServiceId.indexOf(".cmd") > 0 || returnServiceId.indexOf(".frag") > 0){
+	     var position = returnServiceId.indexOf('.');
+	     serviceId = returnServiceId.substring(0,position);
+	}else{
+		if(returnServiceId != "null") {
+			serviceId = returnServiceId;
+		}
+	}
+	
+	
+	// 보안카드,OTP 구분값 없는 경우
+	if ( ( window["POP_WEB"] != "true" ) &&
+		 ( serviceId == '' ) && 
+		 ( 'IPAM91007' == orgErrorCode ) ) { 
+		closeErrPop();
+		document.location.href = "/";
+	}	
+	
+	// LIC에러 발생한 경우
+	if ( 'LIC_7090' == orgErrorCode || 
+	     'LIC_7091' == orgErrorCode ||
+	     'LIC_7092' == orgErrorCode ||
+	     'LIC_7093' == orgErrorCode ||
+	     'LIC_7094' == orgErrorCode ||
+	     'LIC_7095' == orgErrorCode ||
+	     'LIC_7096' == orgErrorCode ||
+	     'LIC_7097' == orgErrorCode ||
+	     'LIC_7098' == orgErrorCode )  { 
+		closeErrPop();
+		document.location.href = "/";
+	}
+
+	// 파트너뱅킹 초기 접속 에러
+	if ( 'WSCN91001' == orgErrorCode ||
+	     'WSCN91002' == orgErrorCode ||
+	     'WSCN91003' == orgErrorCode ||
+	     'WSCN91004' == orgErrorCode ||
+	     'WSCN91005' == orgErrorCode ||
+	     'WSCN91006' == orgErrorCode ||
+	     'WSCN91007' == orgErrorCode ) {
+		window.close();
+	}
+
+	//serviceId가 없으면 레이어 팝업을 닫고 있으면 navigate한다.
+	if(serviceId != ""){
+		closeErrPop();
+		if(window["H_WEB_POP"] != undefined && window["H_WEB_POP"]=='true'){
+			$(".modal-close").parents().find('.modal-wrap').hide();
+			$('body').removeClass('position-fixed');
+		}
+		
+		if(returnServiceId.indexOf(".thtml") > 0 || serviceId.indexOf(".thtml") > 0){
+			common_navigateToContent(serviceId,null); 			// 컨텐츠 페이지로 바로가기, by 정영탁
+		}else if(isGlobal){
+			navigateIP(serviceId);								// 개인뱅킹,파트너뱅킹 서비스 공유를 위해 navigateIP로 변경, by 정영탁
+		}else{
+			if(window["H_WEB"]=='true'){
+				if(serviceId == "IPCA1001I"){
+					navigate('IPCA1001I', {menu_id:'IPCA01'});	// 큰글뱅킹 장기무거래등록버튼시 메뉴id 가져가기
+				}else if(serviceId == "IPAM0491R"){
+					popup_cfLayerOpen('IHCNI302P');				// 큰글뱅킹 해외체류인증
+				}else{
+					navigate(serviceId);
+				}
+			}else{
+				navigate(serviceId);
+			}
+		}
+	}else{
+		closeErrPop();
+	}
+}
+
+function closeMErrorLayer(returnServiceId, orgErrorCode, cuServiceId){
+	$('html').removeClass('lypopOpen');	//2020 e금융고도화 M-SITE 2020-10-17 적용 대상
+	
+	var subServiceId = "";
+	if(cuServiceId != undefined && cuServiceId != 'undefined' && cuServiceId != null && cuServiceId != 'null' && cuServiceId.length > 4){
+		subServiceId = cuServiceId.substring(0,4);
+	}
+	
+	var serviceId = "";
+	
+	//로그인관련 에러라면 로그인 페이지로 이동.
+	if ('NA11005' == orgErrorCode || 'NA11007' == orgErrorCode || 'NA11009' == orgErrorCode 
+			|| 'NA11010' == orgErrorCode || "NC12002" == orgErrorCode
+			|| 'NW11101' == orgErrorCode || "NW11102" == orgErrorCode
+			|| "NW11105" == orgErrorCode) {
+		
+		serviceId = "PMCNA100R"; // 뱅킹로그인
+	} 
+	
+	//프레임웍에 세팅된 return service가 있으면
+	if(returnServiceId.indexOf(".view") > 0 || returnServiceId.indexOf(".cmd") > 0 || returnServiceId.indexOf(".frag") > 0){
+	     var position = returnServiceId.indexOf('.');
+	     serviceId = returnServiceId.substring(0,position);
+	}else{
+		if(returnServiceId != "null")		serviceId = returnServiceId;
+	}
+	
+	// LIC에러 발생한 경우
+	if ( 'LIC_7090' == orgErrorCode || 
+	     'LIC_7091' == orgErrorCode ||
+	     'LIC_7092' == orgErrorCode ||
+	     'LIC_7093' == orgErrorCode ||
+	     'LIC_7094' == orgErrorCode ||
+	     'LIC_7095' == orgErrorCode ||
+	     'LIC_7096' == orgErrorCode ||
+	     'LIC_7097' == orgErrorCode ||
+	     'LIC_7098' == orgErrorCode )  { 
+		closeMErrPop();
+		document.location.href = "/";
+	}
+
+	// 파트너뱅킹 초기 접속 에러
+	if ( 'WSCN91001' == orgErrorCode ||
+	     'WSCN91002' == orgErrorCode ||
+	     'WSCN91003' == orgErrorCode ||
+	     'WSCN91004' == orgErrorCode ||
+	     'WSCN91005' == orgErrorCode ||
+	     'WSCN91006' == orgErrorCode ||
+	     'WSCN91007' == orgErrorCode ) {
+		window.close();
+	}
+	
+	//2020 e금융고도화 M-SITE 2020-10-17 적용 대상
+	if(orgErrorCode == "NB99998" ||	//전산시스템 오류
+	   orgErrorCode == "IPAM91007" || //조회고객이고 보안매체 없을 때
+	   orgErrorCode == "IPCN92010" || //스마트뱅킹 미가입고객일때
+	   orgErrorCode == "WFCO90508" || orgErrorCode == "NW18002" || //서비스 불가 시간일 때 메인으로 이동 ( 에러코드가 'WFCO90508' <- 이게 출력이 되나 로그상 'NW18002' 이것이 출력이 되기에 둘다 조건 걸음
+	   orgErrorCode == "IPCN95A01" //세션이 종료되어 발생하는 오류 (NHBSessionUtil.getSecFldSession Exception)	   
+	){
+		serviceId = "index_mobile";
+		// 보안매체 미등록 고객이 비밀번호 재설정 화면에서 휴대폰(SMS), 이메일 인증 성공 후 장시간(10분이상)미사용으로 인해 세션(인증정보)이 종료되어 오류가  발생된 경우  메인페이지로 이동유도
+		if(cuServiceId == "IPME0125S" || cuServiceId == "IPME0101R") {
+			// IPME0125S : 이메일 인증번호 발송 service
+			// IPME0101R : ID/PW로그인 비밀번호초기화(재설정)(SMS인증) service
+			if(confirm("인증번호 요청 후 장시간 사용되지 않은 상태입니다.\n확인 버튼을 클릭하여 메인페이지로 이동해주세요.") == false) {
+				return false;
+			}
+		}
+	}else{
+		serviceId = "";
+	}
+	
+	closeMErrPop(serviceId);
+
+}
+
+function closeErrPopWinOpen() {
+	$('#layerDiv_errPop_winOpen').close();
+	$('#layerDiv_errPop_winOpen').empty();
+
+	// 저장된 포커스로 이동
+	if (common_FOCUS_LAYER_ID != null) {
+		common_FOCUS_LAYER_ID.focus();
+		common_FOCUS_LAYER_ID = null;
+	}
+}
+
+function closeErrorLayerWinOpen(returnServiceId, orgErrorCode, cuServiceId, isGlobal){
+
+	if (isGlobal == null || isGlobal == undefined) {
+		isGlobal = true;
+	}
+
+	var subServiceId = "";
+	
+	if(cuServiceId != undefined && cuServiceId != 'undefined' && cuServiceId != null && cuServiceId != 'null' && cuServiceId.length > 4){
+		subServiceId = cuServiceId.substring(0,4);
+	}
+	
+	var serviceId = "";
+	
+	//로그인관련 에러라면 로그인 페이지로 이동.
+	if ('NA11005' == orgErrorCode || 'NA11007' == orgErrorCode || 'NA11009' == orgErrorCode 
+			|| 'NA11010' == orgErrorCode || "NC12002" == orgErrorCode
+			|| 'NW11101' == orgErrorCode || "NW11102" == orgErrorCode
+			|| "NW11105" == orgErrorCode) {
+		
+		closeErrPopWinOpen();
+	}
+	
+	//프레임웍에 세팅된 return service가 있으면
+	if(returnServiceId.indexOf(".view") > 0 || returnServiceId.indexOf(".cmd") > 0 || returnServiceId.indexOf(".frag") > 0){
+	     var position = returnServiceId.indexOf('.');
+	     serviceId = returnServiceId.substring(0,position);
+	}else{
+		if(returnServiceId != "null") {
+			serviceId = returnServiceId;
+		}
+	}
+	
+	//serviceId가 없으면 레이어 팝업을 닫고 있으면 navigate한다.
+	if(serviceId != ""){
+		closeErrPopWinOpen();
+		if (returnServiceId.indexOf(".thtml") > 0) {
+			common_navigateToContent(serviceId,null); // 컨텐츠 페이지로 바로가기, by 정영탁
+		} else if (isGlobal) {
+			navigateIP(serviceId);	// 개인뱅킹,파트너뱅킹 서비스 공유를 위해 navigateIP로 변경, by 정영탁
+		} else {
+			navigate(serviceId);
+		}
+	}else{
+		closeErrPopWinOpen();
+	}
+}
+
+function common_cfUserDefinedErrorPop(data, status, xhr) {
+	
+	var errorCode = xhr.getResponseHeader('ERROR_CODE');
+	var errorMsg = xhr.getResponseHeader('ERROR_MESSAGE');
+	errorMsg = decodeURIComponent(errorMsg);
+	errorMsg = errorMsg.split('+').join(' ');
+	
+	var errObject = 
+	{
+		errMsg : errorMsg
+		, errorCode : xhr.getResponseHeader('ERROR_CODE')
+		, orgErrorCode : xhr.getResponseHeader('ORG_ERROR_CODE')
+		, errPrgName : xhr.getResponseHeader('ERROR_PROGRAM_NAME')
+		, errPrgLine : xhr.getResponseHeader('ERROR_PROGRAM_LINE')
+		, errSvrInfo : xhr.getResponseHeader('ERROR_SERVER_INFO')
+		, guid : xhr.getResponseHeader('BACKEND_CHANNEL_GUID')
+		, rmsSvc : xhr.getResponseHeader('RMS_SVC_C')
+		, apSvrNm : xhr.getResponseHeader('EXE_NODE_NO')
+		, preServiceId : xhr.getResponseHeader('PREVIOUS_SERVICE_ID')
+		, returnServiceId : xhr.getResponseHeader('RETURN_SERVICE_ID')
+		, serviceId : xhr.getResponseHeader('service')
+		, status : xhr.status
+	};
+	
+	showErrorLayerPop(errObject);
+	
+}
+
+
+/**
+ * <pre>
+ * 리포트 인쇄 ( CABSOFT 솔루션연계 )
+ * </pre>
+ * @param reportTitle : 리포트타이틀         
+ * @param reportFile : 서식명 
+ * @param reportData : 리포트대상 데이타
+ */
+function common_cfReportPrint ( reportTitle, reportFile, reportData, reportChartImgName ) {
+	
+	// Form 받기
+	var reportSendFrm = document.getElementById ( "reportSendFrm" ) ;
+	var _service_ID = "/servlet/IPCNB000S.view";	
+	
+	// Form Element에  값넣기
+	reportSendFrm.reportTitle.value = reportTitle;
+	reportSendFrm.reportFile.value = reportFile;
+	reportSendFrm.reportData.value = reportData;
+	//대량Data추가
+	reportSendFrm.massiveYN.value = $('#massiveYN').val();
+	reportSendFrm.massiveType.value = $('#massiveType').val();
+	
+	// 글로벌 적용
+	if(window["G_WEB"] == "true"){
+		  reportSendFrm.reportGlobalYN.value = "true";
+		  _service_ID = "PGCNB000S.view";
+	}else{
+		  reportSendFrm.reportGlobalYN.value = "false";
+	}	
+
+	// 차트이미지이름 입력
+	if ( reportChartImgName != null && reportChartImgName != undefined ) {
+		reportSendFrm.reportChartImgName.value = reportChartImgName;
+	}
+	
+	// 리포트 솔루션 팝업 띄움
+	common_cfOpenWinPop (_service_ID ,
+				          "pop_eForm", 
+				          "reportSendFrm", 
+				          ["1000","800","0","0","no","no","no","no","no","no"] );
+}	
+
+/**
+ * <pre>
+ * 리포트 인쇄 위한 Form설정 ( CABSOFT 솔루션연계 )
+ * </pre>
+ */
+function common_cfReportFormInit() {
+	var html = "";
+	html += "<form action='' name='reportSendFrm' id='reportSendFrm' method='post'>";
+	html += "   <input type='hidden' name='reportTitle' id='reportTitle' value='' />";
+	html += "   <input type='hidden' name='reportFile' id='reportFile' value='' />" ;
+	html += "	<input type='hidden' name='reportData' id='reportData' value='' />";
+	html += "	<input type='hidden' name='reportChartImgName' id='reportChartImgName' value='' />";
+	html += "	<input type='hidden' name='reportXmlType' id='reportXmlType' value='' />";
+	html += "	<input type='hidden' name='reportGlobalYN' id='reportGlobalYN' value='' />";
+	// 대용량 처리로직 추가
+	html += "	<input type='hidden' name='totalCount' id='totalCount' value='' />";
+	html += "	<input type='hidden' name='massiveYN' id='massiveYN' value='' />";
+	html += "	<input type='hidden' name='massiveType' id='massiveType' value='' />";
+	html += "</form>";
+	$("body").append(html);
+}	
+
+/**
+ * <pre>
+ * Div영역 초기화.
+ * </pre>
+ */
+function common_cfDivInit() {
+	
+	var html = "";
+	
+	// 에러레이어팝업 DIV
+	html += "<div id='layerDiv_errPop' class='pop_wrap' style='width:800px;display:none;' data-type='dialog' data-dialog-modal='true'></div>";
+	
+	// 에러레이어팝업 DIV
+	html += "<div id='layerDiv_errPop_winOpen' class='pop_wrap' style='width:800px;display:none;' data-type='dialog' data-dialog-modal='true'></div>";
+	
+	//M사이트 에러레이어팝업 DIV //2020 e금융고도화 M-SITE 2020-10-17 적용 대상
+	html += "<div id='layerDiv_mErrPop' class='lypopWrap fade'></div>";
+	
+	// 보안카드,OTP 승인 팝업 DIV
+	html += "<div id='layerDiv_scrtCdOtpPop' class='pop_wrap' style='width:800px;display:none;' data-type='dialog'></div>";
+	
+	//자동로그아웃 팝업. //2020 e금융고도화  큰글뱅킹 2020-11-21 적용 대상
+	html += "<div id='pop_wrap_autoTime' class='lypopWrap fade' data-type='dialog'></div>";
+	
+	//지점찾기
+	html += "<div id='layerDiv_branchSearchDialog' data-type='dialog' class='pop_wrap' style='width:650px;display:none;' data-dialog-modal='true'></div>";
+	
+	$("body").append(html);
+	
+	$('#layerDiv_errPop').dialog();
+	$('#layerDiv_errPop_winOpen').dialog();
+	$('#layerDiv_mErrPop').dialog();
+	$('#layerDiv_scrtCdOtpPop').dialog();
+	$('#pop_wrap_autoTime').dialog();
+	$('#layerDiv_branchSearchDialog').dialog();
+}
+
+/**
+ * 에러상세메시지 팝업 
+ *
+ */
+function common_errorCodeMsg(errorCode){
+	// 현재 포커스 저장
+	if (common_FOCUS_LAYER_ID == null) {
+		common_FOCUS_LAYER_ID = $('*:focus');
+	}
+
+	if(errorCode.length == 4){
+		ec = "EACO0" + errorCode;
+	}else if(errorCode.length == 5){
+		ec = "EACO" + errorCode;
+	}else{
+		ec = errorCode;
+	};
+	$('#layerDiv_errPop').navigate('IPCNA299P',{"errorCode" : ec}).done(function(){
+		$('#layerDiv_errPop').find('.close_pop, .pop_close').tap( closeErrPop );
+		$('#layerDiv_errPop').open({movable : true});
+	});
+}
+
+/**
+ * Content thtml 화면으로 navigate 시 사용
+ * @param url
+ * @param param
+ */
+function common_navigateToContent(url, param, option){
+	
+	/**
+	 * 2018 고도화 카드페이지 카드홈페이지로 이동
+	 */
+
+	if(url.indexOf('IPCN0002M') != -1){
+
+		var sUrl = common_cfGetDomain('IP00');
+		if(window['PERSONALADDRESS'] && window['PERSONALADDRESS'] != ''){
+			sUrl += '/' + window['PERSONALADDRESS'] + ".nh"; 
+		}
+		
+		if (window["startTime"] != undefined && window["startTime"] != null) {
+			navigate('IPCN0001R');
+		} else {
+			document.location.href = sUrl;
+		}
+		return false;
+	}
+	
+	
+	var urlPrefix = "/servlet/content";
+	var result_url = '';
+	 
+	var form = $('<form class="' + 'alopexhiddenform' + '" style="display:none;"></form>').appendTo('head');
+	form.attr('method', 'POST');
+	
+	if(option != null && option.hasOwnProperty('domainCode')){
+		result_url = common_cfGetDomain(option.domainCode) + urlPrefix + url;
+	}else{
+		result_url = urlPrefix + url;
+	}
+	
+	form.attr('action', result_url);
+	
+	if(option != null && option.hasOwnProperty('target')){
+		form.attr('target', option.target);
+	}
+	 
+	for (var prop in param) {
+	     var item = param[prop];
+	     if($.isArray(item)) {
+	    	 $.each(item, function(i,value) {
+	    		 $('<input type="hidden" name="' + prop + '"/>').val(value).appendTo(form);
+	    	 });
+	     } else {
+	    	 $('<input type="hidden" name="' + prop + '"/>').val(item).appendTo(form);
+	     }
+	}
+	
+	//복수 탭 로그인 방지
+	if(window["ISINDEX"] == "true"){
+		$('<input type="hidden" name="sscc"/>').val(window.name).appendTo(form);
+	}
+	
+	//SESSION_TOKEN 값 추가
+	if(window["SESSION_TOKEN"] != undefined && window["SESSION_TOKEN"] != null){
+		$('<input type="hidden" name="SESSION_TOKEN"/>').val(window["SESSION_TOKEN"]).appendTo(form);
+	}
+		
+	//index 페이지일 경우 deviceType parameter 추가
+	if(window["INDEX_TYPE"] != undefined){
+		var deviceType = common_cfGetDeviceType();
+		
+		if(deviceType == "TABLET" && window["INDEX_TYPE"] == "PC"){
+			deviceType = "NORMAL";
+		}else if(deviceType == "TABLET" && window["INDEX_TYPE"] == "MOBILE"){
+			deviceType = "MOBILE";
+		}
+		
+		$('<input type="hidden" name="deviceType"/>').val(deviceType)
+        .appendTo(form);
+	}
+	 
+	form[0].submit();
+}
+
+/**
+ * Global Content thtml 화면으로 navigate 시 사용
+ * @param url
+ * @param param
+ */
+function common_navigateToContent_Global(url, param, option){
+	
+	var urlPrefix = "/servlet/content";
+	var result_url = '';
+	
+	var form = $('<form class="' + 'alopexhiddenform' + '" style="display:none;"></form>').appendTo('head');
+	form.attr('method', 'POST');
+	
+	if(option != null && option.hasOwnProperty('domainCode')){
+		result_url = common_cfGetDomain(option.domainCode) + urlPrefix + url;
+	}else{
+		result_url = urlPrefix + url;
+	}
+	
+	form.attr('action', result_url + "?fwglobal=true");
+	
+	if(option != null && option.hasOwnProperty('target')){
+		form.attr('target', option.target);
+	}
+	
+	for (var prop in param) {
+		var item = param[prop];
+		if($.isArray(item)) {
+			$.each(item, function(i,value) {
+				$('<input type="hidden" name="' + prop + '"/>').val(value).appendTo(form);
+			});
+		} else {
+			$('<input type="hidden" name="' + prop + '"/>').val(item).appendTo(form);
+		}
+	}
+	
+	$('<input type="hidden" name="fwglobal"/>').val("true").appendTo(form);
+	
+	//복수 탭 로그인 방지
+	if(window["ISINDEX"] == "true"){
+		$('<input type="hidden" name="sscc"/>').val(window.name).appendTo(form);
+	}
+	
+	//SESSION_TOKEN 값 추가
+	if(window["SESSION_TOKEN"] != undefined && window["SESSION_TOKEN"] != null){
+		$('<input type="hidden" name="SESSION_TOKEN"/>').val(window["SESSION_TOKEN"]).appendTo(form);
+	} 
+	
+	//index 페이지일 경우 deviceType parameter 추가
+	if(window["INDEX_TYPE"] != undefined){
+		var deviceType = common_cfGetDeviceType();
+		
+		if(deviceType == "TABLET" && window["INDEX_TYPE"] == "PC"){
+			deviceType = "NORMAL";
+		}else if(deviceType == "TABLET" && window["INDEX_TYPE"] == "MOBILE"){
+			deviceType = "MOBILE";
+		}
+		
+		$('<input type="hidden" name="deviceType"/>').val(deviceType)
+		.appendTo(form);
+	}
+	
+	form[0].submit();
+}
+
+/**
+ * 로딩바 element 동적 생성.
+ *
+ */
+function common_makeLoadingBar(){
+	if(window["M_WEB"] != undefined){
+//		document.write("<div id='INGSHOW' style='position:fixed; top:0px; left:0px; z-index:100001; display:none; border;0px solid #000; aria-hidden:true; tabindex=-1;' class='loadingbar'>");
+		//2020 e금융고도화 M-SITE 2020-10-17 적용 대상
+		document.write("<div id='INGSHOW' style='position:fixed; top:50%; left:50%; z-index:100001; display:none; outline:0px;' class='loadingbar'>");
+		document.write("<img src='/images/msite/loading_bar.gif' width='56px' height='56px' alt='고객님께서 요청하신 내용을 처리중입니다. 잠시만 기다리세요'>");
+	}else if(window["LOCALE_INFO"] != "ko_KR"){
+		document.write("<div id='INGSHOW' style='position:fixed; width:292px; height:66px; top:0px; left:0px; z-index:100001; display:none; border;0px solid #000; outline:0;' class='loadingbar'>");
+		document.write("<img src='/images/CN/loading_bar_eng.gif' alt='Please wait while we are processing your request' />");
+		//2020 e금융고도화 이지뱅킹 2020-11-21 적용 대상
+	}else if(window["H_WEB"]!= undefined){
+		document.write("<div id='INGSHOW' class='loading-bar'>");
+		document.write("<p class='text-24 text-medium text-black mb20'>안전하고 편리한 <span class='valign-bottom text-medium text-blue'>농협인터넷뱅킹</span></p>");
+		document.write("<img src='/images/IH/common/img_loading.gif' alt='로딩중 이미지'>");
+		document.write("<p class='text-black mt20'>고객님께서 요청하신 내용을 처리중입니다.<br>잠시만 기다려 주세요.</p>");
+	}else{
+		document.write("<div id='INGSHOW' style='position:fixed; width:292px; height:66px; top:0px; left:0px; z-index:100001; display:none; border;0px solid #000; outline:0;' class='loadingbar'>");
+		document.write("<img src='/images/CN/loading_bar.gif' alt='안전하고 편리한 농협인터넷뱅킹. 고객님께서 요청하신 내용을 처리중입니다. 잠시만 기다리세요' />");
+	}
+	document.write("</div>");
+	document.write('<div id="SHOWBLOCK" style="width:100%;height:100%;overflow: hidden; display: none; z-index: 100000; position: fixed; left: 0px; top: 0px; opacity: 0.5; background:white; filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=50)" class="loadingblocker" ></div>');
+}
+
+/**
+ * 로딩바 show.
+ * 
+ * _progressCount : show된 Dialog 개수 count
+ */
+var _progressCount = 0;
+
+function common_showInitLodingBar(){
+	
+	if(_progressCount == 0){
+		var INGSHOW = document.getElementById("INGSHOW");
+		var SHOWBLOCK = document.getElementById("SHOWBLOCK");
+		try {
+			if(typeof(INGSHOW) != 'undefined') {
+				//document.documentElement.style.overflow = 'hidden';
+				//INGSHOW.style.display = 'block';
+				SHOWBLOCK.style.display = 'block';
+				
+				common_setPositionLoadingBar();
+
+				$(window).bind('resize', common_setPositionLoadingBar);
+			}
+		} catch (e){}
+
+	}
+
+	_progressCount++;
+}
+
+/**
+ * 로딩바 close
+ *
+ */
+function common_closeInitLodingBar(){
+	_progressCount--;
+
+	if(_progressCount <= 0){
+		try{
+			_progressCount = 0;
+			/*if(window.afDialogNumber == 0 || window.afDialogNumber == undefined){
+				document.documentElement.style.overflow = '';
+			}*/
+			document.getElementById("INGSHOW").style.display = "none";
+			document.getElementById("SHOWBLOCK").style.display = "none";
+			
+			$(window).unbind('resize', common_setPositionLoadingBar);
+			
+		} catch (e){}
+	}
+}
+
+function common_setPositionLoadingBar(){
+	
+	var windowCenterTop = ($(window).height() / 2);
+	var windowCenterLeft = 0;
+	
+	if(window.innerWidth != undefined){
+		windowCenterLeft = (window.innerWidth /  2);
+	}else{
+		windowCenterLeft = ($(document).width() /  2);
+	}
+	
+	$('#INGSHOW').css( {'top' : (windowCenterTop - $('#INGSHOW').height()/2) , 'left' : (windowCenterLeft - $('#INGSHOW').width()/2)} ).css({'display' : 'block'});
+}
+
+/**
+ * ecrm - e 마케팅 시스템 
+ * <pre>
+ * ex)
+ *     common_ecrm('dp_id', '상품코드', function(response){});
+ *     common_ecrm('dp_id', {CATE : '1'}, function(response){});
+ * </pre>
+ * @param dp : DP ID
+ * @param param : 상품코드(String) 또는 파라미터(JSON Object)
+ */
+function common_ecrm(dp, param, callbackSuccess, callbackFail){
+	var paramValue = { dp : dp, saac : dp };
+	if (param) {
+		if (typeof(param) == 'string' || typeof(param) == 'number') {
+			paramValue = $.extend({}, paramValue, { PSN_FNC_WRS_C : param });
+		} else {
+			paramValue = $.extend({}, paramValue, param);
+		}
+	}
+    var options = {
+			useProgress : false
+	};
+    
+	try{
+		httpSend("IPCNA320S", paramValue, callbackSuccess, callbackFail, options);
+	}catch(e){
+		console.log('[common_ecrm][실패] ==> ' + e);
+		callbackFail();
+	}
+}
+
+
+
+
+
+/**
+ * 즐겨찾기 설정(TOP메뉴)
+ */
+function common_cfFavoriteInit() {
+	// TOP메뉴의 즐겨찾기 버튼 클릭시
+	$('#utilmenu .fav .tog_list').click(function(){
+		common_cfFavoriteLoading($(this));
+		return false;
+	});
+
+	common_FavoriteButtonInit();	// Body영역의 타이틀 옆 즐겨찾기 버튼(별표) 클릭시
+}
+/**
+ * 즐겨찾기 버튼 설정(Body영역 타이틀 옆)
+ */
+function common_FavoriteButtonInit() {
+	var path = '';
+	if (window["SERVICE_ID"] == null || window["SERVICE_ID"] == undefined || window["SERVICE_ID"] == '') {
+		path = document.location.href;
+	} else {
+		path = window["SERVICE_ID"];
+	}
+
+	if (path != null && path != undefined && path.length > 0 && favorite_checkUrl(path)) {
+		// Body영역의 타이틀 옆 즐겨찾기 버튼(별표) 클릭시
+		var addFav2Elem = $('.add_fav2');
+		if (addFav2Elem.length > 0) {
+			addFav2Elem.addClass('on');
+			addFav2Elem.html('이 페이지를 즐겨찾기에 추가/삭제');
+			$(addFav2Elem).unbind('click');
+			$(addFav2Elem).click(function() {
+				popup_cfLayerOpen('IPAM0061P', {
+					'saac' : 'saac'
+				});
+				return false;
+			});
+		}
+	}
+	if (path != null && path != undefined && path.length > 0 && favorite_checkUrl(path)==false) {
+		// Body영역의 타이틀 옆 즐겨찾기 버튼(별표) 클릭시
+		var addFav2Elem = $('.add_fav2');
+		if (addFav2Elem.length > 0) {
+			addFav2Elem.remove();
+		}
+	}
+}
+
+/**
+ * 즐겨찾기 설정된 목록 Loading
+ */
+function common_cfFavoriteLoading(_this) {
+	//2019고도화 GNB변경 대응
+	$('.fav .f_list .f_top').navigate('/servlet/IPAM0062R', {'saac':'saac'}).done(function(data,status,xhr){
+		// success
+		//_this.toggleClass('on'); _this.next('.f_list').toggle();
+	});
+	$('.head_gnb').removeClass('on');
+}
+
+
+/**
+ * 2019고도화 SiteMap Load
+ */
+function common_cfSitemapLoading(_this) {
+	
+	$('.pop_all_menu').navigate('/servlet/IPCN0701P', {'saac':'saac'}).done(function(data,status,xhr){
+		if($(".all_menu_list > li").eq(0).hasClass('all_tab_01')){
+			$('.head_gnb').addClass('on');
+    		$('.pop_all_menu').css('display','block');
+    		
+    		var classCnt = 0; 
+    		$('.all_menu_list').find('> li').each(function(){
+    			if($(this).hasClass('on')){
+    				classCnt++;
+    			}
+    		});
+    		if(classCnt < 1){
+    			$(".all_tab_06").addClass('on');
+    		}
+    		
+		}
+	});
+}  
+
+
+/**
+ * 2019고도화 메뉴맵 로드.(HTML페이지에서 호출용)
+ */
+function common_cfMenuMapLoading(_this) {
+	
+	$('#'+_this).navigate('/servlet/IPCN0702P').done(function(data,status,xhr){
+	
+	}).fail(function(){});
+}  
+
+
+
+/**
+ * 2019고도화. 현재 Menu ID에 대한 LEVEL1 메뉴 ON처리
+ */
+function common_cfSetGnbOnload(menuID){
+ 	var depth1 = $('#gnb_com > li');
+
+ 	depth1.bind('mouseleave',function(){
+		//추가. 메뉴ID로 LEVEL1 FOCUS
+		if (menuID.length > 5 && typeof(menuID) != 'undefined' && menuID != null && menuID != '' ){
+			$(this).removeClass('on');
+			menuID = menuID.substring(0,6);
+			$('#gnb_com').find("#" + menuID + "").addClass('focus_on');
+		}
+ 	});
+ }   
+
+/**
+ * 2019고도화. 즐겨찾기 로그인/비로그인 구분 Class처리
+ */
+function common_cfSetFavOnload(isLogin) {
+	var depth1 = '.fav .tog_list';
+	
+	$(document).on("click", depth1 ,function(){
+		$(this).toggleClass('on');
+		if (isLogin == 'true') {
+			$('.fav .f_list').removeClass('no_login_fav');
+			$('.fav .f_list .pre_fav_box').remove();
+		} else {
+			$('.fav .f_list').addClass('no_login_fav');
+			$('.fav .f_list .f_top').remove();
+		}
+		
+		$('.f_top').toggle(); 
+		$('.pre_fav_box').toggle(); 
+		$('.btn_search_close').css('display','none');
+		$('.btn_search_open').css('display','block');
+		$('.search_box_area').removeClass('on');
+		$('.global_menu ul li').parent().hide();
+		$('.pop_all_menu').css('display','none');		
+	});
+}
+
+
+
+
+/**
+ * 우편번호,SQNO 받고 해당 주소리턴 (구주소용)
+ *
+ */
+function common_getZipAddress(code, sqno){
+	var returnVal ='';
+	var paramValue = {CODE : code, 
+			          SQNO : sqno };
+	httpSend("IPCNA255S", paramValue, function(responseJson){returnVal= responseJson["zipAddress"];}, function(responseJson){}, {async:false});
+	return returnVal;	
+}
+
+/**
+ * 우편번호,SQNO 받고 해당 주소리턴 (신주소용)
+ *
+ */
+function common_getNewZipAddress(code, sqno){
+	var returnVal ='';
+	var paramValue = {CODE : code, 
+			          SQNO : sqno };
+	httpSend("IPCNA256S", paramValue, function(responseJson){returnVal= responseJson["zipAddress"];}, function(responseJson){}, {async:false});
+	return returnVal;	
+}
+
+/**
+ * 보안필드(E2E, 가상키보드)초기화.
+ *
+ */
+function common_cfResetSecField(arrayField){
+	var cnt = arrayField.length;
+	for(var i=0; i<cnt; i++){
+		var inputId = arrayField[i];	
+		//가상키보드 초기화.
+        var trasnkeyObj = transkey["Tk_" + inputId];
+        if (trasnkeyObj) {
+        	trasnkeyObj.clear();
+        }
+        //물리키보드 초기화.(value만 초기화)
+        $("#" + inputId).val();	
+        
+        /*##########################################################*/
+        /* non-activeX 대응개발 추가*/           
+		if(typeof TK_Clear == "function") TK_Clear(document.getElementById(inputId).form.name, document.getElementById(inputId).name);
+		/*##########################################################*/		
+	}
+}
+
+/**
+ * 자주사용하는입금계좌, 고객의농협계좌, 최근입금계좌등과 같이 layer popup을 이용하여 보안필드에 값을 setting할경우 복호화 대상에서 제외처리.
+ */
+function common_cfSetDirectField(id) {
+    try{
+        if($("#"+id).val().length > 0 && $("input[name=E2E_"+id+"]").val() > 0 && $("#"+id).attr("type")=="password"){
+            if($("#"+id).val() !== "0000" ) {
+                $("#Tk_" + id + "_check").val('direct');
+            } 
+        }else{
+            $("#Tk_" + id + "_check").val('direct');
+        }
+    }catch(e){}
+}
+
+/**
+ * 자주사용하는입금계좌, 고객의농협계좌, 최근입금계좌등과 같이 layer popup을 이용하여 보안필드에 값을 setting 후 다시 물리키보드로 값을 입력시.
+ */
+function common_cfSetE2EField(id) {
+	if(window.navigator.userAgent.indexOf("Windows") == -1) {  //윈도우가 아닌경우.
+		$("#Tk_" + id + "_check").val('transkey');
+	}else{		
+		if(window["M_WEB"] != undefined){
+			$("#Tk_" + id + "_check").val('transkey');
+		}else{
+			var inputObj = document.getElementById("Tk_" + id + "_checkbox");
+			
+			if(inputObj != undefined && inputObj != null){
+				reClickCheckbox (id);
+			}else if(isTranskeyArrayCheck(id)){
+                //그룹으로 묶인 가상키패드
+                $("#Tk_" + id + "_check").val('transkey');
+            }else{
+				$("#Tk_" + id + "_check").val('e2e');	
+			}
+		}	
+	}	
+}
+
+/**
+ * 자주사용하는입금계좌, 고객의농협계좌, 최근입금계좌등과 같이 layer popup을 이용하여 보안필드에 값을 setting 후 다시 물리키보드/가상키보드로 값을 입력시. ( 그룹ID )
+ */
+function common_cfSetE2EGroupField(groupId) {
+	recheckTranskeyGroup (groupId);
+}
+
+/**
+ * <pre>
+ * 안전증명 ( CABSOFT 솔루션연계 )
+ * </pre>
+ */
+function common_cfSmartCert() {
+	
+	var _service_ID = "IPCNB010S.view";
+	
+	// 글로벌 적용
+	if(window["G_WEB"] == "true"){
+	    _service_ID = "PGCNB010S.view";
+	}
+	
+	// 리포트 솔루션 팝업 띄움
+	common_cfOpenWinPop(_service_ID,
+						"pop_SmartCert",
+						"",
+						[ "1000", "800", "0", "0", "no", "no", "no", "no", "no", "no" ]);
+}
+
+/**
+ * <pre>
+ * 안전증명 ( CABSOFT 솔루션연계 ) - 실명번호마스킹용
+ * </pre>
+ */
+function common_cfSmartCertmask() {
+	
+	var _service_ID = "IPCNB010M.view";
+	
+	// 리포트 솔루션 팝업 띄움
+	common_cfOpenWinPop(_service_ID,
+						"pop_SmartCert",
+						"",
+						[ "1000", "800", "0", "0", "no", "no", "no", "no", "no", "no" ]);
+}
+
+/**
+ * <pre>
+ * 디바이스타입 파악을 위한 변수
+ * </pre>
+ */
+var common_KNOWN_MOBILE_USER_AGENT_PREFIXES = [ "w3c ", "w3c-", "acs-", "alav",
+	  "alca", "amoi", "audi", "avan", "benq", "bird", "blac", "blaz", "brew",
+	  "cell", "cldc", "cmd-", "dang", "doco", "eric", "hipt", "htc_", "inno",
+	  "ipaq", "ipod", "jigs", "kddi", "keji", "leno", "lg-c", "lg-d", "lg-g",
+	  "lge-", "lg/u", "maui", "maxo", "midp", "mits", "mmef", "mobi", "mot-",
+	  "moto", "mwbp", "nec-", "newt", "noki", "palm", "pana", "pant", "phil",
+	  "play", "port", "prox", "qwap", "sage", "sams", "sany", "sch-", "sec-",
+	  "send", "seri", "sgh-", "shar", "sie-", "siem", "smal", "smar", "sony",
+	  "sph-", "symb", "t-mo", "teli", "tim-", "tosh", "tsm-", "upg1", "upsi",
+	  "vk-v", "voda", "wap-", "wapa", "wapi", "wapp", "wapr", "webc", "winw",
+	  "winw", "xda ", "xda-" ];
+var common_KNOWN_MOBILE_USER_AGENT_KEYWORDS = [ "blackberry", "webos", "ipod",
+	  "lge vx", "midp", "maemo", "mmp", "netfront", "hiptop", "nintendo DS",
+	  "novarra", "openweb", "opera mobi", "opera mini", "palm", "psp",
+	  "phone", "smartphone", "symbian", "up.browser", "up.link", "wap",
+	  "windows ce" ];
+var common_KNOWN_TABLET_USER_AGENT_KEYWORDS = [ "ipad", "playbook", "hp-tablet" ];
+
+/**
+ * <pre>
+ * 디바이스타입 파악
+ * </pre>
+ * @returns NORMAL(PC), MOBILE, TABLET
+ */
+function common_cfGetDeviceType() {
+	var userAgent = navigator.userAgent.toLowerCase();
+	if (userAgent != null && userAgent.length > 0) {
+		var tUserAgent = userAgent.slice(0, 4);
+	  
+		for ( var i = 0; i < common_KNOWN_MOBILE_USER_AGENT_PREFIXES.length; i++) {
+			if (tUserAgent.indexOf(common_KNOWN_MOBILE_USER_AGENT_PREFIXES[i], 0) != -1) {
+				return 'MOBILE';
+			}
+		}
+	}
+ 
+	for ( var i = 0; i < common_KNOWN_MOBILE_USER_AGENT_KEYWORDS.length; i++) {
+		if (userAgent.indexOf(common_KNOWN_MOBILE_USER_AGENT_KEYWORDS[i], 0) != -1) {
+			return 'MOBILE';
+		}
+	}
+	
+	for ( var ii = 0; ii < common_KNOWN_TABLET_USER_AGENT_KEYWORDS.length; ii++) {
+		if (userAgent.indexOf(common_KNOWN_TABLET_USER_AGENT_KEYWORDS[ii], 0) != -1) {
+			return 'TABLET';
+		}
+	}
+ 
+	if (userAgent.indexOf("android") != -1 && userAgent.indexOf("mobile") != -1) {
+		return 'MOBILE';
+	} else if (userAgent.indexOf("android") != -1
+			&& userAgent.indexOf("mobile") == -1) {
+		return 'TABLET';
+	}
+	
+	// 20141110, by extended
+	// MOBILE, TABLET이  아니면서 SuperSign 사용 여부 확인 
+	if(document.getElementById("BTW_SUPER_SIGN") != null) {
+		return 'SMART_AUTH';
+	}
+	
+	return 'NORMAL';
+} 
+
+/**
+ * <pre>
+ * 글로벌뱅킹용 코드에 따른 언어별 메시지 가져오기 (에러메시지,정보메시지)
+ * </pre>
+ * @param 메시지코드
+ * @returns 언어별 코드매핑 메시지
+ */
+function common_cfGetMessage(code) {
+    try {    
+	    var msgVal = msgCode[arguments[0]];
+        for(var idx = 1; idx < arguments.length; idx++) {
+    	    msgVal = msgVal.replace(/%d/i, arguments[idx]);
+        }
+        return msgVal;    
+    } catch(e) {    
+      return "";
+    }
+}
+
+/**
+ * <pre>
+ * 외부 link Page에서 서비스 호출 시 중계페이지에서 외부 link Page에서 보낸 Parameters를 parsing
+ * </pre>
+ * @returns (JSON) 외부 link Page의 parameters
+ */
+function common_cfGetBroadCastParam(){
+ 
+	var param ={};
+	var varName = '';
+	var value = '';
+	var nowAddress = decodeURIComponent(location.href);
+	var parameters = '';
+	 
+	if(nowAddress.indexOf('?') != -1){
+		parameters = (nowAddress.slice(nowAddress.indexOf('?')+1,nowAddress.length)).split('&');
+		for(var i = 0 ; i < parameters.length ; i++)  {
+			varName = parameters[i].split('=')[0];
+			value = parameters[i].split('=')[1];
+			param[varName] = value;
+		}
+	}
+	 
+	param["deviceType"] = common_cfGetDeviceType();
+	param["proxyPage"] = "Y";
+	 
+	return param;
+}
+
+/**
+ * 전자서명값 특정 element에 넘기기
+ * - 이니텍 crossweb.js SFCertFormProcess 커스터마이징
+ */
+var cfSFCertFormProcessInfo = [];
+function common_cfSFCertFormProcess(elementID, ret, cbdata){
+    var SF_RETURN_SIGN_INFO = get_shttp_filter(ret, "_shttp_client_signature_");
+    if ( ( elementID != "undefined" && elementID != null && $.trim( elementID ) != '' ) && SF_RETURN_SIGN_INFO != "" ) {
+    	var tmpObj = {};
+    	tmpObj.elementID = elementID;
+    	tmpObj.cbdata = cbdata;
+    	cfSFCertFormProcessInfo.push(tmpObj);
+        URLDecode(SF_RETURN_SIGN_INFO, "common_cfSFCertFormProcess_decCallback");
+        return;
+    }    
+}
+
+function common_cfSFCertFormProcess_decCallback(result) {
+    $("#" + cfSFCertFormProcessInfo[0].elementID).val(result);
+    var cbdata = cfSFCertFormProcessInfo[0].cbdata;
+    cfSFCertFormProcessInfo.splice(0, 1);
+    if(cbdata) eval(cbdata.callback)(cbdata.url, cbdata.postdata, cbdata.result);
+}
+
+/**
+* <pre> 
+* 이미지서버 파일(약관/서식)다운로드
+* 
+* jsp에서 보낼 full 경로는 아래와 같습니다. 
+* NhOpModePropertyHelper.getProperty("FILE_DOWNLOAD_PATH") + /file/ebank/form/pdf/(20130430)nhmr1.pdf
+* </pre>
+*/
+
+function common_getFileDownload(uri){
+  var splitlist = uri.split(".");
+  var filext = null;
+  if(splitlist.length > 1)
+	  filext = splitlist[splitlist.length-1];
+    
+  if(filext != null && filext.toUpperCase() == "PDF")
+  {
+	  window.open(encodeURI(uri + "?@_out_of_window"));
+  }else{
+    if(filext != null){
+    	document.location.href = encodeURI(uri);
+	}
+  }
+}
+
+/**
+ * @param key : Domain 구분값(없을 경우 현재 위치한 Domain 설정)
+ * key는 constant.js 참고
+ * //개인뱅킹 - 카드간의 도메인 변경으로 인한 세션 아웃 방지 로직 추가(개인 WEB에만 적용됨)
+ */
+function common_cfGetDomain(key){
+	
+	var domain = '';
+	var temp = '';
+	var currentDomainCode = '';
+	
+	//개발계 및 검증계 여부
+	if(common_cfIsDev()){
+		if(common_cfIsDev() == "staging"){
+			temp += 'STG_';
+			currentDomainCode += 'STG_';
+		}else{
+			temp += 'DEV_';
+			currentDomainCode += 'DEV_';
+		}
+	}
+	
+	temp += key;
+	currentDomainCode += common_cfGetDomainCode();
+	domain = DOMAINCODE[temp];
+	
+	if(domain == undefined || domain == null){
+		domain = '/';
+	}
+	
+	//개인뱅킹 - 카드간의 도메인 변경으로 인한 세션 아웃 방지(개인 WEB에만 적용됨)
+	if(currentDomainCode == "IP00" || currentDomainCode == "IH00" || currentDomainCode == "IP01" || currentDomainCode == "IP05" ){
+		if(temp == "IP00" || temp == "IH00" || temp == "IP01" || temp == "IP05"){
+			domain = DOMAINCODE[currentDomainCode];
+		}
+	}
+	
+	return domain;
+}
+
+function common_cfIsDev(){
+	if (document.location.href.indexOf('https://dev.nonghyup.com') != '-1'
+			|| document.location.href.indexOf('https://localhost') != '-1'
+			|| document.location.href.indexOf('https://127.0.0.1') != '-1') {
+		return true;
+	}else if(document.location.href.indexOf('https://staging.nonghyup.com') != '-1'){
+		return "staging";
+	}else {
+		return false;
+	}
+}
+
+/**
+ * <pre>
+ * 보안카드 입력시 숫자체크 및 자동 Focus 이동
+ * </pre>
+ * @returns 
+ */
+function common_cfSecureCardInputHandler(){
+	
+	var check_auto_cursor;	// 자동커서 on/off 쿠키
+	check_auto_cursor = util_cfGetCookie("security_card_auto_cursor");
+	
+	$("#io_ea_rsp_no1, #io_ea_rsp_no3").bind('focus', function (e){
+		$(this).val("");
+		var id = $(this).attr("id");
+		TK_Clear(document.getElementById(id).form.name, id);
+	});
+	
+	// shift + tab 이동
+	$("#io_ea_rsp_no3").bind('keydown', function (e){
+		if(e.shiftKey){
+			var code = (e.keyCode ? e.keyCode : e.which);
+			if(code == '9'){
+				$(this).val("");
+				var id = $(this).attr("id");
+				TK_Clear(document.getElementById(id).form.name, id);
+			}
+		}
+	});
+	
+	$("#io_ea_rsp_no1, #io_ea_rsp_no3").bind('keyup.custom', function (e){
+		var value = $(this).val();
+		var currentId = $(this)[0].id;
+
+		// 숫자만 입력
+		/*if(!/^\s*\d+\s*$/.test(value)){
+			$(this).val("");
+			return;
+		}*/
+		
+		// 자동커서 기능 '사용' 일경우에만 자동 커서 이동
+		if(check_auto_cursor != "n"){
+			if(value.length == 2){
+				nextId = "io_ea_rsp_no3";
+				if(currentId != "io_ea_rsp_no3"){
+					$("#io_ea_rsp_no3").focus();
+				}
+			}
+		}
+	});
+}
+
+/**
+ * History back 방지
+ */
+function common_blockHistoryBack(){
+	httpSend("echoService", {"VIEW_SERVICE_ID" : window["VIEW_SERVICE_ID"]}, function(){
+		//console.log("echoService success");
+	}, function(responseJson, status, xhr){
+		if(xhr.getResponseHeader("ORG_ERROR_CODE") == "NA11005" && window["IS_ERROR"] == ""){
+			document.location.href = "/";
+		}
+		if(xhr.getResponseHeader("ORG_ERROR_CODE") == "NW11109" && window["IS_ERROR"] == ""){
+			document.location.href = "/";
+		}
+	}, {"useProgress" : false, "headers" : {"saac" : "saac"}});
+}
+
+
+/**
+ * 현재의 위치를 판단하여, 변환된 URL을 반환
+ * (IP에서 접속하면 IP로 연결, WS에서 접속하면 WS로 연결)
+ * @author 정영탁(SI303162)
+ */
+function common_cfGetCurrentGlobalPath(path) {
+	if (path.length <= 2) {
+		return path;
+	}
+	var _pathname = document.location.pathname;
+	_pathname = _pathname.substring(_pathname.lastIndexOf('/') + 1, _pathname.length);
+	var _firstPath = _pathname.substring(0,2);
+	if (_firstPath == 'IP' || _firstPath == 'WS' || _firstPath == 'IH') {
+		var subPath = path.substring(2, path.length);
+		if(_firstPath == 'IH' && (subPath == 'CNA001R' || subPath == 'CNA0005R' || subPath == 'CNA902R')){
+			return 'IP'+subPath;
+		}else{
+			return (path.substring(0,2) == 'IP' ? _firstPath + subPath : path);
+		}
+	} else {
+		return path;
+	}
+}
+
+/**
+ * <pre>
+ * 개인뱅킹+파트너뱅킹 공용 navigate
+ * (IP에서 접속하면 IP로 연결, WS에서 접속하면 WS로 연결)
+ * @author 정영탁(SI303162)
+ * </pre>
+ */
+function navigateIP(path, param, option, loadto) {
+	return navigate(common_cfGetCurrentGlobalPath(path), param, option, loadto);
+}
+
+/**
+ * <pre>
+ * 개인뱅킹+파트너뱅킹 공용 httpSend
+ * (IP에서 접속하면 IP로 연결, WS에서 접속하면 WS로 연결)
+ * @author 정영탁(SI303162)
+ * </pre>
+ */
+function httpSendIP(service, content, success, error, option) {
+	return httpSend(service/*common_cfGetCurrentGlobalPath(service)*/, content, success, error, option);
+}
+
+/**
+ * <pre>
+ * 개인뱅킹+파트너뱅킹 공용 navigate
+ * (IP에서 접속하면 IP로 연결, WS에서 접속하면 WS로 연결)
+ * @author 정영탁(SI303162)
+ */
+(function($) {
+	$.fn.navigateIP = function(path, param, option, loadto) {
+		var _this = $(this);
+		return _this.navigate(common_cfGetCurrentGlobalPath(path), param, option, loadto).done(function(){
+			// ajax 거래시에 complete js 실행(content영역에서 사용 - 퍼블리싱)
+			try {
+				contentLoadComplete();
+			} catch (e) {}
+
+			common_FavoriteButtonInit();	// Body영역의 타이틀 옆 즐겨찾기 버튼(별표) 클릭시
+		});
+	};
+})(jQuery);
+
+/**
+ * <pre>
+ * lnb 클릭시 페이지 이동없이 하위메뉴 펼침
+ * </pre>
+ * * @param elem : 클릭대상 메뉴 element
+ */
+function common_cfLnbToggle(elem){
+	var fParentElem = $(elem).parent();
+	
+	fParentElem.siblings().removeClass("on");
+	
+	if(fParentElem.hasClass("on")){
+		fParentElem.removeClass("on");
+	}else{
+		fParentElem.addClass("on");
+	}
+}
+
+/**
+ * <pre>
+ * gnb 메뉴 2depth에서 마우스오버시 3depth 보여주기
+ * 변수 : common_cfDepth1 , commmon_cfGnbTimeOut
+ * 메서드 : common_cfSetGnb, common_cfActGnb, common_cfGetGnbDepth1Cnt, common_cfGetGnbDepth2Cnt
+ * </pre>
+ */
+
+var common_cfDepth1;
+var common_cfGnbTimeout;
+
+function common_cfSetGnb(d1,d2, excludeMenus){
+	common_cfDepth1 = $('#gnb>ul').children('li');
+	common_cfActGnb(d1-1,d2-1);
+	var depth3 = $('#gnb .wrap_ul');
+	var depth3Arrow = $('#gnb .arrow');
+	
+	for(i=0;i<common_cfDepth1.length;i++){
+		// 예외처리할 메뉴 depth는 제외
+		if (typeof(excludeMenus) == 'object' && excludeMenus.length > 0) {
+			for (var j = 0; j < excludeMenus.length; j++) {
+				if (excludeMenus[j] == common_cfDepth1.eq(i).attr('id')) {
+					common_cfDepth1.eq(i).children('ul').remove();
+					break;
+				}
+			}
+		}
+		
+		//주석을 풀면 1depth도 마우스오버 이벤트로 변경됨
+		var depth1A = common_cfDepth1.eq(i).children('a').eq(0);
+		depth1A.bind('mouseover focus',function(){
+			clearTimeout(common_cfGnbTimeout);
+			var onD1 = common_cfDepth1.index($(this).parent());
+			common_cfActGnb(onD1);
+			depth2 = common_cfDepth1.eq(onD1).children('ul').eq(0).children('li');
+		});
+		depth1A.bind('mouseout blur',function(){
+			common_cfGnbTimeout = setTimeout('common_cfActGnb('+(d1-1)+','+(d2-1)+')',200);//앵커 간 간격있는 경우에 대응
+		});
+		
+		var depth2 = common_cfDepth1.eq(i).children('ul').eq(0).children('li');
+		for(j=0;j<depth2.length;j++){
+			var depth2A = depth2.eq(j).children('a').eq(0);
+			depth2A.bind('mouseover focus',function(){
+				clearTimeout(common_cfGnbTimeout);
+				var onD1 = common_cfDepth1.index($(this).parents('li').eq(1));
+				var onD2 = common_cfDepth1.eq(onD1).children('ul').eq(0).children('li').index($(this).parent());
+				common_cfActGnb(onD1,onD2,'show');
+			});
+			depth2A.bind('mouseout blur',function(){
+				common_cfGnbTimeout = setTimeout('common_cfActGnb('+(d1-1)+','+(d2-1)+')',10);//ie7,8 이벤트 반응 속도 느린 것 대응
+			})
+		}
+	};
+	depth3.bind('mouseover',function(){
+		clearTimeout(common_cfGnbTimeout);
+		var onD1 = common_cfDepth1.index($(this).parents('li').eq(1));
+		var onD2 = common_cfDepth1.eq(onD1).children('ul').eq(0).children('li').index($(this).parents('li').eq(0));
+		common_cfActGnb(onD1,onD2,'show');
+	});
+	depth3.bind('mouseout',function(){
+		clearTimeout(common_cfGnbTimeout);
+		common_cfGnbTimeout = setTimeout('common_cfActGnb('+(d1-1)+','+(d2-1)+')',10);//ie7,8 이벤트 반응 속도 느린 것 대응
+	});
+	depth3Arrow.bind('mouseover',function(){
+		clearTimeout(common_cfGnbTimeout);
+		var onD1 = common_cfDepth1.index($(this).parents('li').eq(1));
+		var onD2 = common_cfDepth1.eq(onD1).children('ul').eq(0).children('li').index($(this).parents('li').eq(0));
+		common_cfActGnb(onD1,onD2,'show');
+	});
+	depth3Arrow.bind('mouseout',function(){
+		clearTimeout(common_cfGnbTimeout);
+		common_cfGnbTimeout = setTimeout('common_cfActGnb('+(d1-1)+','+(d2-1)+')',10);//ie7,8 이벤트 반응 속도 느린 것 대응
+	});
+	depth3.find('a').bind('mouseover focus',function(){
+		clearTimeout(common_cfGnbTimeout);
+		var onD1 = common_cfDepth1.index($(this).parents('li').eq(2));
+		var onD2 = common_cfDepth1.eq(onD1).children('ul').eq(0).children('li').index($(this).parents('li').eq(1));
+		common_cfActGnb(onD1,onD2,'show');
+	});
+	depth3.find('a').bind('mouseout blur',function(){
+		clearTimeout(common_cfGnbTimeout);
+		common_cfGnbTimeout = setTimeout('common_cfActGnb('+(d1-1)+','+(d2-1)+')',10);//ie7,8 이벤트 반응 속도 느린 것 대응
+	})
+}
+
+function common_cfActGnb(d1,d2,show){
+	common_cfDepth1.removeClass('on');
+	var depth2 = common_cfDepth1.eq(d1).children('ul').eq(0).children('li');
+	depth2.find('a').removeClass('on');
+	common_cfDepth1.eq(d1).addClass('on');
+	if(d2>=0){
+		depth2.eq(d2).children('a').eq(0).addClass('on');
+	}
+	if(show){
+		for(j=0;j<depth2.length;j++){
+			if(j!=d2){
+				depth2.eq(j).removeClass('on');
+				depth2.eq(j).children('.gnb3d').hide();//ie7 mode bug 대응
+			}
+		}
+		depth2.eq(d2).addClass('on');
+		depth2.eq(d2).children('.gnb3d').show();//ie7 mode bug 대응
+	}else{
+		depth2.removeClass('on');
+		depth2.children('.gnb3d').hide();//ie7 mode bug 대응
+	}
+}
+
+function common_cfGetGnbDepth1Order( menuID ){	
+	
+	var cnt = -1;
+	if ( menuID.length < 6 ) return cnt;
+	
+	var gnbDepth1MenuID = menuID.substring(0,6);	
+	var depth1Menus = $('#gnb>ul').children('li');
+			
+	for ( var i = 0 ; i < depth1Menus.length; i++ ) {
+		
+		if ( depth1Menus.eq(i).attr('id') == gnbDepth1MenuID ) {
+			cnt = i + 1;
+			break;
+		}
+	}	
+	
+	return cnt;
+}
+
+
+function common_cfGetGnbDepth2Order( menuID ){	
+	
+	var cnt = -1;
+	if ( menuID.length < 8 ) return cnt;
+	
+	var gnbDepth2MenuID = menuID.substring(0,8);	
+	var depth2Menus = $("#" + gnbDepth2MenuID ).parents("ul:first").children('li');
+			
+	for ( var i = 0 ; i < depth2Menus.length; i++ ) {
+		
+		if ( depth2Menus.eq(i).attr('id') == gnbDepth2MenuID ) {
+			cnt = i + 1;
+			break;
+		}
+	}	
+	
+	return cnt;
+}
+
+
+/**
+ * 현재 페이지의 메뉴ID를 반환한다.
+ * @author FAS 정영탁
+ */
+function common_cfGetCurrentMenuId(rootMenuId, defaultMenuId){
+	if(rootMenuId == "" || rootMenuId == null || rootMenuId == undefined){
+		console.log("[common_cfGetCurrentMenuId]_error : no rootMenuId");
+		return "";
+	}
+
+	var _getCurrentMenuId = function(menuObj) {
+		var menuId = null;
+		if (location.href.indexOf(menuObj["url"]) > -1) {
+			return (menuObj["link"] || menuObj["id"]);
+		} else if (menuObj["subMenus"]) {
+			for (var i = 0; i < menuObj["subMenus"].length; i++) {
+				var _currentMenuId = _getCurrentMenuId(menuObj["subMenus"][i]);
+				if (_currentMenuId != null) {
+					menuId = _currentMenuId;
+					break;
+				}
+			}
+		}
+		return menuId;
+	};
+
+	var rootObj = eval('menu_'+rootMenuId);
+	var result = _getCurrentMenuId(rootObj);
+
+	return (result || defaultMenuId);
+}
+
+/**
+ * GNB 클릭시 2depth메뉴 보여주기
+ */
+function common_cfShow2DepthGnb(target){
+	try{
+		$('#gnb').find('>li').each(function(){
+			if($(this).hasClass('on')){
+				$(this).removeClass('on');
+			}
+		});
+		$(target).parent().addClass('on');
+	}catch(e){}	
+}
+
+
+/**
+ * GNB 메뉴 생성
+ * @author FAS 정영탁
+ */
+function common_createGNBMenu(rootMenuId, menuId){
+	
+	if(rootMenuId == "" || rootMenuId == null || rootMenuId == undefined){
+		console.log("[common_createGNBMenu]_error : no rootMenuId");
+		return "";
+	}
+	
+	//menu id가 없을 시 root menu의 첫번째 메뉴로 redering
+	if(menuId == null || menuId == undefined || menuId == ""){
+		menuId = rootMenuId+'01';
+	}
+	
+	var rootObj = eval('menu_'+rootMenuId);
+	var subMenus = rootObj["subMenus"];
+	var selected_menus_depth = (menuId.length-4)/2;
+	var highlight_menus = [selected_menus_depth];
+	
+	var tempStr = "";
+	for(var i=0; i<selected_menus_depth; i++){
+		if(tempStr == ""){
+			tempStr = menuId;
+			highlight_menus[(selected_menus_depth-1)] = tempStr;
+		}else{
+			tempStr = tempStr.substring(0, tempStr.length-2);
+			highlight_menus[(selected_menus_depth-1)-i] = tempStr;
+		}
+	}
+	
+	//html string 초기화
+	window["GNBMENU_HTML"] = "";
+	
+	var result = _getGNBMenuHTML(subMenus, highlight_menus);
+	
+	//html string 초기화
+	window["GNBMENU_HTML"] = "";
+	
+	return result;
+}
+
+/**
+ * [내부함수] GNB 메뉴 생성
+ * @author FAS 정영탁
+ */
+function _getGNBMenuHTML(subMenus, highlight_menus){
+	
+	//GNB는 2 depth까지만 구현(3 depth의 id 길이는 10임)
+	if(subMenus == null || subMenus == undefined 
+			|| subMenus == "" || subMenus[0]["id"].length >= 10){
+		return "";
+	}
+	
+	var elem;
+	var menuId;
+	var href_Value;
+	var highlight_CSS1;
+	var highlight_CSS2;
+	var menu_Depth;
+	var labelString_Value = '';
+	
+	//subMenus의 id 길이로 menu의 depth를 구함.
+	if(subMenus[0]["id"].length == 6){
+		menu_Depth = 0;
+	}else if(subMenus[0]["id"].length == 8){
+		menu_Depth = 1;
+	}else{
+		console.log("common_getGNBMenuHTML subMenus id format error!!!");
+		return "";
+	}
+	
+	//html string 구현 시작
+	window["GNBMENU_HTML"] += '<ul>';
+	
+	for(var i=0; i<subMenus.length; i++){
+		
+		href_Value = '';
+		highlight_CSS1 = '';
+		highlight_CSS2 = '';
+		elem = subMenus[i];
+		menuId = elem["link"] != "" ? elem["link"] : elem["id"]; // 자기 자신이 아닌 다른 메뉴를 body에 보여줄 경우
+		
+		//최상위의 메뉴의 highlight는 <li> 태그에, 그 하위 메뉴는 <a>태그에 class="on" 을 추가 함.
+		if(highlight_menus != undefined && highlight_menus[menu_Depth] == elem["id"]){
+			if(menu_Depth == 0){
+				highlight_CSS1 = 'class="on"';
+			}else if(menu_Depth == 1){
+				highlight_CSS2 = 'class="on"';
+			}
+		}
+		
+		//content 또는 service에 따라 호출하는 method 결정
+		if(elem["content"] == "true"){
+			if (elem["linkType"] != undefined && elem["linkType"] == "link"){
+				href_Value = '<a href="javascript:common_navigateToContent(\'' + elem["url"] + '\',null);"' + highlight_CSS2 + '>';
+			} else {
+				href_Value = '<a href="javascript:common_navigateToContent(\'' + elem["url"] + '\',{menu_id:\'' + menuId + '\'});"' + highlight_CSS2 + '>';
+			}
+		}else{
+			if (elem["linkType"] != undefined && elem["linkType"] == "link"){
+				href_Value = '<a href="javascript:navigate(\'/servlet/' + elem["url"] + '\',null);"' + highlight_CSS2 + '>';
+			} else {
+				href_Value = '<a href="javascript:navigate(\'/servlet/' + elem["url"] + '\',{menu_id:\'' + menuId + '\'});"' + highlight_CSS2 + '>';
+			}
+		}
+		
+		//외부 링크의 새창 팝업 연결이 되는 메뉴
+		if(elem["linkType"] != undefined && elem["linkType"] == "newWin"){
+			href_Value = '<a href="'+ elem["url"] + '" target="_blank" title="새창 열림"' + highlight_CSS2 + '>';
+		} else if (elem["linkType"] != undefined && elem["linkType"] == "javascript"){
+			href_Value = '<a href="#none" data-tap="'+ elem["url"] + ';return false;"' + highlight_CSS2 + '>';
+		}
+		
+		//최상위인 메뉴의 label은 기존에 <span>을 감싸도록 되어있음. 
+		if(menu_Depth == 0){
+			labelString_Value = '<span>' + elem["label"] + '</span>';
+		}else if(menu_Depth == 1){
+			labelString_Value = elem["label"];
+		}
+		
+		if (elem["displaytype"] != "2"){
+			window["GNBMENU_HTML"] += '<li id="' + elem["id"] + '"' + highlight_CSS1 + '>';
+			window["GNBMENU_HTML"] += href_Value + labelString_Value + '</a>';
+			
+			//subMenu가 있을 시 반복
+			if(elem["subMenus"] != undefined && elem["finish"] != "Y"){
+				_getGNBMenuHTML(elem["subMenus"], highlight_menus);
+			}
+			
+			window["GNBMENU_HTML"] += '</li>';
+		}
+	}
+	
+	window["GNBMENU_HTML"] += '</ul>';
+	
+	// 비어있는 <ul></ul> 태그 삭제
+	window["GNBMENU_HTML"] = window["GNBMENU_HTML"].replace("<ul></ul>", "");
+	
+	return window["GNBMENU_HTML"];
+}
+
+/**
+ * LNB 메뉴 생성
+ * @author FAS 정영탁
+ */
+function common_createLNBMenu(rootMenuId, menuId, titleStringFormat){
+	
+	if(rootMenuId == "" || rootMenuId == null || rootMenuId == undefined){
+		console.log("[common_createLNBMenu]_error : no rootMenuId");
+		return "";
+	}
+	
+	//menu id가 없을 시 root menu의 첫번째 메뉴로 redering
+	if(menuId == null || menuId == undefined || menuId == ""){
+		menuId = rootMenuId+'01';
+	}
+
+	if (titleStringFormat == null || titleStringFormat == undefined || titleStringFormat == ""){
+		titleStringFormat = "<h2>{0}</h2>{1}";
+	}
+
+	var pathMenuId = [];
+	if (menuId.length >= 6) {
+		for (var i = 6; i <= menuId.length; i += 2) {
+			pathMenuId.push( menuId.substring(0, i) );
+		}
+	}
+
+	var rootObj = eval('menu_'+rootMenuId);
+	var subMenus = null;
+	var h2Label = '';
+	var level = 1; // 부모 menuID중 원하는 level 
+
+	// 개인인터넷뱅킹 하위는 2depth 부터
+	if (rootObj["id"] == 'IPZZ') {
+		level = 2;
+	}
+
+    var parentMenuID = menuId.substring( 0 , 4 + ( level * 2 ) ); // 원하는 level의 부모 menuID 구하기
+    var parentMenuObj = _getCurrentMenuObj(rootObj, parentMenuID);
+    subMenus = parentMenuObj["subMenus"];
+    h2Label = parentMenuObj["label"];
+
+	//html string 초기화
+	window["LNBMENU_HTML"] = "";
+	
+	var result = _getLNBMenuHTML(subMenus, pathMenuId);
+	
+	//html string 초기화
+	window["LNBMENU_HTML"] = "";
+	
+	return titleStringFormat.replace('{0}', h2Label).replace('{1}', result);
+}
+
+/**
+ * [내부함수] LNB 메뉴 생성
+ * @author FAS 정영탁
+ */
+function _getLNBMenuHTML(subMenus, highlight_menus){
+	
+	if(subMenus == null || subMenus == undefined 
+			|| subMenus == ""){
+		console.log("[common_createLNBMenu]_error : no subMenus");
+		return "";
+	}
+	
+	var elem;
+	var menuId;
+	var href_Value;
+	var highlight_CSS1;
+	var menu_Depth;
+	var labelString_Value = '';
+	
+	//subMenus의 id 길이로 menu의 depth를 구함.
+	menu_Depth = (subMenus[0]["id"].length - 6) / 2;
+	
+	//html string 구현 시작
+	window["LNBMENU_HTML"] += '<ul>';
+	
+	for(var i=0; i<subMenus.length; i++){
+		
+		href_Value = '';
+		highlight_CSS1 = '';
+		highlight_CSS2 = '';
+		elem = subMenus[i];
+		menuId = elem["link"] != "" ? elem["link"] : elem["id"]; // 자기 자신이 아닌 다른 메뉴를 body에 보여줄 경우
+		
+		if(highlight_menus != undefined && highlight_menus[menu_Depth] == elem["id"]){
+			highlight_CSS1 = 'class="on"';
+		}
+		
+		//content 또는 service에 따라 호출하는 method 결정
+		if(elem["content"] == "true"){
+			if (elem["linkType"] != undefined && elem["linkType"] == "link"){
+				href_Value = '<a href="#none" data-tap="javascript:common_navigateToContent(\'' + elem["url"] + '\',null);return false;">';
+			} else {
+				href_Value = '<a href="#none" data-tap="javascript:common_navigateToContent(\'' + elem["url"] + '\',{menu_id:\'' + menuId + '\'});return false;">';
+			}
+		}else{
+			if (elem["linkType"] != undefined && elem["linkType"] == "link"){
+				href_Value = '<a href="#none" data-tap="javascript:navigate(\'/servlet/' + elem["url"] + '\',null);return false;">';
+			} else {
+				href_Value = '<a href="#none" data-tap="javascript:navigate(\'/servlet/' + elem["url"] + '\',{menu_id:\'' + menuId + '\'});return false;">';
+			}
+		}
+		
+		//외부 링크의 새창 팝업 연결이 되는 메뉴
+		if(elem["linkType"] != undefined && elem["linkType"] == "newWin"){ // 새창열림
+			href_Value = '<a href="'+ elem["url"] + '" target="_blank" title="새창 열림" >';
+		} else if (elem["linkType"] != undefined && elem["linkType"] == "javascript"){ // JavaScript 실행
+			href_Value = '<a href="#none" data-tap="'+ elem["url"] + ';return false;">';
+		} else if (elem["linkType"] != undefined && elem["linkType"] == "toggle"){ // LNB 토글
+			href_Value = '<a href="#none" data-tap="common_cfLnbToggle(this); return false;">';
+		}
+		
+		labelString_Value = elem["label"];
+		
+		if (elem["displaytype"] != "2"){
+			window["LNBMENU_HTML"] += '<li id="' + elem["id"] + '"' + highlight_CSS1 + '>';
+			window["LNBMENU_HTML"] += href_Value + labelString_Value + '</a>';
+			
+			//subMenu가 있을 시 반복
+			if(elem["subMenus"] != undefined){
+				_getLNBMenuHTML(elem["subMenus"], highlight_menus);
+			}
+			
+			window["LNBMENU_HTML"] += '</li>';
+		}
+		
+	}
+	
+	window["LNBMENU_HTML"] += '</ul>';
+	
+	// 비어있는 <ul></ul> 태그 삭제
+	window["LNBMENU_HTML"] = window["LNBMENU_HTML"].replace("<ul></ul>", "");
+	
+	return window["LNBMENU_HTML"];
+}
+
+/**
+ * [내부함수] 선택된 메뉴 Object 반환
+ * @author FAS 정영탁
+ */
+function _getCurrentMenuObj(menuObj, menuId) {
+	if (menuObj["id"] == menuId) {
+		return menuObj;
+	} else if (menuObj["subMenus"]) {
+		for (var i = 0; i < menuObj["subMenus"].length; i++) {
+			var _currentMenuObj = _getCurrentMenuObj(menuObj["subMenus"][i], menuId);
+			if (_currentMenuObj != null) {
+				return _currentMenuObj;
+				break;
+			}
+		}
+	}
+	return null;
+}
+
+/**
+ * Navigation Path 반환
+ * @author FAS 정영탁
+ */
+function common_cfGetNavigation(rootMenuId, menuId){
+	if(rootMenuId == "" || rootMenuId == null || rootMenuId == undefined){
+		console.log("[common_createLNBMenu]_error : no rootMenuId");
+		return "";
+	}
+	
+	//menu id가 없을 시 root menu의 첫번째 메뉴로 redering
+	if(menuId == null || menuId == undefined || menuId == ""){
+		menuId = rootMenuId+'01';
+	}
+
+	var pathMenuId = [];
+	for (var i = 4; i <= menuId.length; i += 2) {
+		if (menuId.substring(0, i) != 'IPZZ') {
+			pathMenuId.push( menuId.substring(0, i) );
+		}
+	}
+
+	var rootObj = eval('menu_'+rootMenuId);
+	var locationHtml = "";
+	for (var i = 0; i < pathMenuId.length; i++) {
+		var elem = _getCurrentMenuObj(rootObj, pathMenuId[i]);
+        if (!elem) {
+            continue;
+        }
+		var href_Value = '';
+		var _menuId = elem["link"] != "" ? elem["link"] : elem["id"]; // 자기 자신이 아닌 다른 메뉴를 body에 보여줄 경우
+		
+		// 예외처리
+		if (elem["id"] == "IPZZ" || elem["id"] == "WSZZ" || elem["id"] == "IPMY" || elem["url"] == ""){
+			continue;
+		}
+
+        if (i > 0) {
+            locationHtml += ' &gt; ';
+        }
+		if (i + 1 < pathMenuId.length) {
+			if (elem["content"] == "true"){
+				href_Value = '<a href="#none" data-tap="javascript:common_navigateToContent(\'' + elem["url"] + '\',{menu_id:\'' + _menuId + '\'});return false;">';
+			} else {
+				href_Value = '<a href="#none" data-tap="javascript:navigate(\'/servlet/' + elem["url"] + '\',{menu_id:\'' + _menuId + '\'});return false;">';
+			}
+			//외부 링크의 새창 팝업 연결이 되는 메뉴
+			if(elem["linkType"] != undefined && elem["linkType"] == "newWin"){
+				href_Value = '<a href="'+ elem["url"] + '" target="_blank" title="새창 열림" >';
+			} else if (elem["linkType"] != undefined && elem["linkType"] == "javascript"){
+				href_Value = '<a href="#none" data-tap="'+ elem["url"] + ';return false;">';
+			}
+			locationHtml += href_Value + elem["label"] + '</a>';
+		} else {
+			locationHtml += '<strong class="point1">' + elem["label"] + '</strong>';
+		}
+	}
+	
+	return locationHtml;
+}
+
+
+/**
+ * indexType : 접속 index page가 PC index or M사이트 index를 설정(ex. MOBILE, PC)
+ * domainCode : 해당 index page의 Domain Code (ex. IP00, IC00)
+ */
+function common_cfSetIndexPageConfig(indexType, domainCode , initAfterCallback){
+	
+	try{
+		var config_table = null;
+		
+		if(indexType != undefined && indexType == "MOBILE"){
+			config_table = MOBILE_INDEX_CONFIG_TABLE;
+		}else{
+			config_table = PC_INDEX_CONFIG_TABLE;
+		} 
+		
+		var config_obj = config_table[domainCode] != undefined ? config_table[domainCode] : null;
+		var deviceType = common_cfGetDeviceType();
+		var initServiceYN = null;
+		
+		if(config_obj != null){
+			initServiceYN = config_obj["INITSERVICE"];
+			
+			if(initServiceYN){
+				httpSend("initService", null, function (){
+					if(typeof initAfterCallback == typeof function(){}){
+						initAfterCallback();
+					}
+				}, function (){}, {"useProgress" : false, "headers" : {"saac" : "saac"}});
+			}
+			
+			if(config_obj[deviceType] != null){
+				setTimeout(function (){
+					document.location.href = config_obj[deviceType];
+				},10);
+			}else{
+				return;
+			}
+		}else{
+			//모든 예외사항이 발생 시 개인뱅킹의 main index로 이동.
+			httpSend("initService", null, function (){
+				if(typeof initAfterCallback == typeof function(){}){
+					initAfterCallback();
+				}
+			}, function (){}, {"useProgress" : false, "headers" : {"saac" : "saac"}});
+			setTimeout(function (){
+				document.location.href = common_cfGetDomain("IP00");
+			},10);
+		}
+	}catch(e){
+		//모든 예외사항이 발생 시 개인뱅킹의 main index로 이동.
+		httpSend("initService", null, function (){
+			if(typeof initAfterCallback == typeof function(){}){
+				initAfterCallback();
+			}
+		}, function (){}, {"useProgress" : false, "headers" : {"saac" : "saac"}});
+		setTimeout(function (){
+			document.location.href = common_cfGetDomain("IP00");
+		},10);
+	}
+	
+}
+
+/**
+ * <pre>
+ * 보안카드,OTP구분값 체크
+ * </pre>
+ */
+function common_cfCheckPwCdDs(){
+	
+	httpSend ( "IPCNA115S", 
+			   null, 
+			   function() {}, 
+	           function(responseJson, status, xhr) { // CallBack Fail	        	   
+	        	    common_cfUserDefinedErrorPop(responseJson, status, xhr);
+	           } ,
+	           { async : false } 
+	         );	
+}
+
+function common_cfGetDomainCode(){
+	
+	var domain = "https://" +  document.location.host;
+	var domainCode = "";
+	
+	for(var i in DOMAINCODE){
+		if(DOMAINCODE[i] == domain){
+			domainCode = i.substring(i.length-4, i.length);
+			break;
+		}
+	}
+	
+	return domainCode;
+	
+}
+
+/**
+ * <pre>
+ * 이니텍 에러 체크
+ * </pre>
+ */
+function common_cfCheckInitechError (status){
+	
+	// 값이 없는지 체크
+	if ( status == null || status == undefined ) {
+		return false;
+	}
+	
+	// status가 이니텍 에러코드에 해당되는지 판단
+	if ( "800" == status ||
+		 "921" == status ||
+		 "922" == status ||
+		 "923" == status ||
+		 "924" == status ||		 
+		 "925" == status ||
+		 "926" == status ||
+		 "927" == status ||
+		 "928" == status ||
+		 "929" == status ||
+		 "930" == status ||
+		 "931" == status ||
+		 "932" == status ||
+		 "933" == status ||
+		 "934" == status ||
+		 "935" == status ||
+		 "936" == status ||
+		 "937" == status ||
+		 "938" == status ||
+		 "939" == status ||
+		 "940" == status ||
+		 "949" == status ) {
+		 return true;
+	}	 
+	
+	return false;
+}
+
+/**
+ * 버튼 속성 변경
+ * - 페이지 내의 button type을 초기화 한다(기본값: submit을 button으로 변경)
+ */
+function common_cfInitButtonType(formId) {
+	if (typeof(formId) == 'object') {
+		formId = $(formId);
+	} else {
+		formId = $('#'+formId);
+	}
+
+	formId.find('button').each(function(){
+		$(this).attr('type', 'button');
+	});
+}
+
+/**
+ * 보안카드 자동커서 on/off 기능 체크(쿠키)
+ */
+function common_cfCheckAutoCursor(){
+	var check_auto_cursor = util_cfGetCookie("security_card_auto_cursor");
+	
+	common_cfSecureCardInputHandler();	// 숫자만 입력되고 포커스 이동되도록 이벤트 적용
+	
+	// 자동커서 설정 radio init
+	if(check_auto_cursor == "n") {
+		$("#auto_cursor_radio_n").attr("checked", "checked");
+	} else {
+		$("#auto_cursor_radio_y").attr("checked", "checked");
+	}
+	
+	// 자동커서 선택 이벤트
+	$("input[name=auto_cursor_radio]").bind('change', function(e){
+		util_cfSetCookie("security_card_auto_cursor", $(this).val());
+		$("#io_ea_rsp_no1, #io_ea_rsp_no3").unbind("keyup.custom");
+		common_cfSecureCardInputHandler();
+	});
+	
+}
+
+/**
+ * SuperSign 조회를 위한 Ajax
+ * @author 정영탁, 2014.10.31
+ */
+function common_cfSuperSignAjax( ssignObj, callback_success, callback_error ) {
+	$.ajax({
+		type : "POST",
+		url: "/CodeGuard/supersign.jsp",
+		data: ssignObj,
+		cache : false,
+		success : callback_success,
+		error : callback_error
+	});
+}
+
+/**
+ * SuperSign 조회를 위한 Ajax
+ * @author 김승용, 2016.09.29
+ * 지문인증 일경우에만 사용
+ */
+function common_cfSuperSignAjaxFinger( ssignObj, callback_success, callback_error ) {
+	$.ajax({
+		type : "POST",
+		url: "/CodeGuard/supersign.jsp",
+		data: ssignObj,
+		cache : false,
+		success : callback_success,
+		error : callback_error
+	});
+}
+
+/**
+ * 해외IP차단서비스 가입고객 거래 Block
+ */
+function common_cfForeignIPBlock( param , callback ) {
+	var _service_name="IPCNA700S";
+	if(window["G_WEB"] == "true") {
+		_service_name="PGCNA700S";
+	}
+	var sendParam = param || {};
+	var wrapperDiv = $('#FOREIGN_IP_BLOCK_WRAPPER_DIV');
+	if(wrapperDiv.size() == 0){
+		wrapperDiv = $('<div></div>').attr({id:'FOREIGN_IP_BLOCK_WRAPPER_DIV','data-type':"dialog" }).css({display:'none'});
+		$('body').append(wrapperDiv);
+	}	
+	$(wrapperDiv).navigate(_service_name, sendParam).done(function(data,status,xhr){
+		if(typeof callback === 'function') callback(data,status,xhr);
+	});
+}
+
+/**
+ * 스마트금융 페이지로 전환
+ */
+function common_toSFMainNavigate(sub , joongjo){
+	var serviceId  		= sub || 'SFMN0001R';
+	var naac_ds_dtlc 	= joongjo || '1';
+
+	
+	common_toSFGateway(serviceId , {SF_NAAC_DS_DTLC:naac_ds_dtlc});
+}
+
+/**
+ * 스마트금융 페이지로 전환
+ */
+function common_toSFGateway(serviceId , param) {
+	var paramValue = { TARGET_SERVICE : serviceId };
+
+	httpSend("ISSUETOKEN",
+			paramValue,
+			function(responseJson) { // 성공시 CallBack 
+				var logging_url = responseJson["TARGET"] + "?p_id="+ responseJson["TARGET"] + "&mvtomkt=1";
+				try {		
+			    	n_click_logging ( logging_url );
+				} catch (e) {}
+
+				var urlPrefix = "/content/html/sf/cn/";
+				var result_url = ''; 
+
+				result_url = common_cfGetDomain('SF00') + urlPrefix + "sfgateway.html?refbnk=1";
+
+				result_url += "&SERVICE_ID=" + responseJson["TARGET"] + "&NAVIGATE_TYPE=" + responseJson["NAVIGATE_TYPE"];
+				
+				if (responseJson["ENCTKIDX"] == null || responseJson["ENCTKIDX"] == "undefined" || responseJson["ENCTKIDX"] == '') {
+					
+					if(param){
+						for(key in param){
+							result_url += '&' + key + '=' + param[key];
+						}
+					}
+					
+					var funcGohmcifNoSSO = function (){
+						document.location.href = result_url;
+						return;
+					};
+					
+					if(responseJson["isShowAlertPop"] == "Y"){						
+
+							var layerObj = $('#layer_hmcifSso');
+							layerObj.find('.close_pop').tap(function(){layerObj.close();});
+							layerObj.find('#btn_hmcifSso').tap(function(){funcGohmcifNoSSO();layerObj.close();});
+							layerObj.open();
+
+					}else{
+						funcGohmcifNoSSO();						
+					}
+				} else {
+					result_url += "&SERVICE_ID=VERIFYTOKEN&NAVIGATE_TYPE=1&ENCTKIDX=" + responseJson["ENCTKIDX"] + "&TARGET_SERVICE=" + responseJson["TARGET"];
+					if(param){
+						for(key in param){
+							result_url += '&' + key + '=' + param[key];
+						}
+					}
+			
+					document.location.href = result_url;
+				}
+				
+		
+			},
+			function(responseJson, status, xhr) { // CallBack Fail    						  
+				common_cfUserDefinedErrorPop(responseJson, status, xhr);
+				$('#layerDiv_scrtCdOtpPop').close(); // 레이어팝업 닫기
+			},
+			{ async : false, useProgress : false } // Sync옵션
+	);
+}
+
+function common_toCCMainNavigate(){
+	common_toCCGateway();
+}
+
+function common_toCCGateway(paramValue){
+	httpSend("ISSUETOKENCARD",
+			paramValue,
+			function(responseJson) { // 성공시 CallBack 
+				if (responseJson["ENCTKIDX"] == null || responseJson["ENCTKIDX"] == "undefined" || responseJson["ENCTKIDX"] == '') {
+					var frm_cardSso;
+					
+					var funcGoCardNoSSO = function (addURL){
+						frm_cardSso = $('<form ' + '" style="display:none;"></form>').appendTo('head');
+						frm_cardSso.attr('method', 'POST');
+						frm_cardSso.attr('action', common_cfGetDomain('CC00') + (typeof addURL != 'undefined' ? addURL : ''));
+						frm_cardSso.attr('target', 'NHCard');
+						frm_cardSso.submit();
+						return;
+					};
+					
+					if(responseJson["isShowAlertPop"] == 'Y'){
+						var layerObj = $('#layer_cardSso');
+						layerObj.find('.close_pop').tap(function(){layerObj.close();});
+						layerObj.find('#btn_cardSso').tap(function(){funcGoCardNoSSO('/IpCm9151I.act');layerObj.close();});
+						layerObj.open();
+					}else{
+						funcGoCardNoSSO();
+					}
+				}else{
+					var result_url = common_cfGetDomain('CC00') + '/IpCnB020S.act?ENCTKIDX=' + responseJson["ENCTKIDX"];
+					
+					if(typeof paramValue === "undefined"){
+						document.location.href = result_url;
+					}else{
+						if(paramValue.hasOwnProperty("DSN_ADR") || paramValue.hasOwnProperty("GE")){
+							var frm_cardSso;
+							frm_cardSso = $('<form ' + '" style="display:none;"></form>').appendTo('head');
+							frm_cardSso.attr('method', 'POST');
+							frm_cardSso.attr('action', result_url);
+							frm_cardSso.attr('target', 'NHCard');
+							frm_cardSso.submit();
+							return;
+						}else{
+							document.location.href = result_url;
+						}
+					}
+				}
+			},
+			function(responseJson, status, xhr) { // CallBack Fail    						  
+				common_cfUserDefinedErrorPop(responseJson, status, xhr);
+				$('#layerDiv_scrtCdOtpPop').close(); // 레이어팝업 닫기
+			},
+			{ async : false, useProgress : false } // Sync옵션
+	);
+}
+
+function common_toPSGateway(serviceId , param) {
+	var indexPagePS = '/ip/ps/IPPS0001M.thtml';
+	
+	var ssoParam = {};
+	var addParam = param || {};
+	
+	if(typeof serviceId == 'undefined' || serviceId == ''){
+		ssoParam['DSN_ADR'] = indexPagePS;
+	} else {
+		ssoParam['DSN_ADR'] = serviceId;
+	}
+	
+	httpSend("ISSUETOKENCARD",
+			ssoParam,
+			function(responseJson) { // 성공시 CallBack 
+				addParam.from 		= 'IP';
+				
+				if(responseJson["isShowAlertPop"] == 'Y'){
+					var layerObj = $('#layer_mcpsSso');
+					layerObj.find('.close_pop').tap(function(){layerObj.close();});
+					layerObj.find('#btn_mcpsSso').tap(function(){
+						document.location.href = common_cfGetDomain('PS00');
+					});
+					layerObj.open();
+					return false;
+				}
+
+				
+				if(responseJson["ENCTKIDX"]){ // 정상적으로 SSO토큰발급이 이루어진 경우
+					var gateURL 	= common_cfGetDomain('PS00') + "/service/html/psgateway.html?ENCTKIDX=" + responseJson["ENCTKIDX"];
+					if(addParam){
+						for(key in addParam){
+							gateURL += '&' + key + '=' + addParam[key];
+						}
+					}
+					document.location.href = gateURL;
+				} else {
+					if(ssoParam['DSN_ADR'] == indexPagePS){
+						document.location.href = common_cfGetDomain('PS00');
+					} else {						
+						addParam.saac 		= 'saac';
+						
+						var isService 	= (ssoParam['DSN_ADR'].indexOf(".thtml") == -1) ? true : false;
+						var gateURL 	= (isService ? "/servlet/" + ssoParam['DSN_ADR'] + '.view' : "/servlet/content" + ssoParam['DSN_ADR']);
+						
+						(function (addURL , param){
+							var frmExternal = $('<form ' + '" style="display:none;"></form>');
+							frmExternal.attr('method', 'POST');
+							frmExternal.attr('action', common_cfGetDomain('PS00') + (typeof addURL != 'undefined' ? addURL : ''));
+							if(param){
+								for(key in param){
+									$('<input/>').attr('name' , key).val(param[key]).appendTo(frmExternal);
+								}
+							}
+							frmExternal.appendTo('head');
+							frmExternal.submit();
+							return;
+						})(gateURL , addParam);
+					}
+				}
+			},
+			function(responseJson, status, xhr) { // CallBack Fail    						  
+				common_cfUserDefinedErrorPop(responseJson, status, xhr);
+			},
+			{ async : false, useProgress : false } // Sync옵션
+	);
+}
+
+/**
+ * E2E 추가적용처리
+ * 
+ * @param idOfObject : 해당 object 의 ID 값
+ * @param type : n (숫자형)
+ * @param hasTranskeyCheckBoxNecessarily : TranskeyCheckBox 필수추가여부 (true/false)
+ */
+function common_addE2eElement(idOfObject, type, hasTranskeyCheckBoxNecessarily) {
+    if(typeof setE2Eelement !== 'undefined') {
+        var e2eElementAdded        = idOfObject +":"+ type +":"+ hasTranskeyCheckBoxNecessarily;
+        var arrayOfE2eElementAdded = [e2eElementAdded];
+        if(typeof arrayOfE2eElementAdded === "object") {
+        	common_removeE2eElement(idOfObject, type, hasTranskeyCheckBoxNecessarily);
+        	setE2Eelement = setE2Eelement.concat(arrayOfE2eElementAdded);
+        }
+    }
+}
+
+/**
+ * E2E 제거적용처리
+ * 
+ * @param idOfObject : 해당 object 의 ID 값
+ * 
+ */
+function common_removeE2eElement(idOfObject, type, hasTranskeyCheckBoxNecessarily) {
+    if(typeof setE2Eelement !== 'undefined') {
+        var e2eElementRemoved        = idOfObject +":"+ type +":"+ hasTranskeyCheckBoxNecessarily;
+        for(var i = 0 ; i < setE2Eelement.length ; i++) {
+        	if(setE2Eelement[i] === e2eElementRemoved) {
+        		setE2Eelement.splice(i, 1);
+        		break;
+        	}
+        }
+    }
+}
+
+
+/**
+ * E2E값 제거
+ * 페이지에서 동적으로 페이지를 변경하는 경우 (show/hide가 아닌 empty, append의 경우)
+ * E2E 적용 필드의 E2E_fieldname 이 존재하는 경우 키보드 보안 오류가 발생하므로 
+ * empty, append 시에 E2E_fieldname element를 제거한다.
+ * @param idOfObject : 해당 object 의 ID 값
+ * 
+ */
+function common_removeE2eHiddenElement(hiddenE2eFieldName) {
+    if($("[name="+hiddenE2eFieldName+"]").length > 0 )
+    	$("[name="+hiddenE2eFieldName+"]").remove();
+}
+
+/**
+ * E2E적용필드에 TranskeyCheckBox 붙일 때 사용
+ * @param inputObj
+ */
+function common_appendTranskeyCheckBoxToE2eElement(inputObj) {
+    
+	var _pathname = document.location.pathname;
+	_pathname = _pathname.substring(_pathname.lastIndexOf('/') + 1, _pathname.length);
+	var _firstPath = _pathname.substring(0,2);
+	
+	var checkboxElement='';
+	
+	//2020 e금융고도화 이지뱅킹 2020-11-21 적용 대상
+	var div = '';
+	var span = '';
+	var label = '';
+	
+    if(_firstPath == 'IH' || "IH00" == common_cfGetDomainCode()) {	// 이지뱅킹
+    	div = $("<div class='d-table-cell'></div>");
+		span = $("<span></span>").addClass("mousebtn");
+		label = $("<label></label>");
+    
+		checkboxElement+="<input type=\"checkbox\" data-type=\"checkbox\" title=\"";
+		checkboxElement+=(common_cfGetMessage('I0659') == "")? "마우스 입력기 사용" : common_cfGetMessage('I0659');
+		checkboxElement+="\" id=\"Tk_";
+		checkboxElement+=inputObj.id;
+		checkboxElement+="_checkbox\" name=\"Tk_";
+		checkboxElement+=inputObj.id;
+		checkboxElement+="_checkbox\" ";
+		checkboxElement+="onclick=\"transkey.Tk_";
+		checkboxElement+=inputObj.id;
+		checkboxElement+=".onClickCheckbox(event);\"/>";
+		checkboxElement+=" <span class=\"labelC\">";
+		checkboxElement+= (common_cfGetMessage('I0658') == "")? "마우스입력기" : common_cfGetMessage('I0658');
+		checkboxElement+="</span>"; 
+		label.append(checkboxElement);
+		span.append(label);
+		div.append(span);
+
+    	$(inputObj).parent().parent().after(div);
+    } else {
+		span = $("<span></span>").addClass("mousebtn");
+		label = $("<label></label>");
+		
+		checkboxElement+="<input type=\"checkbox\" data-type=\"checkbox\" title=\"";
+		checkboxElement+=(common_cfGetMessage('I0659') == "")? "마우스 입력기 사용" : common_cfGetMessage('I0659');
+		checkboxElement+="\" id=\"Tk_";
+		checkboxElement+=inputObj.id;
+		checkboxElement+="_checkbox\" name=\"Tk_";
+		checkboxElement+=inputObj.id;
+		checkboxElement+="_checkbox\" ";
+		checkboxElement+="onclick=\"transkey.Tk_";
+		checkboxElement+=inputObj.id;
+		checkboxElement+=".onClickCheckbox(event);\"/>";
+		checkboxElement+=" <span class=\"labelC\">";
+		checkboxElement+= (common_cfGetMessage('I0658') == "")? "마우스입력기" : common_cfGetMessage('I0658');
+		checkboxElement+="</span>"; 
+		checkboxElement+"";
+		label.append(checkboxElement);
+		span.append(label);
+
+	    $(inputObj).parent().after(span);
+	    $(inputObj).parent().after("&nbsp;");
+    }
+}
+
+
+function common_setSecureToDirect(sourceId, targetId) {
+	var targetForm, sourceForm;
+	if($.type(sourceId) == "undefined" || $.type(targetId) == "undefined") {
+		return;
+	} else {
+		var sourceObj = document.getElementById(sourceId);
+		var targetObj = document.getElementById(targetId);
+		sourceForm = sourceObj.form;
+		targetForm = targetObj.form;
+		
+		common_setDefaultSecureField($(targetForm), $(sourceForm), targetId, sourceId);
+		
+
+	}
+}
+
+function common_setDefaultSecureField(targetForm, sourceForm, targetId, sourceId){
+	var transkey_i, transkeyUuid, secure_view, hid_key_data,transkey_inputs;
+	
+	//secure 필드가 없는 경우
+	
+	if(targetForm.find("#secure_view").length <= 0) {
+		//create element
+		console.log("create Element");
+		targetForm.append(sourceForm.find("transkeyUuid"));
+		targetForm.append(sourceForm.find("secure_view"));
+		targetForm.append(sourceForm.find("hid_key_data"));
+		
+		
+		targetForm.append(sourceForm.find("transkey_i"));
+		
+		targetForm.append(sourceForm.find("transkey_inputs"));
+		targetForm.find("#transkey_inputs").val("Tk_"+targetId+":"+targetId+":"+$("#"+sourceId).attr("type").toLowerCase());
+		
+		_setDefaultSecureField(targetForm, sourceForm, targetId, sourceId);
+		
+	} else {
+		//secure 필드가 이미 존재하는 경우
+		//append element
+		//처음 호출 된 경우
+		console.log("already Element - first call");
+		if(targetForm.find("#transkey_inputs").val().indexOf("Tk_"+targetId+":"+targetId) < 0) {
+			//transkey_i + 1, transkey_inputs + targetfield
+			transkey_i = targetForm.find("#transkey_i");
+			transkey_i.val(Number(transkey_i.val())+1);
+			
+			transkey_inputs = targetForm.find("#transkey_inputs");
+			transkey_inputs.val(transkey_inputs.val()+",Tk_"+targetId+":"+targetId+":"+$("#"+sourceId).attr("type").toLowerCase());
+			
+			_setDefaultSecureField(targetForm, sourceForm, targetId, sourceId);
+			
+		} else {
+		//호출이 한번이라도 된적이 있으면
+			console.log("already Element - second call");
+			targetForm.find("[name=E2E_"+targetId+"]").val(sourceForm.find("[name=E2E_"+sourceId+"]").val());
+			targetForm.find("#transkey_Tk_"+targetId).val(sourceForm.find("#transkey_Tk_"+sourceId).val());
+			targetForm.find("#Tk_"+targetId+"_check").val(sourceForm.find("#Tk_"+sourceId+"_check").val());
+			
+		}
+	}
+	
+	function _setDefaultSecureField(targetForm, sourceForm, targetId, sourceId){
+		var e2e_target, transkey_Tk_target, Tk_target_check;
+		
+		e2e_target = $("<input></input>");
+		e2e_target.attr({"type":"hidden","name":"E2E_"+targetId}).val(sourceForm.find("[name=E2E_"+sourceId+"]").val());
+		
+		
+		transkey_Tk_target = $("<input></input>");
+		transkey_Tk_target.attr({"type":"hidden","name":"transkey_Tk_"+targetId, "id":"transkey_Tk_"+targetId}).val(sourceForm.find("#transkey_Tk_"+sourceId).val());
+		
+		Tk_target_check = $("<input></input>");
+		Tk_target_check.attr({"type":"hidden","name":"Tk_"+targetId+"_check", "id":"Tk_"+targetId+"_check"}).val(sourceForm.find("#Tk_"+sourceId+"_check").val());
+		
+		targetForm.append(e2e_target);
+		targetForm.append(transkey_Tk_target);
+		targetForm.append(Tk_target_check);
+	}
+}
+
+/**
+ * NxKey Check 
+ */
+
+function isTKLoadingCheck(){
+	if(navigator.userAgent.indexOf("Windows") > 0){//윈도우환경 체크
+	   if(typeof TK_Loading != "function"){
+		   alert("키보드보안 설치를 다시 확인하시기 바랍니다(Error 10)");
+		   navigate("IPCNA902R");
+	   }
+	} 
+}
+
+function nxKeyLoadCheck(result){
+	   try{
+		  if(result.reply.keydata == null) {
+             alert("키보드보안 설치를 다시 확인하시기 바랍니다(Error 11)");
+             navigate("IPCNA902R");
+		  }
+	   }catch(e){
+		   	alert("키보드보안 설치를 다시 확인하시기 바랍니다(Error 12)");
+		   	navigate("IPCNA902R");
+	   }
+}
+
+
+
+/**
+ * 지원 OS, WebBrowser 안내용 팝업출력처리
+ */
+function common_showLayerPopupForInformationAboutSupportedOsAndWebBrowser(solutionType) {
+	/*
+    if(solutionType == "INISAFEWebEX") {
+        if(window["G_WEB"] == "true") {
+            popup_cfLayerLoad("/content/html/i18n/en_US/cn/pgcn0092c.html");
+        } else {
+            popup_cfLayerLoad("/content/html/ip/cn/ipcn0092c.html");
+        }
+    }
+    */
+	document.location.href = common_cfGetDomain('IP00') + "/content/html/ip/cn/osbrowserguide.html";
+}
+
+
+//지문인증 로그인 추가 글로벌
+function fingerAuthPopGlobal() {	
+	if($("#loginType") != undefined) {
+		$("#loginType").val("");
+	}
+	popup_cfLayerOpen('PGCNI140P', {
+		'ssign_data' : 'login',
+		'ssign_ext_data' : 'login',
+		'ssign_req_type' : 'SID',	// 인증서이동의 경우 'data', 그 이외는 'SID'
+		'ssign_cert_type' : 'BIO',		//
+		'ssign_cert_serial' : window["SMART_CERT_SERIAL"]
+	});	
+}
+
+//지문인증 로그인 추가
+function fingerAuthPop() {
+	if($("#loginType") != undefined) {
+		$("#loginType").val("");		
+	}
+	popup_cfLayerOpen('IPCNI140P', {
+		'ssign_data' : 'login',
+		'ssign_ext_data' : 'login',
+		'ssign_req_type' : 'SID',	// 인증서이동의 경우 'data', 그 이외는 'SID'
+		'ssign_cert_type' : 'BIO',		//
+		'ssign_cert_serial' : window["SMART_CERT_SERIAL"]
+	});
+}
+
+
+//간편인증 로그인 글로벌
+function common_cfPinCertPopGlobal() {	
+	popup_cfLayerOpen('PGCNI160P', {
+		'ssign_data' : 'login',
+		'ssign_ext_data' : 'login',
+		'ssign_req_type' : 'SID',	// 인증서이동의 경우 'data', 그 이외는 'SID'
+		'ssign_cert_type' : 'PIN',		//
+		'ssign_cert_serial' : window["SMART_CERT_SERIAL"]
+	});	
+}
+
+//간편인증 로그인 
+function common_cfPinCertPop() {
+	popup_cfLayerOpen('IPCNI160P', {
+		'ssign_data' : 'login',
+		'ssign_ext_data' : 'login',
+		'ssign_req_type' : 'SID',	// 인증서이동의 경우 'data', 그 이외는 'SID'
+		'ssign_cert_type' : 'PIN',		//
+		'ssign_cert_serial' : window["SMART_CERT_SERIAL"]
+	});
+}
+
+//NHOnePass 로그인 팝업
+function common_cfNHOnePassPop() {
+	popup_cfLayerOpen('IPCNI180P');
+}
+
+
+//NHOnePass 로그인 팝업 글로벌
+function common_cfNHOnePassPopGlobal() {
+	popup_cfLayerOpen('PGCNI180P');
+}
+
+// 간편뱅킹, 지문인증 팝업 대체 안내 팝업
+function common_cfOtherLoginBlock(){
+	popup_cfLayerOpen('IPCNI182P');
+}
+
+//간편뱅킹, 지문인증 팝업 대체 안내 팝업 글로벌
+function common_cfOtherLoginBlockGlobal(){
+	popup_cfLayerOpen('PGCNI182P');
+}
+
+
+
+function common_cfAjaxTransaction(url,token,method,data,callback){
+	
+	return $.ajax({
+		url: url
+		,type: method
+		,dataType:'json'
+		,data:data
+		,contentType : 'application/json; charset=UTF-8'
+	    ,timeout:300000
+		,success:function(result){
+				console.log('success');
+				console.log(result);
+				callback(result);
+		}
+		,beforeSend: function(xhr){
+			xhr.setRequestHeader('Authorization', 'JWT ' + token);
+			common_showInitLodingBar();
+		}
+		,error: function(data,status,opt){
+				console.log("code:" +data.status+"\n"+"message:"+data.responseText+"\n"+"error:"+opt);
+		}
+		,complete:function(){
+			common_closeInitLodingBar();
+		}
+	});
+	
+}
+
+
+function fingerGuidePop(){
+	popup_cfLayerOpen('IPCNI141P');
+}
+function fingerGuidePopGlobal(){
+	popup_cfLayerOpen('PGCNI141P');
+}
+function nhOnePassGuidePop(){
+	popup_cfLayerOpen('IPCNI142P');
+}
+function nhOnePassGuidePopGlobal(){
+	popup_cfLayerOpen('PGCNI142P');
+}
+
+
+//지원종료 안내팝업 추가
+function serviceExpiredOsPopup(){
+	var tp = navigator.platform;
+	var ua = navigator.userAgent;
+	var result = {};
+
+	if (tp == "Win32" || tp == "Win64"){
+	    		if(ua.search("Windows Phone") >= 0){
+	    			result.platform = "Windows Phone";
+	    			result.name="Windows Phone";
+	    		} else {
+	    			result.platform = "WINDOWS";
+	    		}
+	 }
+
+	if(result.platform == "WINDOWS"){
+				if(ua.indexOf("Windows NT 5.0") != -1 || ua.indexOf("Windows NT 5.01") != -1){result.version="5.0"; result.name="Windows 2000";}
+				else if(ua.indexOf("Windows NT 5.1") != -1) {result.version="5.1"; result.name="XP";}
+				else if(ua.indexOf("Windows NT 5.2") != -1) {result.version="5.2"; result.name="XP64/Windows 2003";}
+				else if(ua.indexOf("Windows NT 6.0") != -1) {result.version="6.0"; result.name="VISTA";}
+	}
+
+	if(result.name=="Windows 2000" || result.name=="XP" || (result.name=="XP64/Windows 2003") || result.name=="VISTA"){
+		if ( window["M_WEB"] != "true" ) { // M뱅킹이 아닌 경우
+			if(window["G_WEB"] != "true") {
+				popup_cfContentLayerOpen('/ip/am/ipam0907p.html');
+			}
+		}
+	}
+}
+
+function common_preSolutionCheckFunc(type , callback){
+	
+	if(common_cfGetDeviceType() != 'NORMAL') {
+		callback(); 
+		return;
+	}
+	
+	if(type == 'fincert' || type == 'cert' || type == 'finger' || type == 'pinCert' || type == 'idPw' || type == 'NHOnePass'){
+		var common_solutionChecker = new NHSolutionChecker();
+		common_solutionChecker.setCheckSolution('Astx' 		, 1);
+		common_solutionChecker.setCheckSolution('CrosswebEX', 0);
+		common_solutionChecker.installCheck(
+				
+			function(){
+				
+				
+				
+				if(typeof(ASTX2Loaded) != 'undefined' && ASTX2Loaded ){
+					checkServerASTX2(
+						function(){
+							if(ASTX2_NH.getPCInfoYN){
+								if(typeof callback == 'function') callback();	
+							} else {
+								ASTX2_NH.getPCInfo(callback);
+							}
+						} , 
+						function(){
+							ipcna302_installCheck_fail_callback(callback);							
+						}
+					);
+					
+				}else{
+					checkInstallASTX2(
+						function(){
+							if(ASTX2_NH.getPCInfoYN){
+								if(typeof callback == 'function') callback();	
+							} else {
+								ASTX2_NH.getPCInfo(callback);
+							}
+						} , 
+						function(){
+							ipcna302_installCheck_fail_callback(callback);							
+						}
+					);
+				}
+			},
+			function(){
+				if(typeof ipcna302_installCheck_fail_callback == 'function') ipcna302_installCheck_fail_callback(callback);
+			}
+		);
+		
+	}	
+}
+
+
+function NHSolutionChecker (max_count , term){
+	this.solution_list 	 = ['CrosswebEX','Astx','TouchEnNx'];
+	this.solution_config = {
+		CrosswebEX 	: {checkYn : 0,checkType : 0,essential : 0},
+		Astx 		: {checkYn : 0,checkType : 0,essential : 1},
+		TouchEnNx 	: {checkYn : 0,checkType : 0,essential : 0}
+			
+	};
+	this.initializeChecker = function (max_count , term){
+		this.install_check_max_count = max_count || 40;
+		this.install_check_term = term || 1000;
+		this.install_check_now_count = 0;
+	};
+	
+	this.setEssentialSolution = function(solutionName , essentialYn){
+		var settingTarget = this.solution_config;
+		settingTarget[solutionName].essential   = essentialYn;
+	};
+	
+	this.setCheckSolution = function(solutionName , checkType){
+		var settingTarget = this.solution_config;
+		settingTarget[solutionName].checkYn   = 1;
+		settingTarget[solutionName].checkType = checkType;
+	};
+	this.installCheck = function(success , fail){
+		
+		//처리중 시작
+		common_showInitLodingBar();
+		
+		var checkSolution = [];
+		var size = this.solution_list.length;
+		for(var i = 0; i < size; i++){
+			var sol = this.solution_list[i];
+			if(this.solution_config[sol].checkYn == '1') checkSolution.push(sol);
+		}
+		this._installCheck(checkSolution, success, fail);
+		
+	};
+	this._installCheck = function(checkSolution, successCallback, failCallback){
+		
+		if(typeof(successCallback) != 'function') successCallback = function(){};
+		if(typeof(failCallback) != 'function') failCallback = function(){};
+		if(typeof window.nh_solution_check == 'undefined') failCallback(); 
+		
+		var checkEndYn 	= true;
+		var checkResult = true;
+		
+		for(var i =0; i <checkSolution.length; i++){
+			var rst = nh_solution_check[checkSolution[i]].status;
+			if(rst != 1){
+				if(this.solution_config[checkSolution[i]].checkType != 0){
+					checkResult  = false;
+				}
+				if(rst == 0) { checkEndYn 	= false; }
+			}
+		}
+			
+		
+		this.install_check_now_count++;
+		
+		nh_solution_check.console();
+		
+		if(!checkEndYn){
+			
+			if(this.install_check_now_count == 10){
+				if(nh_solution_check['CrosswebEX'].status == 0 ){
+					if(typeof cwInit != 'undefined' && cwInitStatus == 0){
+						cwInitializationInProgress = false;
+						cwInit();
+					}
+				}
+			}
+			
+			if(this.install_check_now_count >= this.install_check_max_count){
+				common_closeInitLodingBar(); //처리중 종료
+				this.install_check_now_count = 0;
+				if(checkResult){
+					successCallback();
+				}else{
+					failCallback();
+				}
+			}else{
+				var THIS = this;
+				setTimeout(function(){
+					THIS._installCheck(checkSolution , successCallback , failCallback); 
+				} , THIS.install_check_term);
+			}
+		}else{
+			
+			//처리중 종료
+			common_closeInitLodingBar();
+			
+			this.install_check_now_count = 0;
+			if(checkResult){
+				successCallback();
+			}else{
+				failCallback();
+			}
+		}
+		
+	};
+	
+	this.getCheckSolution = function(){
+		var checkFlag = true;
+		var solutionlist = this.solution_list;
+		var solutionConf = this.solution_config;
+		var size = solutionlist.length;
+		for(var i = 0; i < size; i++){
+			var sol = solutionlist[i];
+			if(solutionConf[sol].checkYn == '1' && solutionConf[sol].checkType == '1' && nh_solution_check[sol].status != '1'){
+				checkFlag = false;
+				break;
+			}
+		}
+		return checkFlag;
+	};
+	
+	this.getCheckEssentialSolution = function(){
+		var checkFlag = true;
+		var solutionlist = this.solution_list;
+		var solutionConf = this.solution_config;
+		var size = solutionlist.length;
+		for(var i = 0; i < size; i++){
+			var sol = solutionlist[i];
+			if(solutionConf[sol].essential == '1' && nh_solution_check[sol].status != '1'){
+				checkFlag = false;
+				break;
+			}
+		}
+		return checkFlag;
+	};
+	
+	this.getAllCheckSolution = function(){
+		var checkFlag = true;
+		var solutionlist = this.solution_list;
+		var solutionConf = this.solution_config;
+		var size = solutionlist.length;
+		for(var i = 0; i < size; i++){
+			var sol = solutionlist[i];
+			if(nh_solution_check[sol].status != '1'){
+				checkFlag = false;
+				break;
+			}
+		}
+		return checkFlag;
+	};
+	
+	this.initializeChecker(max_count , term);
+	
+}
+
+var nh_solution_check = {
+		
+	setSolutionConfig : function(name , attr , val){
+		nh_solution_check[name][attr] = val;
+	},
+	getSolutionConfig : function(name , attr){
+		return nh_solution_check[name][attr];
+	},
+	CrosswebEX 	: { 
+		status 		: 0,
+		useExtension: 0,
+		extensionSts: 0
+	},
+	Astx 		: {
+		status 		: 0,
+		useExtension: 0,
+		extensionSts: 0
+	},
+	TouchEnNx 	: { 
+		status 		: 0,
+		useExtension: 1,
+		extensionSts: 0
+	},
+	console : function(){}
+};
+
+function common_cfCheckSolution(afterFunc , checkSol){
+	
+	var serviceID 	= (window["G_WEB"] == "true") ? 'PGCNA302S' : 'IPCNA302S';
+	var func 		= (typeof afterFunc == 'function') ? afterFunc : function(){};
+	var checkParam 	= (typeof checkSol == 'object') ? checkSol : {SO_ND : 'ASTX,INSTALLLAY'};
+	
+	if(common_cfGetDeviceType() != 'NORMAL') {
+		func(); 
+		return;
+	}
+
+	if(typeof solutionGlobalChecker != 'undefined'){
+		
+		var solutionLocalChecker = new NHSolutionChecker();
+		solutionLocalChecker.setCheckSolution('Astx' 		, checkParam.SO_ND.indexOf('ASTX') != -1 ? 1 : 0);
+		solutionLocalChecker.setCheckSolution('CrosswebEX'  , checkParam.SO_ND.indexOf('CROSSWEB') != -1 ? 1 : 0);
+		solutionLocalChecker.setCheckSolution('TouchEnNx' 	, checkParam.SO_ND.indexOf('TOUCHENNX') != -1 ? 1 : 0);
+		solutionLocalChecker.installCheck(func, function(){ipcna302_installCheck_fail_callback(func);});
+	}else{
+		ipcna302_installCheckSuccessAfterCallback = func;
+		common_cfCallSolutionInstallPop(serviceID , {SO_ND : 'ASTX,INSTALLLAY'});
+	}
+
+
+	
+}
+
+function common_cfCallSolutionInstallPop(svcID , param){
+
+	$('#solutionInfoLayerPopup').remove();
+	var serviceID = svcID || 'IPCNA303S';
+	var parameter = param || {};
+	var targetDiv = $('<div></div>');
+	$('body').append(targetDiv);
+	targetDiv.navigate(serviceID , parameter);
+	
+}
+
+function common_cfgoVeraportPage(option){
+	
+	if(	(window["POP_WEB"] != undefined && window["POP_WEB"] == "true") && 
+			(window.opener != undefined || window.opener != null) ){
+			
+			if(typeof window.opener.common_cfgoVeraportPage != 'undefined') window.opener.common_cfgoVeraportPage(option);
+			window.close();
+			return;
+	}else{
+		if(window["G_WEB"] == "true") {
+			navigate('PGCNA300S' , option , {method:'GET'});			
+		}else{
+			navigate('IPCNA300S' , option , {method:'GET'});
+		}
+	}
+	
+}
+
+//지원종료 안내팝업 추가
+function serviceExpiredOsPopup(){
+	
+	var tp = navigator.platform;
+	var ua = navigator.userAgent;
+	var result = {};
+
+	if (tp == "Win32" || tp == "Win64"){
+		if(ua.search("Windows Phone") >= 0){
+			result.platform = "Windows Phone";
+			result.name="Windows Phone";
+		} else {
+			result.platform = "WINDOWS";
+		}
+	 }
+
+	if(result.platform == "WINDOWS"){
+		if(ua.indexOf("Windows NT 5.0") != -1 || ua.indexOf("Windows NT 5.01") != -1){result.version="5.0"; result.name="Windows 2000";}
+		else if(ua.indexOf("Windows NT 5.1") != -1) {result.version="5.1"; result.name="XP";}
+		else if(ua.indexOf("Windows NT 5.2") != -1) {result.version="5.2"; result.name="XP64/Windows 2003";}
+		else if(ua.indexOf("Windows NT 6.0") != -1) {result.version="6.0"; result.name="VISTA";}
+	}
+
+	if(result.name=="Windows 2000" || result.name=="XP" || (result.name=="XP64/Windows 2003") || result.name=="VISTA"){
+		if ( window["M_WEB"] != "true" ) { // M뱅킹이 아닌 경우
+			if(window["G_WEB"] != "true") {
+				popup_cfContentLayerOpen('/ip/am/ipam0907p.html');
+			}
+		}
+	}
+}
+
+
+var common_cfManageCert_execute = false;
+function common_cfManageCert() {
+	if(common_cfManageCert_execute){
+		return;
+	}
+
+	ipcna302_installCheckSuccessAfterCallback = function() {
+		if(window['LOGINYN'] != 'undefined' && window['LOGINYN'] == 'Y' && window['G_WEB'] != "true"){
+			showErrorLayerPop({errorCode : 'MCPR98030'});
+			$('#btnLoginExit').tap(function(){
+				httpSend('IPCNA902R' , {} , function(){
+					common_navigateToContent('/ip/ca/IPCA0001M.thtml', null); // 서브메인 페이지로 이동
+				});
+			});
+		}else{
+			common_cfManageCert_execute = true;
+			ManageCert(function(){
+				common_cfManageCert_execute = false;
+			});
+		}
+	};
+	if(window['G_WEB']){ // 다국어
+		common_cfCallSolutionInstallPop('PGCNA302S' , {SO_ND : 'ASTX,CROSSWEB,INSTALLLAY' , ManagerCert : '1'});
+	}else{
+		common_cfCallSolutionInstallPop('IPCNA302S' , {SO_ND : 'ASTX,CROSSWEB,INSTALLLAY' , ManagerCert : '1'});
+	}
+
+}
+
+// 모바일OTP 인증요청
+function common_cfRequestAuthenticationOfMobileOTP(param) {
+    // NH안심보안카드 고객일 경우 true 를 return
+    var isUserUsingSafeSecurityCard               = function(){ return (jQuery("#PW_CD_DS_VIEW").size() > 0); };    
+    // NH안심보안카드 인증이 완료되었을 경우 true 를 return
+    var isSafeSecurityCardAuthenticationCompleted = function(){ return (jQuery("#PW_CD_DS_VIEW").size() > 0 && jQuery.trim(jQuery("#PW_CD_DS_YN").val())=="T"); };
+    // M Banking 일 경우 true 를 return
+    var isMBanking      = function(){ return (window["M_WEB"] == "true"); };
+    // GlobalBanking 일 경우 true 를 return
+    var isGlobalBanking = function(){ return (window["G_WEB"] == "true"); };
+    // MobileOTP 인증을 위한 DOM 을 setting.24
+    var setObjectsForAuthenticationOfMobileOTP = function() {
+        if(jQuery("#isMobileOTPAuthenticated").length == 1){ jQuery("#isMobileOTPAuthenticated").val("N"); }
+        if(jQuery("#divForAuthenticationSuccessOfMobileOTP"    ).length == 1){ jQuery("#divForAuthenticationSuccessOfMobileOTP"    ).hide(); }
+        if(jQuery("#divForAuthenticationRequirementOfMobileOTP").length == 1){ jQuery("#divForAuthenticationRequirementOfMobileOTP").show(); }
+    };
+    
+    if (isUserUsingSafeSecurityCard()) { // NH안심보안카드 고객일 경우
+        if (isSafeSecurityCardAuthenticationCompleted() == false) { // NH안심보안카드 인증이 완료되지 않았을 경우
+            if(window["G_WEB"]=="true"){ alert(common_cfGetMessage("E0435"));                 }
+            else                       { alert("NH안심보안카드 인증이 완료되지 않았습니다."); }
+            jQuery("#pw_cd_ds_certifcate").focus(); // '안심보안카드 인증' 버튼
+            return false;
+        }
+    }
+
+    setObjectsForAuthenticationOfMobileOTP();
+    
+    if (isMBanking() == false) { // M뱅킹이 아닌 경우(PC, 태블릿)       
+        var serviceID = "IPCNA117P";
+        if (isGlobalBanking()) {
+            serviceID = "PGCNA117P";
+        }
+      //var option = {additionalParam : {nameOfCallBackFunction:"common_cfPostProcessAfterAuthenticationOfMobileOTP"}};
+        var option = {};
+        popup_cfLayerSubOpen(serviceID, param, option);
+        
+        if(window["H_WEB"] == "true") { //큰글
+        	$('.modal-dim').css({'z-index': '1000'});
+        }
+    }
+}
+
+function common_cfIsMobileOTPUser() {
+    if (jQuery("#isMobileOTPAuthenticated").length == 1) {
+        return true;
+    }
+    return false;
+}
+
+function common_cfIsMobileOTPAuthenticated() {
+    if (common_cfIsMobileOTPUser() && jQuery.trim(jQuery("#isMobileOTPAuthenticated").val()) == "Y") {
+        return true;
+    }
+    return false;
+}
+
+
+function ManageCert(callback) {
+	
+	if(window['G_WEB']){ // 다국어
+		SFSetUseHtml5(false);
+		SetProperty("certmanui_language", "ENG");
+		SFCertManagerProcessWithForm(callback);
+	}else{ // 국문
+		SFSetUseHtml5(true);
+		SetProperty("certmanui_language", "KOR");
+		SFCertManagerProcessWithForm(callback);
+	}
+}
+
+function SetProperty( name, value, callback ) {
+
+	crosswebInterface.SetProperty(name, value, callback);
+}
+
+// initech web-ui start
+function getInitechHtml5CommonFunc(isHtml5Flag){
+	
+	var _isHtml5Flag = isHtml5Flag;
+	
+	return {
+		
+		// 로그인
+		SFLoginProcessWithForm : function(url, postData, form, overlap, callback){
+			SFSetUseHtml5(_isHtml5Flag);
+			SFLoginProcessWithForm(url, postData, form, overlap, callback);
+		},
+		// 인증서 제출 로그인
+		SFLoginProcessWithFormIsCmp : function(url, postData, form, overlap, callback){
+			SFSetUseHtml5(_isHtml5Flag);
+			SFLoginProcessWithForm(url, postData, form, overlap, callback, true);
+		},
+		// 발급
+		SFCertIssueProcess : function(url, postData, caName, ref, code, overlap, callback){
+			SFSetUseHtml5(_isHtml5Flag);
+			SFCertIssueProcess(url, postData, caName, ref, code, "", overlap, callback);
+		},
+		// 재발급
+		SFCertReplaceProcess : function(url, postData, caName, ref, code, overlap, callback){
+			SFSetUseHtml5(_isHtml5Flag);
+			SFCertReplaceProcess(url, postData, caName, ref, code, "", overlap, callback);
+		},
+		// 갱신
+		SFCertUpdateProcess : function(url, postData, caName, overlap, callback){
+			SFSetUseHtml5(_isHtml5Flag);
+			SFCertUpdateProcess(url, postData, caName, overlap, callback);
+		},
+		// 폐기
+		SFCertRevokeProcess : function(url, postData, caName, serial, overlap, callback){
+			SFSetUseHtml5(_isHtml5Flag);
+			SFCertRevokeProcess(url, postData, caName, serial, overlap, callback);
+		}
+	};
+}
+var getInitechHtml5Fun = new getInitechHtml5CommonFunc(true);
+var getInitechHtml5GBFun = new getInitechHtml5CommonFunc(false);
+//initech web-ui end
+
+function common_isAvailableBrowserForFincert() {
+	
+	if (typeof(GINI_supportHtml5) === "function" && GINI_supportHtml5()) {
+		return true;
+	}
+	
+	alert("미지원 브라우저 입니다. 최신 브라우저를 이용해주세요.");
+	return false;
+}

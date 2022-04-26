@@ -1,0 +1,29 @@
+@CHARSET "UTF-8";
+
+.af-datepicker {background:#ffffff;width: 206px;font-size: 12px;border: 1px solid #1776b4;padding-bottom:10px;;overflow:hidden;}
+.af-datepicker a {cursor: pointer;text-decoration: none;}
+.af-datepicker .header {background:#1a89d2;;padding: 10px !important;text-align: center;font-weight:bold;font-size:14px;overflow:hidden;position:relative;}
+.af-datepicker .header a{color:#ffffff;}
+.af-datepicker .header .control {text-decoration: none;padding: 0px 5px !important;}
+.af-datepicker .subHeader {height: 100%;margin: 0 auto !important;float:left;}
+.af-datepicker .prev-year,.af-datepicker .prev-month {padding: 0 !important;display:inline-block;}
+.af-datepicker .next-year,.af-datepicker .next-month {padding: 0 !important;display:inline-block;}
+.af-datepicker .btn-close {position:absolute;top:10px;right:5px;width:10%;}
+.af-datepicker .current-year,.af-datepicker .current-month {margin: 0 auto !important;padding: 0 0.1em !important;display:inline-block;text-align: center;width: 33px; color:#ffffff;letter-spacing:-1px;}
+.af-datepicker .current-year{width:60px}
+.af-datepicker table {border-collapse: collapse;padding:0;width:96%;margin:0 auto;}
+.af-datepicker th{text-align:center;}
+.af-datepicker td {text-align:center;}
+.af-datepicker .day {margin:0 auto;width:19px;height:15px;border: 1px solid #ffffff;display: block;text-align: center;}
+.af-datepicker td a:hover,
+.af-datepicker .today{border: 1px solid #1776b4;color:#1776b4;font-weight:bold;}
+.af-datepicker .weekdays {height: 25px;text-align: center;}
+.af-datepicker .btn-close { position: absolute;top: 4px;right: 4px;width: 20px;height: 20px;text-align: center;line-height: 22px;}
+.af-datepicker .btn-close .control {padding:0 0.4em;}
+.af-datepicker.af-default .btn-close {color: #FFF;background-color: #008AE6;border-color: #006BB2;}
+.af-datepicker.af-default .btn-close .control {color: #FFF;background-color: transparent;font-weight: bold;}
+.af-datepicker.af-default .btn-close .control.af-hover {color: #FFF;background-color: #80CCFF;/*hover 시 transition 효과 (IE 제외) */transition: background-color 0.2s linear;-moz-transition:background-color 0.2s linear;-webkit-transition:background-color 0.2s linear;-o-transition:background-color 0.2s linear;}
+.af-datepicker.af-default .btn-close .control.af-pressed {color: #FFF;background-color: #80CCFF;}
+
+/********* modal dialog mask *********/
+.af-dialog-mask.af-default { background-color: white; opacity:0 !important; filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=0) !important; }

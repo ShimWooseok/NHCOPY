@@ -1,0 +1,112 @@
+/*****************************************************************************************
+* 업무명 		: nhbank.html 의 개발영역
+* 세부업무명 	: nhbank.html 의 개발영역
+* 설명 		: nhbank.html 의 개발영역
+* 작성자 : 곽노승
+* 작성일 : 2019.09.06 
+* -----------------------------------------------------------------------------------------
+*  변경이력 
+* -----------------------------------------------------------------------------------------
+*  No 날짜        작성자  내용
+*  1  2019.09.06 곽노승  최초작성
+******************************************************************************************/
+(function(){
+
+	/****************************************************************************************
+	 *  index type(PC, MOBILE) 및 device type에 따른 forward
+	 ****************************************************************************************/
+	 window["INDEX_TYPE"] = 'PC'; // 업무마다 변경 필요
+	 window["DOMAIN_CODE"] = "IP00"; // 업무마다 변경 필요
+	 common_cfSetIndexPageConfig(window["INDEX_TYPE"], window["DOMAIN_CODE"] , function(){
+		/****************************************************************************************
+		 *  페이지 로딩중 initService 실행하고, 서버응답 정상일시 alopexready 후 2뎁스 이하 메뉴를 가져온다.
+		 ****************************************************************************************/
+		 $.alopexready(function() {		 
+			 common_cfMenuMapLoading( "gnb_com" );
+			 common_cfSetGnbOnload( "IPZZ01" );
+			 common_cfSetFavOnload( "false" );
+		 });
+	 });
+
+	/****************************************************************************************
+	 * 글로벌 - 국문 세션 공유 방지
+	 ****************************************************************************************/
+	window["ISINDEX"] = "true";
+	if(window.name == ''){
+		window.name = new Date().getTime();
+	}
+	navigateConfig('additionalParam', {"sscc" : window.name});
+
+	/****************************************************************************************
+	 * Device에 따른 파라미터설정
+	 ****************************************************************************************/
+
+	var param = common_cfGetBroadCastParam();
+	window["INDEX_TYPE"] = 'PC';
+
+	if (param["deviceType"] == 'MOBILE') {
+	} else {
+
+		// PC URL이고, TABLET or PC일 경우는 deviceType을 PC(NORMAL)로 설정
+		param["deviceType"] = 'NORMAL';
+
+		// navigate시 addtional Parameter 설정
+		navigateConfig('additionalParam', param);
+	}
+	
+	
+})();
+
+
+
+/****************************************************************************************
+ *  페이지 로딩후 (alopexReady) 나만의 주소 관련 함수 로딩
+ ****************************************************************************************/
+$.alopexready(function() {
+	showPersonalizationPage(920, -120, 50); // 나만의은행주소용(개인화페이지용)
+	setPersonalizationPageData();
+	
+	$(document).on("tap" ,'#nhSearchBtn', function(){
+		// validation 처리
+		$('#query').validator({rule :{required:true,nospace:true}}); // 검색어
+		if(!$('#query').validate()){
+			alert("검색어를 올바르게 입력해주세요.");
+			$('#query').focus();
+			return false;		
+		} 
+		
+		// form-submit
+		var frm = document.getElementById ("nhSearchFrm");
+		navigate('IPCNA400S', frm);
+	});
+	$(document).on("keydown" ,'#query', function(event){
+		var keyCode = (window.netscape) ? event.which : event.keyCode ;
+	    if(keyCode == 13){
+	    	if($("#nhSearchBtn").trigger('tap')){
+				$('#query').focus();
+				return false;	
+			}
+	    }
+	});
+	
+});
+
+
+
+/****************************************************************************************
+ *  빠른조회 팝업 호출
+ ****************************************************************************************/
+function lfQuickInquiry() {
+	popup_cfWindowOpen('/servlet/IPMS0011I.view', null, {'width':'820px', 'height':'678px', 'scrollbars':'yes'});
+	return false;
+}
+
+/****************************************************************************************
+ *  QUICK조회/이체 팝업 호출
+ ****************************************************************************************/
+function lfQuickTransfer() {
+	popup_cfWindowOpen('/servlet/IPQK0011R.view', null, {'width':'830px', 'height':'680px'});
+	return false;
+}
+
+

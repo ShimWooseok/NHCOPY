@@ -1,0 +1,1617 @@
+var Ntm = window.Ntm || {};
+
+Ntm.Settings = {"tags":[{"type":"SCRIPT","id":"TAG-79387","name":"TESTER","enabled":true,"triggers":["TRG-00001"],"exceptions":[],"code":"function() {\n  console.log(\"%cNTM>>{{AREA_channel}}\", \"background: blue; color: yellow;\");\n}","approval":"DONE","logs":[{"time":1632964578392,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"PLUGIN","id":"TAG-96726","name":"AREA_activeTab","enabled":true,"triggers":["TRG-72708"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-98661","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-25767","name":"AREA_bankingMode","enabled":true,"triggers":["TRG-64190"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-20772","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-27004","name":"AREA_bannerFront","enabled":true,"triggers":["TRG-26295"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-37792","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-46712","name":"AREA_bannerList","enabled":true,"triggers":["TRG-24211"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-27866","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-30141","name":"AREA_bannerSide","enabled":true,"triggers":["TRG-41941"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-79157","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-96580","name":"AREA_footer","enabled":true,"triggers":["TRG-11787"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-70124","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-94020","name":"AREA_footer2","enabled":true,"triggers":["TRG-94120"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-95064","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-43186","name":"AREA_footerDropdown","enabled":true,"triggers":["TRG-31101"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-22866","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-25361","name":"AREA_gearSetting","enabled":true,"triggers":["TRG-40371"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-75338","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-80151","name":"AREA_gnbMenu","enabled":true,"triggers":["TRG-54753"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-65961","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-82454","name":"AREA_hoverMenu","enabled":true,"triggers":["TRG-25798"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-64356","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-32745","name":"AREA_hoverSubMenu","enabled":true,"triggers":["TRG-87990"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-79230","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-52496","name":"AREA_iconMenu","enabled":true,"triggers":["TRG-29275"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-68463","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-85267","name":"AREA_language","enabled":true,"triggers":["TRG-82326"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-85579","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-69898","name":"AREA_login","enabled":true,"triggers":["TRG-39965"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-14805","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-75695","name":"AREA_logo","enabled":true,"triggers":["TRG-69247"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-40737","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-67855","name":"AREA_recommend","enabled":true,"triggers":["TRG-38739"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-11059","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-29123","name":"AREA_recommendIcon","enabled":true,"triggers":["TRG-93165"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-34474","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-55032","name":"AREA_search","enabled":true,"triggers":["TRG-46580"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-61018","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-50085","name":"AREA_smallMenu","enabled":true,"triggers":["TRG-61231"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-36723","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-35603","name":"AREA_starHead","enabled":true,"triggers":["TRG-24829"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-26293","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-88102","name":"AREA_starSub","enabled":true,"triggers":["TRG-79076"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-18826","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-41555","name":"AREA_userDashboard","enabled":true,"triggers":["TRG-50175"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-61947","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-33866","name":"AREA_viewMore","enabled":true,"triggers":["TRG-90690"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-61246","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-15262","name":"AREA_viewMoreBottomList","enabled":true,"triggers":["TRG-91707"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-17091","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-32004","name":"AREA_viewMoreSideList","enabled":true,"triggers":["TRG-18993"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"n_event/area.evt","parameters":{"area":"VAR-76148","container":"VAR-27760"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-53870","name":"0.페이지로드","enabled":true,"triggers":["TRG-00001"],"exceptions":[],"pluginType":"nlogger","logType":"EVENT","path":"","parameters":{"_n_p1":"VAR-93608","_n_p3":"VAR-30298","_n_p5":"VAR-20587","_n_p6":"VAR-38454","_n_p7":"VAR-39822","_n_p8":"VAR-22598","container":"VAR-27760","nhkwd":"VAR-36598"},"cookies":{"_n_session":"VAR-85285","_n_dur":"VAR-72027","_n_seq":"VAR-78954","_n_time":"VAR-46476"}},{"type":"PLUGIN","id":"TAG-45772","name":"AREA_allMenuIcon","enabled":true,"triggers":["TRG-61488"],"exceptions":[],"pluginType":"nlogger","logType":"EVENT","path":"","parameters":{"area":"VAR-58532","container":"VAR-27760"},"cookies":{}}],"triggers":[{"type":"ELEMENTCLICK","id":"TRG-31150","name":"AREA_accountMore","event":"ELEMENTCLICKED","conditions":[],"selector":"div.account_info span.account_more a img"},{"type":"ELEMENTCLICK","id":"TRG-61913","name":"AREA_accountMoreArrow","event":"ELEMENTCLICKED","conditions":[],"selector":"div.account_info ul.account_tab_list a img"},{"type":"ELEMENTCLICK","id":"TRG-72708","name":"AREA_activeTab","event":"ELEMENTCLICKED","conditions":[],"selector":"div.inner ul.tab_sort_list li a"},{"type":"ELEMENTCLICK","id":"TRG-64190","name":"AREA_bankingMode","event":"ELEMENTCLICKED","conditions":[],"selector":"div.header_top > div.logo ul > li > span > a,div.header_top > div.logo ul > li > a"},{"type":"ELEMENTCLICK","id":"TRG-41941","name":"AREA_bannerSide","event":"ELEMENTCLICKED","conditions":[],"selector":"div#wrapper div.quick_ban li a"},{"type":"ELEMENTCLICK","id":"TRG-11787","name":"AREA_footer","event":"ELEMENTCLICKED","conditions":[],"selector":"div#footer ul.footer_list > li > a"},{"type":"ELEMENTCLICK","id":"TRG-31101","name":"AREA_footerDropdown","event":"ELEMENTCLICKED","conditions":[],"selector":"div.family_menu li a"},{"type":"ELEMENTCLICK","id":"TRG-25798","name":"AREA_hoverMenu","event":"ELEMENTCLICKED","conditions":[],"selector":"ul.tab_dues_list > li > a"},{"type":"ELEMENTCLICK","id":"TRG-87990","name":"AREA_hoverSubMenu","event":"ELEMENTCLICKED","conditions":[],"selector":"ul.tab_dues_list ul.main_help_list li > a"},{"type":"ELEMENTCLICK","id":"TRG-29275","name":"AREA_iconMenu","event":"ELEMENTCLICKED","conditions":[],"selector":"ul.quick_list > li"},{"type":"ELEMENTCLICK","id":"TRG-39965","name":"AREA_login","event":"ELEMENTCLICKED","conditions":[],"selector":"#header_login > ul.btn > li > a"},{"type":"ELEMENTCLICK","id":"TRG-69247","name":"AREA_logo","event":"ELEMENTCLICKED","conditions":[],"selector":"div.logo h1 a"},{"type":"ELEMENTCLICK","id":"TRG-38739","name":"AREA_recommend","event":"ELEMENTCLICKED","conditions":[],"selector":"div.inquire_box ul.inquire_list li"},{"type":"ELEMENTCLICK","id":"TRG-93165","name":"AREA_recommendIcon","event":"ELEMENTCLICKED","conditions":[],"selector":"div.btn_recomend_info > a.ico_recomend_info"},{"type":"ELEMENTCLICK","id":"TRG-46580","name":"AREA_search","event":"ELEMENTCLICKED","conditions":[],"selector":"div.ico_search > a"},{"type":"ELEMENTCLICK","id":"TRG-61231","name":"AREA_smallMenu","event":"ELEMENTCLICKED","conditions":[],"selector":"div#globalmenu_new ul.menu li a"},{"type":"ELEMENTCLICK","id":"TRG-24829","name":"AREA_starHead","event":"ELEMENTCLICKED","conditions":[],"selector":"ul.ico_favorit > li.fav > a, div.my_fav_area > span.main_my_fav > a"},{"type":"ELEMENTCLICK","id":"TRG-79076","name":"AREA_starSub","event":"ELEMENTCLICKED","conditions":[],"selector":"div.my_fav_area div ul.white_bottom li,li.fav div ul.white_bottom li"},{"type":"ELEMENTCLICK","id":"TRG-50175","name":"AREA_userDashboard","event":"ELEMENTCLICKED","conditions":[],"selector":"div.mybank_info ul > li > a, div.account_info > span.account_more a img, #sec1MyAcntBtn > a > img"},{"type":"ELEMENTCLICK","id":"TRG-40371","name":"AREA_gearSetting","event":"ELEMENTCLICKED","conditions":[],"selector":"div#utilmenu_new div.ico_setup > a"},{"type":"ELEMENTCLICK","id":"TRG-94120","name":"AREA_footer2","event":"ELEMENTCLICKED","conditions":[],"selector":"div#footer ul.footermenu > li > a, div.family_menu > a"},{"type":"ELEMENTCLICK","id":"TRG-82326","name":"AREA_language","event":"ELEMENTCLICKED","conditions":[],"selector":"div.global_menu.active > ul > li"},{"type":"ELEMENTCLICK","id":"TRG-24211","name":"AREA_bannerList","event":"ELEMENTCLICKED","conditions":[],"selector":"div.inner div.main_thumb_list li a"},{"type":"ELEMENTCLICK","id":"TRG-90690","name":"AREA_viewMore","event":"ELEMENTCLICKED","conditions":[],"selector":"div.inner_cont span.more a img"},{"type":"GENERAL","id":"TRG-00001","name":"페이지 이동","event":"PAGELOADED","conditions":[]},{"type":"ELEMENTCLICK","id":"TRG-54753","name":"AREA_gnbMenu","event":"ELEMENTCLICKED","conditions":[{"operator":"CONTAINS","variable":"VAR-00009","value":"IPZZ"}],"selector":"div.gnb_box ul#gnb_com > li"},{"type":"ELEMENTCLICK","id":"TRG-91707","name":"AREA_viewMoreBottomList","event":"ELEMENTCLICKED","conditions":[],"selector":"div.inner ul.main_link_lsit > li,div.inner ul.main_bottom_lsit > li"},{"type":"ELEMENTCLICK","id":"TRG-26295","name":"AREA_bannerFront","event":"ELEMENTCLICKED","conditions":[],"selector":"div.inner_slide div.bx-viewport > ul > li:not(.bx-clone)"},{"type":"ELEMENTCLICK","id":"TRG-18993","name":"AREA_viewMoreSideList","event":"ELEMENTCLICKED","conditions":[],"selector":"div.blue_area_wrap li, div.inner_cont div.bx-viewport > ul > li:not(.bx-clone)"},{"type":"ELEMENTCLICK","id":"TRG-61488","name":"AREA_allMenuIcon","event":"ELEMENTCLICKED","conditions":[],"selector":"div.amw_inr > a#all_menu_open"}],"variables":[{"type":"BUILTIN","id":"VAR-00001","name":"url","description":"페이지 전체 URL"},{"type":"BUILTIN","id":"VAR-00002","name":"host","description":"페이지 URL 호스트"},{"type":"BUILTIN","id":"VAR-00003","name":"path","description":"페이지 URL 경로"},{"type":"BUILTIN","id":"VAR-00004","name":"params","description":"페이지 URL 파라미터"},{"type":"BUILTIN","id":"VAR-00005","name":"paramDict","description":"페이지 URL 파라미터 (객체)"},{"type":"BUILTIN","id":"VAR-00006","name":"hash","description":"페이지 URL 해시"},{"type":"BUILTIN","id":"VAR-00007","name":"referrer","description":"이전 방문 페이지 주소"},{"type":"BUILTIN","id":"VAR-00008","name":"title","description":"페이지 제목"},{"type":"BUILTIN","id":"VAR-00009","name":"clickId","description":"클릭 항목 ID"},{"type":"BUILTIN","id":"VAR-00010","name":"clickClass","description":"클릭 항목 클래스명"},{"type":"BUILTIN","id":"VAR-00011","name":"clickText","description":"클릭 항목 텍스트"},{"type":"BUILTIN","id":"VAR-00012","name":"clickTag","description":"클릭 항목 태그명"},{"type":"BUILTIN","id":"VAR-00013","name":"customData","description":"커스텀 이벤트 변수"},{"type":"PLUGIN","id":"VAR-00014","name":"nlogger","description":"넷스루 로깅 모듈"},{"type":"SCRIPT","id":"VAR-72027","name":"A0._n_dur","description":null,"code":"function() {\n  \tvar sessionTime = 1000*60*10; \t//세션타임 10분\n  \tvar cTime = new Date().getTime();\n  \tvar pTime = Ntm.Cookie.get(\"_n_cTime\");\n  \tvar dur = Ntm.Cookie.get(\"_n_dur\");\n    \n\tif(pTime) {\n\t\tdur = parseInt(cTime) - parseInt(pTime);\n\t\tif (dur > sessionTime){\n\t\t\tNtm.Cookie.set(\"_n_cTime\", cTime, {path:\"/\"});\n          \tNtm.Cookie.remove(\"_n_dur\");\n          \treturn;\n\t\t} else {\n      \t\tNtm.Cookie.set(\"_n_dur\", dur, {path:\"/\"});\n      \t\tNtm.Cookie.set(\"_n_cTime\", cTime, {path:\"/\"});\n        \treturn dur;\n        }\n\t}\n  \tNtm.Cookie.set(\"_n_cTime\",cTime, {path:\"/\"});\n  \tNtm.Cookie.set(\"_n_dur\",dur, {path:\"/\"});\n\treturn dur;\n}","approval":"DONE","logs":[{"time":1634530565165,"userId":"juyeon","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-85285","name":"A0._n_session","description":null,"code":"function() {\n  \tvar sessionTime = 1000*60*10; \t//세션타임 10분\n  \tvar length = 10;\t//UNIX TIMESTAMP(13자리) + 10자리\n  \tvar pTime = Ntm.Cookie.get(\"_n_pTime\");\t\n    var cTime = new Date().getTime();\n  \tvar name = \"_n_session\";\n\tvar cookie = Ntm.Cookie.get(\"_n_session\");\n  \tvar dur = Ntm.Cookie.get(\"_n_dur\");\n\tvar value;\n  \t\n\tif ( cookie && dur <= sessionTime) {    \t\n\t\treturn cookie;\n\t}  \t\n\n\tvar values = new Array();\n\n\tfor ( i=0; i < length ; i++ ) {\n\t\tvalues[i] = \"\" + Math.random();\n\t}\t\n  \tvalue = cTime;\n\tfor ( i=0; i < length ; i++ ) {\n\t\tvalue += values[i].charAt(2);\n\t}\n  \t\n\tNtm.Cookie.set(name, value, {path:\"/\"});\n\treturn value;\n}","approval":"DONE","logs":[{"time":1634530570172,"userId":"juyeon","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-30298","name":"A2.공통_(n_p3)_상품코드","description":null,"code":"function() {\n\tvar _n_p3 = \"-\";\n  \tif (window._n_p3) {\n    \t_n_p3 = window._n_p3;\n    }  \t\n  \treturn _n_p3;\n}","approval":"DONE","logs":[{"time":1634027526431,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-38454","name":"A4.공통_(n_p6)_중조구분","description":null,"code":"function() {\n\tvar _n_p6 = \"-\";\n  \tif (window._n_p6) {\n    \t_n_p6 = window._n_p6;\n    }\n  \treturn _n_p6;\n}","approval":"DONE","logs":[{"time":1634027843331,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"COOKIE","id":"VAR-18449","name":"AREA_ntmdebugger","description":null,"key":"ntmdebugger","decode":false},{"type":"SCRIPT","id":"VAR-64296","name":"AREA_SNIPPETS","description":null,"code":"function() {\n   /*\n      var el = $0;\n\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar groupTxt = idx + 1;\n\n//subText override\n  \tvar chl = el.closest('div.prd-crd-disp > ul > li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar prodTxt = idx + 1;\n  \t\n//subText override\n  \tvar chl = el.closest('ul.tab-cnts > li.tab-cnt');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar btnTxt = idx + 1;\n  \t\n  \tvar txt = btnTxt + \"_\" + prodTxt + \"_\" + groupTxt;\n\nif (el.className == \"prd-lnk\"){\n    //dn\n} else {\n    \n}\n\n\n  \n   var txt = txt && lookup(txt);\n \n  console.warn(txt);\n  console.warn(el.nodeName);\n   \nvar pid = \"NO_ID\";\n//ID 없음\nvar sec = document.querySelector('section.kb-sec')\nvar sec_txt = sec && sec.getAttribute('ntm_pageid')\n//섹션값 시도\nvar main = document.querySelector('main.app-content.my-asset')\nvar main_txt = main && main.getAttribute('ntm_pageid')\n//메인값 시도\nif (sec_txt && main_txt) {\npid = \"2_ID\";\n} else if (sec_txt && main_txt == null) {\npid = sec_txt;\n} else if (main_txt && sec_txt == null) {\npid = main_txt;\n}\npid\n\nvar sel = document.querySelectorAll('div#footer_lay div ul.advice_list li')\naryMenu = [];\nsel.forEach(p);\nfunction p(e) {\n aryMenu.push(e.innerText)\n//aryMenu.push(e.querySelector('img').getAttribute('alt'))\n\n   // aryMenu.push(e.getAttribute(\"class\"));\n   //aryMenu.push(e.getAttribute(\"title\"));\n   // aryMenu.push(e.getAttribute(\"alt\"));\n}\nsel\nconsole.table(aryMenu);\nconsole.log(aryMenu.toString())\n\n- mobile ver\n- text procressor\n- error procressor\n- 채널맵\n- 텍스트 의존 변수들 전부 재고하기, 업무상 합의\n장점: 텍스트 변화가 있을 때 값이 바뀐다 (즉각 반영됨)\n단점: 텍스트 변화가 있을 때 값이 바뀐다 (데이터 일관성 저하)\n- 순서로 바꾼 경우\n\n\nPICK UP FROM\nhttp://16.88.120.69:9310/container/84130/variable/edit/VAR-18046/\n\nwindow.addEventListener('beforeunload', function(e){e.preventDefault(); e.returnValue=\"\";});\n\n///후보코드-검색창 검색 매칭되면 스크랩가능\ndocument.querySelector('#recentList > ul > li:nth-child(1) > a').getAttribute('onclick')\ndocument.querySelector('#recentList > ul > li:nth-child(1) > a').innerText\n\nvar spa = document.querySelector('#pageStack');\nvar $this = $(Ntm.Variable.get('clickElement'));\nvar title = '';\nvar obs = new MutationObserver((mutations) => {\n    Ntm.Evenet.fireUserDefined('popup');\n})\n\nvar opt = = {\n    attributes: true,\nchildList: true,\ncharacterData: true\n};\nobs.observe(spa, opt);\n\nvar target = document.querySelectorAll(\"div#mainMenuWrap\");\n    for (var i = 0; i < target.length; i++) {\n        var observer = new MutationObserver(function(mutations){\n        mutations.forEach(function(mutation) {\n            var elem = mutation.target.getAttribute('style');\n            if (elem == \"display:block;\") {\n                var pname = mutation.target.querySelector('div.confirmMsg').innerText;\n                var pmsg = mutation.target.querySelector('div.confirmMsg').innerText;\n                Ntm.Event.fireUserDefined(\"popup\", {\n                    pname: pname,\n                    pmsg: pmsg});\n                } else {\n                    //dn\n                }\n            });\n        });\n\n\nvar config = {\nattributes: true,\nchildList: true,\ncharacterData: true\n};\nobserver.observe(target[i], config);\n    }\n\n// Ntm.Event.fireUserDefined(\"popup\", {pname: \"111\", pmsg: \"222\"})\n\n   */\n}","approval":"DONE","logs":[{"time":1634030475136,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-46476","name":"A0._n_time","description":null,"code":"function() {\n   var hour = new Date().getHours();\n   var minute = new Date().getMinutes();\n   var second = new Date().getSeconds();\n   var num = '';\n   \n   if (hour == 0 && minute <= 29 && second <= 59) {\t\t\t// 00:00:00 ~ 00:29:59\n     num = 1;\n } else if (hour == 0 && minute >= 30 && second <= 59) {\t// 00:30:00 ~ 00:59:59\n     num = 2;\n } else if (hour == 1 && minute <= 29 && second <= 59) {\t// 01:00:00 ~ 01:29:59\n     num = 3;\n } else if (hour == 1 && minute >= 30 && second <= 59) {\t// 01:30:00 ~ 01:59:59\n     num = 4;\n } else if (hour == 2 && minute <= 29 && second <= 59) {\t// 02:00:00 ~ 02:29:59\n     num = 5;\n } else if (hour == 2 && minute >= 30 && second <= 59) {\t// 02:30:00 ~ 02:59:59\n     num = 6;\n } else if (hour == 3 && minute <= 29 && second <= 59) {\t// 03:00:00 ~ 03:29:59\n     num = 7;\n } else if (hour == 3 && minute >= 30 && second <= 59) {\t// 03:30:00 ~ 03:59:59\n     num = 8;\n } else if (hour == 4 && minute <= 29 && second <= 59) {\t// 04:00:00 ~ 04:29:59\n     num = 9;\n } else if (hour == 4 && minute >= 30 && second <= 59) {\t// 04:30:00 ~ 04:59:59\n     num = 10;\n } else if (hour == 5 && minute <= 29 && second <= 59) {\t// 05:00:00 ~ 05:29:59\n     num = 11;\n } else if (hour == 5 && minute >= 30 && second <= 59) {\t// 05:30:00 ~ 05:59:59\n     num = 12;\n } else if (hour == 6 && minute <= 29 && second <= 59) {\t// 06:00:00 ~ 06:29:59\n     num = 13;\n } else if (hour == 6 && minute >= 30 && second <= 59) {\t// 06:30:00 ~ 06:59:59\n     num = 14;\n } else if (hour == 7 && minute <= 29 && second <= 59) {\t// 07:00:00 ~ 07:29:59\n     num = 15;\n } else if (hour == 7 && minute >= 30 && second <= 59) {\t// 07:30:00 ~ 07:59:59\n     num = 16;\n } else if (hour == 8 && minute <= 29 && second <= 59) {\t// 08:00:00 ~ 08:29:59\n     num = 17;\n } else if (hour == 8 && minute >= 30 && second <= 59) {\t// 08:30:00 ~ 08:59:59\n     num = 18;\n } else if (hour == 9 && minute <= 29 && second <= 59) {\t// 09:00:00 ~ 09:29:59\n     num = 19;\n } else if (hour == 9 && minute >= 30 && second <= 59) {\t// 09:30:00 ~ 09:59:59\n     num = 20;\n } else if (hour == 10 && minute <= 29 && second <= 59) {\t// 10:00:00 ~ 10:29:59\n     num = 21;\n } else if (hour == 10 && minute >= 30 && second <= 59) {\t// 10:30:00 ~ 10:59:59\n     num = 22;\n } else if (hour == 11 && minute <= 29 && second <= 59) {\t// 11:00:00 ~ 11:29:59\n     num = 23;\n } else if (hour == 11 && minute >= 30 && second <= 59) {\t// 11:30:00 ~ 11:59:59\n     num = 24;\n } else if (hour == 12 && minute <= 29 && second <= 59) {\t// 12:00:00 ~ 12:29:59\n    num = 25;\n } else if (hour == 12 && minute >= 30 && second <= 59) {\t// 12:30:00 ~ 12:59:59\n     num = 26;\n } else if (hour == 13 && minute <= 29 && second <= 59) {\t// 13:00:00 ~ 13:29:59\n     num = 27;\n } else if (hour == 13 && minute >= 30 && second <= 59) {\t// 13:30:00 ~ 13:59:59\n     num = 28;\n } else if (hour == 14 && minute <= 29 && second <= 59) {\t// 14:00:00 ~ 14:29:59\n     num = 29;\n } else if (hour == 14 && minute >= 30 && second <= 59) {\t// 14:30:00 ~ 14:59:59\n     num = 30;\n } else if (hour == 15 && minute <= 29 && second <= 59) {\t// 15:00:00 ~ 15:29:59\n     num = 31;\n } else if (hour == 15 && minute >= 30 && second <= 59) {\t// 15:30:00 ~ 15:59:59\n     num = 32;\n } else if (hour == 16 && minute <= 29 && second <= 59) {\t// 16:00:00 ~ 16:29:59\n     num = 33;\n } else if (hour == 16 && minute >= 30 && second <= 59) {\t// 16:30:00 ~ 16:59:59\n     num = 34;\n } else if (hour == 17 && minute <= 29 && second <= 59) {\t// 17:00:00 ~ 17:29:59\n     num = 35;\n } else if (hour == 17 && minute >= 30 && second <= 59) {\t// 17:30:00 ~ 17:59:59\n     num = 36;\n } else if (hour == 18 && minute <= 29 && second <= 59) {\t// 18:00:00 ~ 18:29:59\n     num = 37;\n } else if (hour == 18 && minute >= 30 && second <= 59) {\t// 18:30:00 ~ 18:59:59\n     num = 38;\n } else if (hour == 19 && minute <= 29 && second <= 59) {\t// 19:00:00 ~ 19:29:59\n     num = 39;\n } else if (hour == 19 && minute >= 30 && second <= 59) {\t// 19:30:00 ~ 19:59:59\n     num = 40;\n } else if (hour == 20 && minute <= 29 && second <= 59) {\t// 20:00:00 ~ 20:29:59\n     num = 41;\n } else if (hour == 20 && minute >= 30 && second <= 59) {\t// 20:30:00 ~ 20:59:59\n     num = 42;\n } else if (hour == 21 && minute <= 29 && second <= 59) {\t// 21:00:00 ~ 21:29:59\n     num = 43;\n } else if (hour == 21 && minute >= 30 && second <= 59) {\t// 21:30:00 ~ 21:59:59\n     num = 44;\n } else if (hour == 22 && minute <= 29 && second <= 59) {\t// 22:00:00 ~ 22:29:59\n     num = 45;\n } else if (hour == 22 && minute >= 30 && second <= 59) {\t// 22:30:00 ~ 22:59:59\n     num = 46;\n } else if (hour == 23 && minute <= 29 && second <= 59) {\t// 23:00:00 ~ 23:29:59\n     num = 47;\n } else if (hour == 23 && minute >= 30 && second <= 59) {\t// 23:30:00 ~ 23:59:59\n     num = 48;\n }\n\n  console.log(\"_n_time ::: \" + num);\n  return num;\n   \n}","approval":"DONE","logs":[{"time":1634530573243,"userId":"juyeon","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-57128","name":"AREA_accountMore","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n\tvar txt = \"psnl00100\";\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n //  var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  console.warn(txt);\n  console.warn(el.nodeName);\n  return txt;\n}","approval":"DONE","logs":[{"time":1635830667617,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-26746","name":"AREA_accountMoreArrow","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n\tvar txt = \"psnl00400\";\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n //  var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  console.warn(txt);\n  console.warn(el.nodeName);\n  return txt;\n}","approval":"DONE","logs":[{"time":1635830664194,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-98661","name":"AREA_activeTab","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar txt = idx + 1;\n  \tvar txt = idxToCode(txt, 2);\n  var temp_txt = txt; //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\nvar txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\nfunction lookup(val){\n    \tnv = \"evnt0\" + txt + \"00\";\n    return nv;\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}\n  /*\nfunction pii(){\n      nv = txt.replace(\"개인정보\", \"\");\n    return nv;\n    }\n\n    */\n  console.warn(txt);\n  console.warn(el.nodeName);\n  return txt;\n}","approval":"DONE","logs":[{"time":1634030406791,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-27866","name":"AREA_bannerList","description":null,"code":"function() {\n  var el = Ntm.Variable.get(\"clickElement\");\n  var bch = \"\";\n  var sec = \"\";\n\tsec = el.closest('div.main_thumb_list.active').id;\n  \tsec = lookupSec(sec);\n  \tsec = idxToCode(sec, 2);\n  if (el.closest('ul').className == \"more_list\") {\n  \tbch = 6;\n  } else {\n  \tbch = 0;\n  }\n//subText override\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar t1qs = idx + bch + 1;\n  \tvar txt = idxToCode(t1qs, 2);\n\n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n   var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\nfunction lookup(val){\n    \tnv = \"evnt0\" + sec + txt;\n    return nv;\n    }\nfunction lookupSec(val){\n    var list = {\n    'all_list':'1',\n    'event_list':'2',\n    'product_list':'3'\n    };\n    return list[val];\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}\n  \n  console.warn(txt);\n  console.warn(el.nodeName);\n  \n  return txt;\n}","approval":"DONE","logs":[{"time":1634030419184,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-79157","name":"AREA_bannerSide","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n//subText override\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar txt = idx + 1;\n  \tvar txt = idxToCode(txt, 2);\n  \t  \t\n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n   var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n // \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\nfunction lookup(val){\n    \tnv = \"quic0\" + txt + \"00\";\n    return nv;\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}\n  /*\n   var txt = txt && lookup(txt);\n   */\n  console.warn(txt);\n  console.warn(el.nodeName);\n  \n  return txt;\n}","approval":"DONE","logs":[{"time":1634030424616,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-37792","name":"AREA_bannerFront","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar txt = idx;\n  \tvar txt = idxToCode(txt, 2);\n  \t  \t\n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n   var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\nfunction lookup(val){\n    \tnv = \"prom0\" + txt + \"00\";\n    return nv;\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}\n  /*\n   var txt = txt && lookup(txt);\n   */\n  console.warn(txt);\n  console.warn(el.nodeName);\n  \n  return txt;\n}","approval":"DONE","logs":[{"time":1634030413512,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-70124","name":"AREA_footer","description":null,"code":"function() {\n    var el = Ntm.Variable.get(\"clickElement\");\n    // subText override\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar txt = idx + 1;\n  \tvar txt = idxToCode(txt, 2);\n  \n   var temp_txt = txt && txpr(txt); // text preprocessing\n   var txt = txt && txpr(txt);      // text preprocessing\n   var txt = txt && lookup(txt);    // text convert\n  // var txt = txt && pii(txt);     // PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  function lookup(val){\n    \tnv = \"foot0\" + txt + \"00\";\n    return nv;\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}  /*\n   var txt = txt && lookup(txt);\n   */\n  console.warn(txt);\n  console.warn(el.nodeName);\n  /*\n  function lookup(val){\n    var list = {\n    'ip':'개인테스트',\n    'card':'카드테스트'\n    };\n    return list[val];\n    }\n    */\n  return txt;\n}","approval":"DONE","logs":[{"time":1634030428216,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-95064","name":"AREA_footer2","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n//subText override\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar txt = idx + 7;\n  \tvar txt = idxToCode(txt, 2);\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n   var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  function lookup(val){\n    \tnv = \"foot0\" + txt + \"00\";\n    return nv;\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}  /*\n   var txt = txt && lookup(txt);\n   */\n  console.warn(txt);\n  console.warn(el.nodeName);\n  /*\n  function lookup(val){\n    var list = {\n    'ip':'개인테스트',\n    'card':'카드테스트'\n    };\n    return list[val];\n    }\n    */\n  return txt;\n}","approval":"DONE","logs":[{"time":1634200270850,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-22866","name":"AREA_footerDropdown","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n//subText override\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar txt = idx + 1;\n  \tvar txt = idxToCode(txt, 2);\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n   var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n // \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\nfunction lookup(val){\n    \tnv = \"foot013\" + txt;\n    return nv;\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}\n\n  /*\n   var txt = txt && lookup(txt);\n   */\n  console.warn(txt);\n  console.warn(el.nodeName);\n  /*\n  function lookup(val){\n    var list = {\n    'ip':'개인테스트',\n    'card':'카드테스트'\n    };\n    return list[val];\n    }\n    */\n  return txt;\n}","approval":"DONE","logs":[{"time":1635830658931,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-75338","name":"AREA_gearSetting","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n   var txt = \"head00700\";\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n  // var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  console.warn(txt);\n  console.warn(el.nodeName);\n  return txt;\n}","approval":"DONE","logs":[{"time":1634030435384,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-64356","name":"AREA_hoverMenu","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n//subText override\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar txt = idx + 1;\n  \tvar txt = idxToCode(txt, 2);\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n   var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  function lookup(val){\n    \tnv = \"help0\" + txt + \"00\";\n    return nv;\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}\n  /*\n   var txt = txt && lookup(txt);\n   */\n  console.warn(txt);\n  console.warn(el.nodeName);\n  /*\n  function lookup(val){\n    var list = {\n    'ip':'개인테스트',\n    'card':'카드테스트'\n    };\n    return list[val];\n    }\n    */\n  return txt;\n}","approval":"DONE","logs":[{"time":1634030442328,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-79230","name":"AREA_hoverSubMenu","description":null,"code":"function() {\n  var el = Ntm.Variable.get(\"clickElement\");\n  \tvar chl = el.closest('li.on');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar t1qs = idx + 1;\n  \tvar txt = idxToCode(t1qs, 2);\n  \tvar chl2 = el.closest('li');\n\tvar prt2 = chl2.parentNode;\n\tvar idx2 = Array.prototype.indexOf.call(prt2.children, chl2);\n\tvar t2qs = idx2 + 1;\n  \tvar txt2 = idxToCode(t2qs, 2);\n\n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n   var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n\nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\nfunction lookup(val){\n    \tnv = \"help0\" + txt + txt2;\n    return nv;\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}\n  \n  console.warn(txt);\n  console.warn(el.nodeName);\n  return txt;\n}","approval":"DONE","logs":[{"time":1634030446360,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-68463","name":"AREA_iconMenu","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n//subText override\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar txt = idx + 1;\n  \tvar txt = idxToCode(txt, 2);\n  \t  \t\n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n   var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\nfunction lookup(val){\n    \tnv = \"slnk0\" + txt + \"00\";\n    return nv;\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}\n  /*\n   var txt = txt && lookup(txt);\n   */\n  console.warn(txt);\n  console.warn(el.nodeName);\n  \n  return txt;\n}","approval":"DONE","logs":[{"time":1634030450072,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-40737","name":"AREA_logo","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n\tvar txt = \"head00100\";\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n //  var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  console.warn(txt);\n  console.warn(el.nodeName);\n  return txt;\n}","approval":"DONE","logs":[{"time":1632971633690,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-11059","name":"AREA_recommend","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n//subText override\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar txt = idx + 1;\n  \tvar txt = idxToCode(txt, 2);\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n   var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  function lookup(val){\n    var list = {\n    '01':'rcmd00201',\n    '02':'rcmd00301',\n    '03':'rcmd00202',\n    '04':'rcmd00302'\n    };\n    return list[val];\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}\n\n  console.warn(txt);\n  console.warn(el.nodeName);\n\n  return txt;\n}","approval":"DONE","logs":[{"time":1634030460976,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-34474","name":"AREA_recommendIcon","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n\tvar txt = \"rcmd00100\";\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n //  var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n// \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  console.warn(txt);\n  console.warn(el.nodeName);\n  return txt;\n}","approval":"DONE","logs":[{"time":1634030465009,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-61018","name":"AREA_search","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n\tvar txt = \"head00800\";\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n //  var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n// \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  console.warn(txt);\n  console.warn(el.nodeName);\n  return txt;\n}","approval":"DONE","logs":[{"time":1634030468672,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-36723","name":"AREA_smallMenu","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n//subText override\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar txt = idx + 1;\n  \tvar txt = txt.toString();\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n   var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  function lookup(val){\n    \tnv = \"head01\" + txt + \"00\";\n    return nv;\n    }\n  /*\n   var txt = txt && lookup(txt);\n   */\n  console.warn(txt);\n  console.warn(el.nodeName);\n  /*\n  function lookup(val){\n    var list = {\n    'ip':'개인테스트',\n    'card':'카드테스트'\n    };\n    return list[val];\n    }\n    */\n  return txt;\n}","approval":"DONE","logs":[{"time":1634030472016,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-61947","name":"AREA_userDashboard","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n\tvar t1 = el.nodeName;\n  \tvar t2 = el.innerText;\n  \tvar t3 = el.alt;\n  var txt = t1 + t2 + t3;\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n   var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  function lookup(val){\n    var list = {\n    'A즉시이체undefined':'psnl00200',\n\t'A거래내역undefined':'psnl00300',\n\t'IMG더보기':'psnl00400',\n    'IMG계좌더보기':'psnl00100'\n    };\n    return list[val];\n    }\n\n  console.warn(txt);\n  console.warn(el.nodeName);\n\n  return txt;\n}","approval":"DONE","logs":[{"time":1634030483776,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-78954","name":"A0._n_seq","description":null,"code":"function () {\n    var seq = Ntm.Variable.getCookie(\"_n_seq\");\n    var sessionTime = 1000*60*10;\t\t\t// 세션타임 10분    \n  \tvar dur = Ntm.Cookie.get(\"_n_dur\");\t\n   \n  \tseq = Number(seq);\t \t\n    if (dur > sessionTime) {\n      seq = 1;   \t        \n    } else { \n\t  seq = seq + 1;\t        \n    }\n\n    Ntm.Cookie.set(\"_n_seq\", seq, {path:\"/\"});\n    console.log(\"seq ::: \", seq);\n    return seq;\n}","approval":"DONE","logs":[{"time":1634530567603,"userId":"juyeon","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-20772","name":"AREA_bankingMode","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n  \t\tvar t1qs = el && el.closest('li');\n    \t\tvar t1 = t1qs && t1qs.getAttribute('class');\n//  \t\tvar t2qs = el && el.closest('li');\n//    \t\tvar t2 = t2qs && t2qs.getAttribute('class');\n  if (t1 == null) {\n    \tvar txt = \"big\";\n    } else {\n  \t\tvar txt = t1;\n  \t}\n  \n\n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n   var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\nfunction lookup(val){\n    var list = {\n    'big':'head00201',\n    'off':'head00202',\n    'ic':'head00300',\n    'card':'head00400'\n    };\n    return list[val];\n    }\n/*\nfunction pii(){\n      nv = txt.replace(\"개인정보\", \"\");\n    return nv;\n    }\n\n    */\n  console.warn(txt);\n  console.warn(el.nodeName);\n  return txt;\n}","approval":"DONE","logs":[{"time":1634030410047,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-18826","name":"AREA_starSub","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar txt = idx + 1;\n  \tvar txt = idxToCode(txt, 2);\n  var temp_txt = txt; //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\nvar txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\nfunction lookup(val){\n    \tnv = \"help008\" + txt;\n    return nv;\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}\n  /*\nfunction pii(){\n      nv = txt.replace(\"개인정보\", \"\");\n    return nv;\n    }\n\n    */\n  console.warn(txt);\n  console.warn(el.nodeName);\n  return txt;\n}","approval":"DONE","logs":[{"time":1635830676426,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-26293","name":"AREA_starHead","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n  var qs = el && el.parentNode;\n\tvar txt = qs && qs.className;\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\nfunction lookup(val){\n    var list = {\n    'fav':'head00600',\n    'main_my_fav':'help00800'\n    };\n    return list[val];\n    }\n  \n  console.warn(txt);\n  console.warn(el.nodeName);\n  return txt;\n}","approval":"DONE","logs":[{"time":1634030478489,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-57681","name":"TTTTTTTTTTTTTTest","description":null,"code":"function() {\n\tvar arr = [{{AREA_gnbMenu_}},{{AREA_language_}},{{AREA_login_}}];    \n\tconsole.warn(\"arr ::: \" + arr);\n}","approval":"DONE","logs":[{"time":1636432361137,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-25770","name":"ttttest_trigger","description":null,"code":"function() {\n   var test = Ntm.Settings.triggers;\n  \n  console.log(\"test0 :::\", test[0]);\n  console.log(\"test1 :::\", test[1]);\n}","approval":"DONE","logs":[{"time":1636441216184,"userId":"juyeon","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-65961","name":"AREA_gnbMenu_","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n//subText override\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar txt = idx + 1;\n  \tvar txt = idxToCode(txt, 2);\n  \t  \t\n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n   var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\nfunction lookup(val){\n    \tnv = \"gnb_0\" + txt + \"00\";\n    return nv;\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}\n  /*\n   var txt = txt && lookup(txt);\n   */\n  console.warn(txt);\n  console.warn(el.nodeName);\n  return txt;\n}","approval":"DONE","logs":[{"time":1634030439184,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-85579","name":"AREA_language_","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n//subText override\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar txt = idx + 1;\n  \tvar txt = idxToCode(txt, 2);\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n   var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  function lookup(val){\n    \tnv = \"head005\" + txt;\n    return nv;\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}\n  /*\n   var txt = txt && lookup(txt);\n   */\n  console.warn(txt);\n  console.warn(el.nodeName);\n  /*\n  function lookup(val){\n    var list = {\n    'ip':'개인테스트',\n    'card':'카드테스트'\n    };\n    return list[val];\n    }\n    */\n  return txt;\n}","approval":"DONE","logs":[{"time":1632971630738,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-14805","name":"AREA_login_","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n//subText override\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n\tvar txt = idx + 9;\n  \tvar txt = idxToCode(txt, 2);\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n   var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  function lookup(val){\n    \tnv = \"head0\" + txt + \"00\";\n    return nv;\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}\n  /*\n   var txt = txt && lookup(txt);\n   */\n  console.warn(txt);\n  console.warn(el.nodeName);\n  /*\n  function lookup(val){\n    var list = {\n    'ip':'개인테스트',\n    'card':'카드테스트'\n    };\n    return list[val];\n    }\n    */\n  return txt;\n}","approval":"DONE","logs":[{"time":1634030453656,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-78493","name":"TEMP","description":null,"code":"function() {\n   \tconsole.log(\"TEMP\");\n  \treturn;\n}","approval":"DONE","logs":[{"time":1636520008378,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-20587","name":"A3.공통_(n_p5)_이벤트코드","description":null,"code":"function() {\n\tvar _n_p5 = \"\";\n  \tif (window._n_p5) {    \n    \t_n_p5 = window._n_p5;\n    }  \t\n  \treturn _n_p5;\n}","approval":"DONE","logs":[{"time":1634027881372,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-22598","name":"A6.공통_(n_p8)_PUSHKEY","description":null,"code":"function() {\n\tvar _n_p8 = \"\";\n  \tconsole.warn(\"window._n_p8 :: \" + window._n_p8);\n  \tif (window._n_p8) {\n    \t_n_p8 = window._n_p8;\n      \tNtm.Cookie.set(\"pushKey\", _n_p8);\n    }\n  \tconsole.warn(\"_n_p8 :: \" + window._n_p8);\n  \treturn _n_p8;\n}","approval":"DONE","logs":[{"time":1634173421936,"userId":"nspark","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-39822","name":"A5.공통_(n_p7)_서비스ID","description":null,"code":"function() {\n   \tvar _n_p7 = window._n_p7;\n  \tif (!_n_p7 || _n_p7 == \"content\") {\n      \tvar path = document.location.pathname;\n      \tvar path_length = path.split(\"/\").length;\n      \tvar svcId = path.split(\"/\")[path_length - 1];\n    \t_n_p7 = svcId;\n    };\n  \t_n_p7 = _n_p7.split(\".\")[0];\n  \tconsole.log(\"_n_p7 :: \" + _n_p7);\n  \treturn _n_p7;\n}","approval":"DONE","logs":[{"time":1634027918396,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-93608","name":"A1.공통_(n_p1)_서비스명","description":null,"code":"function() {\n\tvar _n_p1 = window._n_p1;\n  \tif (!_n_p1 || _n_p1 == \"-\") {      \t\n    \t_n_p1 = document.title;\n    }\n  \t_n_p1 = _n_p1.replace(/\\s|\\n|\\t/g,\"\");\n \tconsole.log (\"_n_p1 :: \" + _n_p1);\n  \treturn _n_p1;\n}","approval":"DONE","logs":[{"time":1634027838323,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"STRING","id":"VAR-37030","name":"AREA_channel","description":null,"value":"pbk"},{"type":"STRING","id":"VAR-20278","name":"AREA_subChannel","description":null,"value":"bnk"},{"type":"SCRIPT","id":"VAR-36598","name":"nhkwd","description":null,"code":"function() {\n  \n  nhkwd = $(\"#query1\").val(); \n  \n  console.warn(nhkwd);\n  return nhkwd;\n}","approval":"DONE","logs":[{"time":1637627803388,"userId":"juyeon","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-61246","name":"AREA_viewMore","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n  var txt = el.getAttribute('alt');\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && lookup(txt); //text convert\n  //var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  {{isLogin}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  \n  function lookup(val){\n    var list = {\n    '새소식더보기':'00100',\n\t'보안소식더보기':'00200'\n    };\n    return list[val];\n    }\n\n  console.warn(txt);\n  console.warn(el.nodeName);\n\n  return txt;\n}","approval":"DONE","logs":[{"time":1634030488882,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-63679","name":"isLogin","description":null,"code":"function() { \n  var txt = \"\";\n  if (typeof LOGINYN != 'undefined' && LOGINYN) {\n    txt = \"lcnt\";\n  } else {\n    txt = \"ncnt\";\n  }\n  return txt;\n}","approval":"DONE","logs":[{"time":1639353675144,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-17091","name":"AREA_viewMoreBottomList","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n\tvar idx = Array.prototype.indexOf.call(prt.children, chl);\n  if ({{isLogin}} == \"ncnt\") {\n\tvar txt = idxToCode(idx + 3, 2);\n  } else {\n\tvar txt = idxToCode(idx + 4, 2);\n  }\n\tvar temp_txt = txt; //text preprocessing\n \tvar txt = txt && txpr(txt); //text preprocessing\n\tvar txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  {{isLogin}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\nfunction lookup(val){\n    \tnv = \"0\" + txt + \"00\";\n    return nv;\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}\n\n  console.warn(txt);\n  console.warn(el.nodeName);\n  return txt;\n}","approval":"DONE","logs":[{"time":1635748404168,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-76148","name":"AREA_viewMoreSideList","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n  var t1 = \"\";\n  var t2 = el && el.closest('ul').className;\n  \tvar chl = el.closest('li');\n\tvar prt = chl.parentNode;\n \t var idx = Array.prototype.indexOf.call(Array.from(prt.children).filter(node => node.className.toLowerCase() !== \"bx-clone\"), chl);\n  if ({{isLogin}} == \"ncnt\") {\n\tvar t1 = \"3\";\n   if (t2 == \"custom_link_list\") {\n\tvar t2 = idxToCode(idx + 2, 2);\n \t } else {\n\tvar t2 = idxToCode(idx + 1, 2);\n  }\n  } else {\n\tvar t1 = \"7\";\n\tvar t2 = idxToCode(idx + 1, 2);\n  }\n\n  var txt = \"00\" + t1 + t2;\n\tvar temp_txt = txt; //text preprocessing\n \tvar txt = txt && txpr(txt); //text preprocessing\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  {{isLogin}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\nfunction idxToCode(num, size) {\n    var idx = num.toString();\n    while (idx.length < size) idx = \"0\" + idx;\n    return idx;\n}\n\n  console.warn(txt);\n  console.warn(el.nodeName);\n  return txt;\n}","approval":"DONE","logs":[{"time":1636520004163,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-35992","name":"COOKIE.UID","description":null,"code":"function() {\n  \tvar uid = Ntm.Cookie.get(\"UID\");\n  \tif (!uid) {\n      if (window._n_bank_uid) {\n          uid = window._n_bank_uid;\n          Ntm.Cookie.set(\"UID\", uid, {path:\"/\"});\n      }\n    }  \t\n  \treturn uid;\n}","approval":"DONE","logs":[{"time":1639674027462,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-27760","name":"A0.채널번호","description":null,"code":"function() {\n\tvar container = \"1\";  \n  \t//UID 쿠키 발급 로직\t\n  \tvar uid = Ntm.Cookie.get(\"UID\");\n  \tif (!uid) {\n      if (window._n_bank_uid) {\n          uid = window._n_bank_uid;\n          Ntm.Cookie.set(\"UID\", uid, {path:\"/\"});\n      }\n    }\n  \n  \treturn container;\n}","approval":"DONE","logs":[{"time":1639683708848,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-58532","name":"AREA_allMenuIcon","description":null,"code":"function() {\n   var el = Ntm.Variable.get(\"clickElement\");\n   var txt = \"gnb_00800\";\n  \n  var temp_txt = txt && txpr(txt); //text preprocessing\n  var txt = txt && txpr(txt); //text preprocessing\n  // var txt = txt && lookup(txt); //text convert\n  //   var txt = txt && pii(txt); //PII preprocessing\n  var aryWrap = [\n  {{AREA_channel}},\n  {{AREA_subChannel}},\n  txt\n//  \"<=\",\n//  temp_txt\n  ];\n   var txt = aryWrap.join(\"\");\n  \nfunction txpr(){\n      nv = txt.replace(/\\s|\\n|\\t/g, \"\");\n    return nv;\n    }\n  console.warn(txt);\n  console.warn(el.nodeName);\n  return txt;\n}","approval":"DONE","logs":[{"time":1638441936004,"userId":"admin","action":"CONFIRM","comment":""}]}],"lastModified":"2021-12-20 15:37:28","plugins":[{"type":"PLUGIN","id":"VAR-00014","name":"nlogger","description":"넷스루 로깅 모듈"}]};
+
+Ntm.Console = function() {
+    var _this = {};
+
+    _this.log = function() {
+        if(!Ntm.Preview.isPreviewMode()) return;
+        console.log.apply(this, arguments);
+    };
+
+    return {
+        log: _this.log
+    }
+}();
+
+Ntm.Cookie = function() {
+    var _this = {};
+
+    _this.get = function(key, decode) {
+        var map = _this.map(decode);
+        var value = map[key];
+
+        return value ? value : "";
+    };
+
+    _this.set = function(key, value, options) {
+        if(!options) options = {};
+
+        document.cookie = key + '=' + encodeURIComponent(value) + ';' +
+            (options.expires ? 'expires=' + options.expires + ';' : '') +
+            (options.path ? 'path=' + options.path + ';' : '') +
+            (options.domain ? 'domain=' + options.domain : '');
+    };
+
+    _this.remove = function(key, options) {
+        _this.set(key, "", Ntm.Helper.extend({
+            expires: "Thu, 01-Jan-1970 00:00:01 GMT",
+            path: "/"
+        }, options));
+    };
+
+    _this.map = function(decode) {
+        var cookies = document.cookie.split(';');
+        var cookieMap = {};
+
+        for (var index = 0; index < cookies.length; index++) {
+            var cookie = cookies[index].trim();
+            if(cookie.length === 0) continue;
+
+            var token = cookie.split('=');
+            var key = token.shift();
+            var value = token.join("=");
+
+            if(decode) value = decodeURIComponent(value);
+
+            cookieMap[key] = value;
+        }
+
+        return cookieMap;
+    };
+
+    return {
+        get: _this.get,
+        set: _this.set,
+        remove: _this.remove
+    }
+}();
+
+Ntm.Variable = function() {
+    var _this = {};
+
+    _this.clickEvent = {};
+    _this.customData = {};
+    _this.addOnData = {
+        param: {},
+        cookie: {}
+    };
+
+    _this.setClickEvent = function(event, target) {
+        _this.clickEvent = Ntm.Helper.extend(event, {
+            target: target
+        });
+    };
+
+    _this.setClickTarget = function(target) {
+        _this.clickEvent = Ntm.Helper.extend(_this.clickEvent, {
+            target: target
+        });
+    };
+
+    _this.setCustomData = function(customData) {
+        _this.customData = customData;
+    };
+
+    _this.getBuiltinVariable = function(name) {
+        switch(name) {
+            case "url":
+                return window.location.href;
+
+            case "host":
+                return window.location.origin;
+
+            case "path":
+                return window.location.pathname;
+
+            case "referrer":
+                return _this.getReferer();
+
+            case "params":
+                return _this.getUrlParams();
+
+            case "paramDict":
+                return _this.getUrlParamsAsDict();
+
+            case "title":
+                return document.title;
+
+            case "clickElement":
+                return _this.getClickElement();
+
+            case "clickId":
+                return _this.getClickId();
+
+            case "clickClass":
+                return _this.getClickClass();
+
+            case "clickText":
+                return _this.getClickText();
+
+            case "clickTag":
+                return _this.getClickTag();
+
+            case "hash":
+                return window.location.hash;
+
+            case "customData":
+                return _this.customData;
+        }
+
+        return null;
+    };
+
+    _this.getReferer = function() {
+        var ref = self.document.referrer;
+        var parentHref = "";
+        var parentRef = "";
+
+        try {
+            parentHref = top.document.location.href;
+            parentRef = top.document.referrer;
+        } catch (e) {
+            return ref;
+        }
+
+        if(ref === parentHref) return parentRef;
+
+        return ref;
+    };
+
+    _this.getPlugin = function(name) {
+        return "Ntm.Plugin." + name;
+    };
+
+    _this.getUrlParams = function() {
+        return decodeURI(window.location.search.substr(1));
+    };
+
+    _this.getUrlParamsAsDict = function() {
+        var urlParams = _this.getUrlParams();
+        return urlParams ? JSON.parse('{"' + decodeURI(urlParams).replace(/&/g, '","').replace(/=/g, '":"') + '"}') : ''
+    };
+
+    _this.getCookie = function(key, decode) {
+        return Ntm.Cookie.get(key, decode);
+    };
+
+    _this.getClickElement = function() {
+        return _this.clickEvent.target;
+    };
+
+    _this.getClickId = function() {
+        if(_this.clickEvent.target) return _this.clickEvent.target.id || "";
+        return "";
+    };
+
+    _this.getClickClass = function() {
+        if(_this.clickEvent.target) return _this.clickEvent.target.className || "";
+        return "";
+    };
+
+    _this.getClickText = function() {
+        if(_this.clickEvent.target) return _this.clickEvent.target.innerText || "";
+        return "";
+    };
+
+    _this.getClickTag = function() {
+        if(_this.clickEvent.target) return _this.clickEvent.target.tagName || "";
+        return "";
+    };
+
+    _this.getElementValue = function(variable) {
+        var element;
+        var clickTarget = _this.clickEvent.target;
+
+        switch (variable.selector) {
+            case "CLICK":
+                element = clickTarget;
+                break;
+
+            case "ENTIRE":
+                element = document.querySelector(variable.value);
+                break;
+
+            case "DESCENDANT":
+                if(clickTarget) element = clickTarget.querySelector(variable.value);
+                break;
+
+            case "ASCENDANT":
+                if(clickTarget) {
+                    var tagName = variable.value.toUpperCase();
+                    var target = clickTarget.parentElement;
+                    var order = 0;
+
+                    while(target) {
+                        if(target.tagName.toUpperCase() === tagName) {
+                            order++;
+
+                            if(order == variable.order) {
+                                element = target;
+                                break;
+                            }
+                        }
+
+                        target = target.parentElement;
+                    }
+                }
+                break;
+        }
+
+        return element ? (variable.attribute ? element.getAttribute(variable.attribute) : element.innerText) : undefined;
+    };
+
+    _this.addOnParam = function(data) {
+        _this.addOnData.param = Ntm.Helper.extend(_this.addOnData.param, data);
+    };
+
+    _this.addOnCookie = function(data) {
+        _this.addOnData.cookie = Ntm.Helper.extend(_this.addOnData.cookie, data);
+    };
+
+    _this.getAddOnData = function() {
+        return _this.addOnData;
+    };
+
+    _this.clearAddOnData = function() {
+        _this.addOnData = {
+            param: {},
+            cookie: {}
+        };
+    };
+
+    return {
+        get: _this.getBuiltinVariable,
+        getPlugin: _this.getPlugin,
+        getCookie: _this.getCookie,
+        getElementValue: _this.getElementValue,
+        setClickEvent: _this.setClickEvent,
+        setClickTarget: _this.setClickTarget,
+        setCustomData: _this.setCustomData,
+        addOnParam: _this.addOnParam,
+        addOnCookie: _this.addOnCookie,
+        getAddOnData: _this.getAddOnData,
+        clearAddOnData: _this.clearAddOnData
+    }
+}();
+
+Ntm.Helper = function() {
+    var _this = {};
+
+    _this.find = function (values, key, match) {
+        for (var index = 0; index < values.length; index++) {
+            var value = values[index];
+            if (value[key] === match) {
+                return value;
+            }
+        }
+
+        return undefined;
+    };
+
+    _this.getVariableById = function (id) {
+        return _this.find(Ntm.Settings.variables, "id", id);
+    };
+
+    _this.getVariableByName = function(name) {
+        return _this.find(Ntm.Settings.variables, "name", name);
+    };
+
+    _this.copy = function(obj) {
+        return JSON.parse(JSON.stringify(obj));
+    };
+
+    _this.extend = function() {
+        var extended = {};
+
+        for(var index = 0; index < arguments.length; index++) {
+            var source = arguments[index];
+
+            for(var prop in source) {
+                if(Object.prototype.hasOwnProperty.call(source, prop))
+                    extended[prop] = source[prop];
+            }
+        }
+
+        return extended;
+    };
+
+    _this.length = function(obj) {
+        var count = 0;
+
+        for(key in obj) {
+            count++;
+        }
+
+        return count;
+    };
+
+    _this.replaceAll = function(text, find, replace) {
+        return text ? text.split(find).join(replace) : text;
+    };
+
+    _this.isValidSettings = function() {
+        return Ntm.Settings.hasOwnProperty("tags") &&
+            Ntm.Settings.hasOwnProperty("triggers") &&
+            Ntm.Settings.hasOwnProperty("variables");
+    };
+
+    return {
+        extend: _this.extend,
+        copy: _this.copy,
+        length: _this.length,
+        find: _this.find,
+        replaceAll: _this.replaceAll,
+        getVariableById: _this.getVariableById,
+        getVariableByName: _this.getVariableByName,
+        isValidSettings: _this.isValidSettings
+    }
+}();
+
+Ntm.Evaluator = function() {
+    var _this = {};
+
+    _this.evaluate = function(variable) {
+        switch(variable.type) {
+            case "BUILTIN":
+                return Ntm.Variable.get(variable.name);
+
+            case "PLUGIN":
+                return Ntm.Variable.getPlugin(variable.name);
+
+            case "STRING":
+            case "NUMBER":
+                return variable.value;
+
+            case "COOKIE":
+                return Ntm.Variable.getCookie(variable.key);
+
+            case "ELEMENT":
+                return Ntm.Variable.getElementValue(variable);
+
+            case "SCRIPT":
+                return _this.runScript(_this.evaluateNested(variable.code));
+
+            case "VARIABLE":
+                return _this.runScript('function(){return ' + variable.value + '}');
+        }
+
+        return null;
+    };
+
+    _this.evaluateNested = function(script) {
+        var variables = _this.gatherAllVariables(script);
+
+        if(Ntm.Helper.length(variables) > 0) {
+            script = _this.replaceVariablesWithinQuotations(script, variables);
+            script = _this.replaceVariables(script, variables);
+        }
+
+        return script;
+    };
+
+    _this.gatherAllVariables = function(script) {
+        var regex = /{{([^{}]+)}}/g;
+        var variables = {};
+
+        while(true) {
+            var match = regex.exec(script);
+            if(!match) break;
+
+            var expression = match[0];
+            if(variables[expression]) continue;
+
+            var variable = Ntm.Helper.getVariableByName(match[1]);
+            var evaluated = variable ? value(_this.evaluate(variable), variable.type) : value(variable);
+
+            variables[expression] = evaluated;
+        }
+
+        return variables;
+
+        function value(obj, type) {
+            return type != "PLUGIN" ? JSON.stringify(obj) : obj;
+        }
+    };
+
+    _this.replaceVariables = function(script, variables) {
+        var count = 1;
+        var declarations = "";
+
+        for(var key in variables) {
+            var variable = "__ntm__" + count++;
+            declarations += "var " + variable + " = " + variables[key] + ";\n";
+            script = Ntm.Helper.replaceAll(script, key, variable);
+        }
+
+        var regex = /function[^{]+{/;
+        var match = regex.exec(script);
+
+        if(match) {
+            var func = match[0];
+            var index = match.index + func.length;
+            var result = "";
+
+            result += func + "\n";
+            result += declarations + "\n";
+            result += script.substring(index);
+            script = result;
+        }
+
+        return script;
+    };
+
+    _this.replaceVariablesWithinQuotations = function(script, variables) {
+        script = replace(script, variables, /[\"]([^\"]*)[\"]/g);
+        script = replace(script, variables, /[\']([^\']*)[\']/g);
+        return script;
+
+        function replace(script, variables, regex) {
+            while(true) {
+                var match = regex.exec(script);
+                if(!match) break;
+
+                var quotation = match[0];
+                var front = script.substring(0, match.index);
+                var rear = script.substring(match.index + quotation.length);
+
+                for(var key in variables) {
+                    var value = variables[key];
+                    value = Ntm.Helper.replaceAll(value, '"', '');
+                    value = Ntm.Helper.replaceAll(value, "'", "");
+                    quotation = Ntm.Helper.replaceAll(quotation, key, value);
+                }
+
+                script = front + quotation + rear;
+                regex.lastIndex = match.index + quotation.length;
+            }
+
+            return script;
+        }
+    };
+
+    _this.runScript = function(script) {
+        try {
+            return eval("(" + script + ")()");
+        }
+        catch(e) {
+            Ntm.Console.log(e, script);
+        }
+    };
+
+    return {
+        evaluate: _this.evaluate
+    }
+}();
+
+Ntm.Matcher = function() {
+    var _this = {};
+
+    _this.matchAll = function(conditions) {
+        return !conditions.some(function(condition) {
+            var variable = Ntm.Helper.getVariableById(condition.variable);
+            var operand1 = Ntm.Evaluator.evaluate(variable);
+            var operand2 = condition.value;
+
+            return !_this.match(condition.operator, operand1, operand2);
+        });
+    };
+
+    _this.match = function(operator, operand1, operand2) {
+        switch (operator) {
+            case "EQUALS":
+                return equals(operand1, operand2);
+
+            case "NOTEQUALS":
+                return !equals(operand1, operand2);
+
+            case "CONTAINS":
+                return contains(operand1, operand2);
+
+            case "NOTCONTAINS":
+                return !contains(operand1, operand2);
+
+            case "STARTSWITH":
+                return startsWith(operand1, operand2);
+
+            case "NOTSTARTSWITH":
+                return !startsWith(operand1, operand2);
+
+            case "ENDSWITH":
+                return endsWith(operand1, operand2);
+
+            case "NOTENDSWITH":
+                return !endsWith(operand1, operand2);
+
+            case "MATCHES":
+                return match(operand1, operand2);
+
+            case "NOTMATCHES":
+                return !match(operand1, operand2);
+
+            case "LESSTHAN":
+                return lessThan(operand1, operand2);
+
+            case "LESSTHANOREQUALS":
+                return lessThan(operand1, operand2) || equals(operand1, operand2);
+
+            case "GREATERTHAN":
+                return greaterThan(operand1, operand2);
+
+            case "GREATERTHANOREQUALS":
+                return greaterThan(operand1, operand2) || equals(operand1, operand2);
+
+            default:
+                return false;
+        }
+
+        function equals(operand1, operand2) {
+            switch(typeof operand1) {
+                case "number":
+                    return isNumber(operand2) && operand1 === Number(operand2);
+
+                case "string":
+                    return isString(operand2) && operand1.toUpperCase() === operand2.toUpperCase();
+
+                case "boolean":
+                    return isBoolean(operand2) && operand1 === toBoolean(operand2);
+            }
+
+            return false;
+        }
+
+        function contains(operand1, operand2) {
+            return isString(operand1) && isString(operand2) &&
+                operand1.toUpperCase().indexOf(operand2.toUpperCase()) >= 0;
+        }
+
+        function startsWith(operand1, operand2) {
+            return isString(operand1) && isString(operand2) &&
+                operand1.toUpperCase().indexOf(operand2.toUpperCase()) == 0;
+        }
+
+        function endsWith(operand1, operand2) {
+            return isString(operand1) && isString(operand2) &&
+                operand1.toUpperCase().lastIndexOf(operand2.toUpperCase()) == operand1.length - operand2.length;
+        }
+
+        function match(operand1, operand2) {
+            return operand1.match(operand2);
+        }
+
+        function lessThan(operand1, operand2) {
+            return isNumber(operand1) && isNumber(operand2) && Number(operand1) < Number(operand2);
+        }
+
+        function greaterThan(operand1, operand2) {
+            return isNumber(operand1) && isNumber(operand2) && Number(operand1) > Number(operand2);
+        }
+
+        function isNumber(operand) {
+            return !isNaN(Number(operand));
+        }
+
+        function isString(operand) {
+            return typeof operand === "string";
+        }
+
+        function isBoolean(operand) {
+            return operand === "true" || operand === "false";
+        }
+
+        function toBoolean(operand) {
+            return operand === "true";
+        }
+    };
+
+    return {
+        matchAll: _this.matchAll
+    }
+}();
+
+Ntm.Tag = function() {
+    var _this = {};
+
+    _this.isExecutable = function(tag) {
+        var allTriggersFired = tag.triggers.every(function(id) {
+            return Ntm.Trigger.getById(id).fired;
+        });
+
+        var allExceptionsNotFired = tag.exceptions.every(function(id) {
+            return !Ntm.Trigger.getById(id).fired;
+        });
+
+        return allTriggersFired && allExceptionsNotFired;
+    };
+
+    _this.run = function(tag) {
+        if(!tag.enabled || !_this.isExecutable(tag)) return;
+
+        switch(tag.type) {
+            case "PLUGIN":
+                _this.runPlugin(tag);
+                break;
+
+            case "SCRIPT":
+                Ntm.Evaluator.evaluate({
+                    type: "SCRIPT",
+                    code: tag.code
+                });
+                Ntm.Variable.clearAddOnData();
+                break;
+        }
+    };
+
+    _this.runPlugin = function(t) {
+        var tag = Ntm.Helper.copy(t);
+        var addOnData = Ntm.Variable.getAddOnData();
+        var parameters = variable(Ntm.Helper.extend(tag.parameters, addOnData.param));
+        var cookies = variable(Ntm.Helper.extend(tag.cookies, addOnData.cookie));
+
+        tag.type = "SCRIPT";
+        tag.code = "function() { {{" + tag.pluginType + "}}.";
+
+        switch(tag.logType) {
+            case "EVENT":
+                tag.code += "event(" + parameters + "," + cookies + ");";
+                break;
+
+            case "USER":
+                tag.code += "user(" + parameters + ");";
+                break;
+
+            case "ORDER":
+                tag.code += "order(" + parameters + ");";
+                break;
+
+            case "CANCEL":
+                tag.code += "cancel(" + parameters + ");";
+                break;
+
+            case "CANCELALL":
+                tag.code += "cancelAll(" + parameters + ");";
+                break;
+
+            case "CUSTOM":
+                tag.code += "log('" + tag.path + "'," + parameters + "," + cookies + ");";
+                break;
+        }
+
+        tag.code += "}";
+
+        _this.run(tag);
+
+        function variable(obj) {
+            var result = '{';
+
+            for(key in obj) {
+                var v = Ntm.Helper.getVariableById(obj[key]);
+                result += result.length > 1 ? ',' : '';
+                result += '"' + key + '":';
+                result += v ? ('{{' + v.name + '}}') : JSON.stringify(obj[key]);
+            }
+
+            result += '}';
+
+            return result;
+        }
+    };
+
+    _this.runAll = function() {
+        Ntm.Settings.tags.forEach(function(tag) {
+            _this.run(tag);
+        });
+    };
+
+    _this.hasTrigger = function(tag, event) {
+        return tag.triggers.some(function(id) {
+            return Ntm.Trigger.getById(id).event === event;
+        });
+    };
+
+    _this.getAllTriggerIds = function(tag) {
+        var result = tag.exceptions ? tag.exceptions : [];
+        return result.concat(tag.triggers);
+    };
+
+    return {
+        run: _this.run,
+        runAll: _this.runAll,
+        hasTrigger: _this.hasTrigger,
+        getAllTriggerIds: _this.getAllTriggerIds
+    }
+}();
+
+Ntm.Trigger = function() {
+    var _this = {};
+
+    _this.settings = Ntm.Settings;
+
+    _this.init = function(event) {
+        _this.settings.triggers.forEach(function(trigger) {
+            if(event && event !== trigger.event) return;
+            trigger.fired = false;
+        });
+    };
+
+    _this.getById = function(id) {
+        return Ntm.Helper.find(_this.settings.triggers, "id", id);
+    };
+
+    _this.listByEvent = function(event) {
+        var result = [];
+
+        _this.settings.triggers.forEach(function(trigger) {
+            if(trigger.event === event) result.push(trigger);
+        });
+
+        return result;
+    };
+
+    return {
+        init: _this.init,
+        getById: _this.getById,
+        listByEvent: _this.listByEvent
+    }
+}();
+
+Ntm.Event = function() {
+    var _this = {};
+
+    _this.PAGE_LOADED = "PAGELOADED";
+    _this.WINDOW_LOADED = "WINDOWLOADED";
+    _this.DOM_READY = "DOMREADY";
+    _this.ELEMENT_CLICKED = "ELEMENTCLICKED";
+    _this.CLICKED = "CLICKED";
+    _this.URL_CHANGED = "URLCHANGED";
+    _this.HASH_CHANGED = "HASHCHANGED";
+    _this.CUSTOM = "CUSTOM";
+
+    _this.location = null;
+    _this.clickHandlers = [];
+    _this.rebindTimer = null;
+
+    _this.init = function() {
+        if(document.readyState === 'interactive' || document.readyState === 'complete') _this.onDomReady();
+        else {
+            document.addEventListener("DOMContentLoaded", function() {
+                _this.onDomReady();
+            });
+        }
+
+        window.addEventListener("load", function() {
+            _this.onWindowLoaded();
+        });
+
+        window.addEventListener("hashchange", function(event) {
+            _this.onHashChanged(event);
+        })
+    };
+
+    _this.registerObserver = function() {
+        var interval = 0;
+        
+        if(interval <= 0 && window.MutationObserver) {
+            var observer = new MutationObserver(function(mutations) {
+                clearTimeout(_this.rebindTimer);
+                _this.rebindTimer = setTimeout(_this.rebind, 100);
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        }
+        else setInterval(_this.rebind, interval > 0 ? interval : 1000);
+    };
+
+    _this.bind = function() {
+        document.addEventListener("click", function(event) {
+            _this.handleForClick(event, event.target);
+        });
+    };
+
+    _this.rebind = function() {
+        var triggers = Ntm.Trigger.listByEvent(_this.ELEMENT_CLICKED);
+
+        triggers.forEach(function(trigger) {
+            var elements = _this.querySelectorAll(trigger.selector);
+
+            for (var i = 0; i < elements.length; i++) {
+                _this.clickHandlers.forEach(function(handler) {
+                    elements[i].removeEventListener("click", handler);
+                });
+            }
+        });
+
+        _this.clickHandlers = [];
+
+        triggers.forEach(function(trigger) {
+            var elements = _this.querySelectorAll(trigger.selector);
+
+            for (var i = 0; i < elements.length; i++) {
+                var handler = function(event) {
+                    _this.handleForElementClick(event, event.currentTarget, trigger);
+                };
+
+                elements[i].addEventListener("click", handler);
+                _this.clickHandlers.push(handler);
+            }
+        });
+
+        _this.manageLocation();
+
+        //Ntm.Console.log("rebinded: " + _this.clickHandlers.length);
+    };
+
+    _this.manageLocation = function() {
+        if(_this.location != window.location.href) _this.onUrlChanged();
+        _this.location = window.location.href;
+    };
+
+    _this.querySelectorAll = function(selector) {
+        var elements = [];
+
+
+        _this.querySelectorAllAsArray(document, selector).forEach(function(element) {
+            elements.push(element);
+        });
+
+        _this.querySelectorAllAsArray(document, "iframe").forEach(function(iframe) {
+            try {
+                _this.querySelectorAllAsArray(iframe.contentWindow.document, selector).forEach(function (element) {
+                    elements.push(element);
+                });
+            }
+            catch(e) {
+                Ntm.Console.log("cannot bind events because of CORS problems");
+            }
+        });
+
+        return elements;
+    };
+
+    _this.querySelectorAllAsArray = function(documentBase, selector) {
+        var elements = documentBase.querySelectorAll(selector);
+        if(elements.forEach === undefined) elements = Array.prototype.slice.call(elements);
+        return elements ? elements : [];
+    };
+
+    _this.onPageLoaded = function() {
+        Ntm.Console.log('%c EVENT >> PAGELOADED ', 'background:#2196F3;color:white');
+        _this.location = window.location.href;
+        _this.handle(_this.PAGE_LOADED);
+    };
+
+    _this.onDomReady = function() {
+        Ntm.Console.log('%c EVENT >> DOMREADY ', 'background:#2196F3;color:white');
+        _this.registerObserver();
+        _this.bind();
+        _this.rebind();
+        _this.handle(_this.DOM_READY);
+    };
+
+    _this.onWindowLoaded = function() {
+        Ntm.Console.log('%c EVENT >> WINDOWLOADED ', 'background:#2196F3;color:white');
+        _this.handle(_this.WINDOW_LOADED);
+    };
+
+    _this.onUrlChanged = function() {
+        Ntm.Console.log('%c EVENT >> URLCHANGED ', 'background:#2196F3;color:white');
+        _this.handle(_this.URL_CHANGED);
+    };
+
+    _this.onHashChanged = function() {
+        Ntm.Console.log('%c EVENT >> HASHCHANGED ', 'background:#2196F3;color:white');
+        _this.handle(_this.HASH_CHANGED);
+    };
+
+    _this.handle = function(eventType, trigger) {
+        Ntm.Trigger.init();
+
+        var triggers = trigger ? [trigger] : Ntm.Trigger.listByEvent(eventType);
+
+        triggers.forEach(function(trigger) {
+            if(_this.match(trigger.target) && Ntm.Matcher.matchAll(trigger.conditions)) trigger.fired = true;
+        });
+
+        Ntm.Tag.runAll();
+    };
+
+    _this.handleForElementClick = function(event, target, trigger) {
+        Ntm.Console.log('%c EVENT >> %s ', 'background:#2196F3;color:white', _this.ELEMENT_CLICKED, event.clientX, event.clientY, target);
+        Ntm.Variable.setClickEvent(event, target);
+        _this.handle(_this.ELEMENT_CLICKED, trigger);
+    };
+
+    _this.handleForClick = function(event, target) {
+        Ntm.Console.log('%c EVENT >> %s ', 'background:#2196F3;color:white', _this.CLICKED, event.clientX, event.clientY, target);
+
+        Ntm.Settings.tags.forEach(function(tag) {
+            if(!Ntm.Tag.hasTrigger(tag, _this.CLICKED)) return;
+
+            Ntm.Trigger.init(_this.CLICKED);
+
+            Ntm.Tag.getAllTriggerIds(tag).forEach(function(triggerId) {
+                var trigger = Ntm.Trigger.getById(triggerId);
+                if(!trigger.event || trigger.event !== _this.CLICKED) return;
+
+                Ntm.Variable.setClickEvent(event, target);
+                if(_this.match(trigger.target) && Ntm.Matcher.matchAll(trigger.conditions)) trigger.fired = true;
+            });
+
+            Ntm.Tag.run(tag);
+        });
+
+        Ntm.Trigger.init();
+    };
+
+    _this.handleForUserDefined = function(name, data) {
+        Ntm.Console.log('%c EVENT >> CUSTOM : ', 'background:#2196F3;color:white', name, data);
+
+        Ntm.Trigger.init();
+        Ntm.Variable.setCustomData(data);
+
+        Ntm.Trigger.listByEvent(_this.CUSTOM).forEach(function(trigger) {
+            if(trigger.eventName === name && Ntm.Matcher.matchAll(trigger.conditions)) trigger.fired = true;
+        });
+
+        Ntm.Tag.runAll();
+    };
+
+    _this.match = function(tagName) {
+        if(tagName) {
+            var target = Ntm.Variable.get("clickElement");
+
+            while(target) {
+                if(target.tagName.toUpperCase() === tagName.toUpperCase()) {
+                    Ntm.Variable.setClickTarget(target);
+                    return true;
+                }
+
+                target = target.parentElement;
+            }
+
+            return false;
+        }
+
+        return true;
+    };
+
+    return {
+        init: _this.init,
+        firePageLoaded: _this.onPageLoaded,
+        fireClicked: function(event) {
+            _this.handleForClick(event, event.target);
+        },
+        fireUserDefined: _this.handleForUserDefined
+    }
+}();
+
+Ntm.Preview = function() {
+    var _this = {
+        previewMode: false,
+        containerId: ""
+    };
+
+    _this.init = function(preview, id) {
+        if(!preview) Ntm.Cookie.remove(id);
+
+        _this.previewMode = preview;
+        _this.containerId = id;
+
+        if(!preview) return;
+
+        _this.showPreviewBanner();
+    };
+
+    _this.showPreviewBanner = function() {
+        var frame = _this.makeFrame();
+
+        var lastNode = document.body && document.body.lastChild || document.body || document.head;
+        lastNode.parentNode.insertBefore(frame, lastNode);
+
+        var frameDocument = frame.document;
+        if (frame.contentDocument) frameDocument = frame.contentDocument;
+        else if (frame.contentWindow) frameDocument = frame.contentWindow.document;
+
+        if(frameDocument) {
+            var html =
+                '<p style="float:left; padding-left:20px; font-size:15px; font-weight: bold; margin-top:12px">미리보기 모드</p>' +
+                '<p style="float:right; padding-right:20px; font-size:12px; margin-top:15px">최근 수정: ' + Ntm.Settings.lastModified + '</p>';
+
+            frameDocument.open();
+            frameDocument.writeln(html);
+            frameDocument.close();
+        }
+
+        Ntm.Console.log('%c PREVIEW MODE ', 'background:#F44336;color:white');
+    };
+
+    _this.isPreviewMode = function() {
+        return _this.previewMode;
+    };
+
+    _this.getContainerId = function() {
+        return _this.containerId;
+    };
+
+    _this.makeFrame = function() {
+        var iframe = document.createElement('iframe');
+        iframe.src = 'about:blank';
+        iframe.style.position = 'fixed';
+        iframe.style.width = '100%';
+        iframe.style.height = '60px';
+        iframe.style.bottom = '0';
+        iframe.style.borderTop = '1px solid #eee';
+        iframe.style.borderRight = '0';
+        iframe.style.borderLeft = '0';
+        iframe.style.borderBottom = '0';
+        iframe.style.margin = '0';
+        iframe.style.padding = '0';
+        iframe.style.visibility = 'visible';
+        iframe.style.backgroundColor = '#fffacc';
+        iframe.style.visible = '1';
+        iframe.style.zIndex = '2147483647';
+        return iframe;
+    };
+
+    return {
+        init: _this.init,
+        isPreviewMode: _this.isPreviewMode,
+        getContainerId: _this.getContainerId
+    }
+}();
+
+Ntm.Plugin = {};
+
+Ntm.Plugin.nlogger = (function() {
+    var _this = {};
+
+    _this.serviceId = "internet_bank";
+    _this.baseUrlHttp = "http://ebizhub.nonghyup.com/nlog";
+    _this.baseUrlHttps = "https://ebizhub.nonghyup.com/nlog";
+    _this.previewServiceId = "wcpreview";
+    _this.previewCotainerKey = "nth_cid";
+    _this.previewTimeKey = "nth_time";
+    _this.cookieKeys = [ {
+  "cookie" : "nth_pcid",
+  "logging" : "PCID",
+  "removable" : false,
+  "required" : true,
+  "always" : false,
+  "builtin" : false
+}, {
+  "cookie" : "UID",
+  "logging" : "UID",
+  "removable" : false,
+  "required" : false,
+  "always" : false,
+  "builtin" : false
+}, {
+  "cookie" : null,
+  "logging" : "nth_sdk",
+  "removable" : false,
+  "required" : true,
+  "always" : false,
+  "builtin" : true
+}, {
+  "cookie" : null,
+  "logging" : "nth_locale_lang",
+  "removable" : false,
+  "required" : false,
+  "always" : false,
+  "builtin" : true
+}, {
+  "cookie" : null,
+  "logging" : "nth_locale_country",
+  "removable" : false,
+  "required" : false,
+  "always" : false,
+  "builtin" : true
+}, {
+  "cookie" : null,
+  "logging" : "nth_resolution",
+  "removable" : false,
+  "required" : true,
+  "always" : false,
+  "builtin" : true
+}, {
+  "cookie" : null,
+  "logging" : "nth_screen_id",
+  "removable" : false,
+  "required" : false,
+  "always" : false,
+  "builtin" : true
+}, {
+  "cookie" : null,
+  "logging" : "nth_screen_title",
+  "removable" : false,
+  "required" : false,
+  "always" : false,
+  "builtin" : true
+} ];
+    _this.cookieDomain = "nonghyup.com";
+
+    _this.loggingByXhr = true;
+    _this.withCredentials = false;
+    _this.requestMethod = "get";
+    _this.requestTimeout = 1000;
+    _this.requestQueueSize = 10;
+    _this.sessionStorageKey = "__nlogger__";
+
+    _this.log = function(path, params, cookies, options) {
+        _this.send(_this.makeUrl("/log/event", path, params, cookies), options);
+    };
+
+    _this.event = function(params, cookies) {
+        _this.send(_this.makeUrl("/log/event", null, params, cookies));
+    };
+
+    _this.user = function(params) {
+        _this.send(_this.makeUrl("/user", null, params));
+    };
+
+    _this.order = function(params) {
+        _this.send(_this.makeUrl("/order/request", null, params));
+    };
+
+    _this.cancel = function(params) {
+        _this.send(_this.makeUrl("/order/cancel", null, params));
+    };
+
+    _this.cancelAll = function(params) {
+        _this.send(_this.makeUrl("/order/cancel-all", null, params));
+    };
+
+    _this.send = function(url, options) {
+        if(_this.loggingByXhr) _this.sendByXhr(url);
+        else {
+            options = _this.extend({
+                async: true,
+                onSuccess: null,
+                onError: null,
+                callBackTimeOutAsMillis: 400
+            }, options);
+
+            _this.sendByTag(url, options);
+        }
+    };
+
+    _this.makeUrl = function(action, path, params, cookies) {
+        var preview = Ntm.Preview.isPreviewMode();
+        var baseUrl = window.location.protocol === "https:" ? _this.baseUrlHttps : _this.baseUrlHttp;
+        var query = _this.toQueryString(params, true);
+        var url = window.location.protocol + "//" + _this.getDomainWithPort();
+        var hash;
+
+        if(path) url += "/" + path;
+        else {
+            url += window.location.pathname + window.location.search;
+
+            if(window.location.hash) {
+                if(!window.location.search || window.location.hash.indexOf("?") >=0) url = window.location.href;
+                else hash = window.location.hash;
+            }
+        }
+
+        if(query) {
+            url += url.indexOf("?") < 0 ? "?" : "&";
+            url += query;
+        }
+
+        if(hash) url += hash;
+
+        cookies = _this.extend(cookies, _this.getCookies());
+
+        addCookie('nth_sdk', 'WEB');
+        addCookie('nth_locale_lang', _this.getLocaleLanguage());
+        addCookie('nth_locale_country', _this.getLocaleCountry());
+        addCookie('nth_resolution', _this.getResolution());
+        addCookie('nth_screen_id', document.location.pathname);
+        addCookie('nth_screen_title', document.title);
+
+        if(preview) {
+            addCookie(_this.previewCotainerKey, Ntm.Preview.getContainerId());
+            addCookie(_this.previewTimeKey, new Date().getTime());
+        }
+
+        params = {
+            s: preview ? _this.previewServiceId : _this.serviceId,
+            u: url,
+            r: _this.getReferer(),
+            a: navigator.userAgent,
+            c: _this.toCookieString(cookies, true),
+            v: _this.cacheBuster()
+        };
+
+        return baseUrl + action + "?" + _this.toQueryString(params, true);
+
+        function addCookie(key, value) {
+            if(!isReserved(key) && !isRequired(key)) return;
+
+            var cookie = {};
+            cookie[key] = value;
+
+            cookies = _this.extend(cookie, cookies);
+        }
+
+        function isReserved(loggingKey) {
+            return loggingKey === _this.previewCotainerKey || loggingKey === _this.previewTimeKey;
+        }
+
+        function isRequired(loggingKey) {
+            for (var index = 0; index < _this.cookieKeys.length; index++) {
+                var cookieKey = _this.cookieKeys[index];
+                if (cookieKey.logging === loggingKey) return cookieKey.required;
+            }
+
+            return false;
+        }
+    };
+
+    _this.getReferer = function() {
+        var ref = self.document.referrer;
+        var parentHref = "";
+        var parentRef = "";
+
+        try {
+            parentHref = top.document.location.href;
+            parentRef = top.document.referrer;
+        } catch (e) {
+            return ref;
+        }
+
+        if(ref === parentHref) return parentRef;
+
+        return ref;
+    };
+
+    _this.getDomainWithPort = function() {
+        var port = location.port;
+        if (port === undefined || port === "" || port === "0" || port === 0) return document.domain;
+        return document.domain + ":" + port;
+    };
+
+    _this.getDomain = function() {
+        var domain = document.domain;
+        if(_this.isIpType(domain)) return domain;
+
+        var tokens = domain.split('.');
+        var length = tokens.length;
+        if(length !== 4 && length !== 3) return domain;
+
+        var dm = tokens[length - 2] + '.' + tokens[length - 1];
+        return tokens[length - 1].length === 2 ? tokens[length - 3] + '.' + dm : dm;
+    };
+
+    _this.isIpType = function(domain) {
+        var ipRegex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        return ipRegex.test(domain);
+    };
+
+    _this.getResolution = function() {
+        var screenSize = "";
+        var screen = window.screen;
+
+        if(screen != null && typeof screen === "object") {
+            screenSize = screen.width + "x" + screen.height;
+        }
+
+        return screenSize;
+    };
+
+    _this.getLocaleLanguage = function() {
+        var tokens = _this.getLanguage().split("-");
+        return tokens.length > 0 ? tokens[0] : "";
+    };
+
+    _this.getLocaleCountry = function() {
+        var tokens = _this.getLanguage().split("-");
+        return tokens.length > 1 ? tokens[1] : "";
+    };
+
+    _this.getLanguage = function() {
+        var language = "-";
+        var navigator = window.navigator;
+
+        if(navigator.language) language = navigator.language.toLowerCase();
+        else if(navigator.userLanguage) language = navigator.userLanguage.toLowerCase();
+
+        return language;
+    };
+
+    _this.getCookies = function() {
+        var result = {};
+
+        for(var index = 0; index < _this.cookieKeys.length; index++) {
+            var keyPair = _this.cookieKeys[index];
+
+            if(keyPair.builtin) continue;
+
+            var value = _this.getCookie(keyPair.cookie);
+
+            if(!value) {
+                if(!keyPair.required) continue;
+                value = _this.generateUuid();
+                setUuid(keyPair.cookie, value);
+                if(!keyPair.always) continue;
+            }
+
+            result[keyPair.logging] = value;
+        }
+
+        return result;
+
+        function setUuid(key, value) {
+            var date = new Date();
+            var options = {
+                path: "/",
+                expires: date
+            };
+
+            if(!_this.cookieDomain) options.domain = _this.getDomain();
+            else if(_this.cookieDomain !== "default") options.domain = _this.cookieDomain;
+
+            date.setFullYear(date.getFullYear() + 10);
+            _this.setCookie(key, value, options);
+        }
+    };
+
+    _this.getCookie = function(key) {
+        var result = new RegExp('(?:^|; )' + key + '=([^;]*)').exec(document.cookie);
+        return (result != null) ? decodeURIComponent(result[1]) : null;
+    };
+
+    _this.setCookie = function(key, value, options) {
+        if(!options) options = {};
+
+        var expires = options.expires;
+        var path = options.path;
+        var domain = options.domain;
+
+        document.cookie = key + '=' + encodeURIComponent(value) + ';' +
+            (expires ? 'expires=' + expires.toUTCString() + ';' : '') +
+            (path ? 'path=' + path + ';' : '') +
+            (domain ? 'domain=' + domain : '');
+    };
+
+    _this.deleteCookie = function(key) {
+        document.cookie = key + '=; expires=Thu, 01-Jan-1970 00:00:01 GMT;';
+    };
+
+    _this.generateUuid = function() {
+        var result = "";
+
+        if(typeof window.crypto != 'undefined' && typeof window.crypto.getRandomValues != 'undefined') {
+            var buf = new Uint16Array(8);
+            window.crypto.getRandomValues(buf);
+            var S4 = function (num) {
+                var ret = num.toString(16);
+                while (ret.length < 4) {
+                    ret = "0" + ret;
+                }
+                return ret;
+            };
+
+            result = (S4(buf[0]) + S4(buf[1]) + "-" + S4(buf[2]) + "-"
+            + S4(buf[3]) + "-" + S4(buf[4]) + "-" + S4(buf[5])
+            + S4(buf[6]) + S4(buf[7]));
+        }
+        else {
+            result = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+                function (c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r
+                        : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+        }
+
+        return result + '-' + new Date().getTime();
+    };
+
+    _this.sendByTag = function(url, options) {
+        var element = _this.createScriptElement(url, options);
+        _this.appendElement(element);
+        _this.removeElement(element);
+    };
+
+    _this.sendByXhr = function(url) {
+        try {
+            _this.addRequest(url);
+            _this.sendAllRequests();
+        } catch(e) {
+            console.log("send error", e);
+        }
+    };
+
+    _this.createScriptElement = function(src, options) {
+        var element = document.createElement('script');
+        element.type = 'text/javascript';
+        element.src = src;
+        element.async = options.async;
+        element.charset = 'UTF-8';
+
+        if(options.onSuccess) {
+            if(typeof element.onreadystatechange !== 'undefined') {
+                element.onreadystatechange = function() {
+                    if(this.readyState === 'complete' || this.readyState === 'loaded')
+                        setTimeout(options.onSuccess, options.callBackTimeOutAsMillis);
+                };
+            }
+            else {
+                element.onload = function() {
+                    setTimeout(options.onSuccess, options.callBackTimeOutAsMillis);
+                };
+            }
+        }
+
+        if(options.onError) {
+            element.onerror = function() {
+                setTimeout(options.onError, options.callBackTimeOutAsMillis);
+            };
+        }
+
+        return element;
+    };
+
+    _this.appendElement = function(element) {
+        var ssc = document.getElementsByTagName('script')[0];
+        ssc.parentNode.insertBefore(element, ssc);
+    };
+
+    _this.removeElement = function(element) {
+        if(typeof element.remove === 'function') element.remove();
+        else element.parentNode.removeChild(element);   // For IE
+    };
+
+    _this.sendAllRequests = function() {
+        var requests = _this.getRequests();
+
+        for(var i = 0; i < requests.length; i++) {
+            _this.sendRequest(requests[i]);
+        }
+
+        _this.clearRequests();
+    };
+
+    _this.sendRequest = function(url) {
+        var xhr = _this.createXmlHttpRequest();
+        if (!xhr) return false;
+
+        xhr.withCredentials = _this.withCredentials;
+
+        var timer = setTimeout(function() {
+            xhr.abort();
+        }, _this.requestTimeout);
+
+        if(_this.requestMethod.trim().toLowerCase() === "post") {
+            var parts = url.split("?");
+            xhr.open("POST", parts[0], true);
+            if(xhr.setRequestHeader) xhr.setRequestHeader("Content-type", "text/plain");
+            xhr.send(parts[1]);
+        }
+        else {
+            xhr.open("GET", url, true);
+            xhr.send(null);
+        }
+
+        xhr.onload = function () {
+            clearTimeout(timer);
+        };
+
+        xhr.onerror = xhr.onabort = function () {
+            clearTimeout(timer);
+            _this.addRequest(url);
+        };
+    };
+
+    _this.createXmlHttpRequest = function() {
+        var xhr;
+        var xhrs = [
+            function() {return new XDomainRequest()},
+            function() {return new XMLHttpRequest()},
+            function() {return new ActiveXObject("Msxml2.XMLHTTP")},
+            function() {return new ActiveXObject("Msxml3.XMLHTTP")},
+            function() {return new ActiveXObject("Microsoft.XMLHTTP")}
+        ];
+
+        for (var i = 0; i < xhrs.length; i++) {
+            try {
+                xhr = xhrs[i]();
+            }
+            catch (e) {
+                continue;
+            }
+            break;
+        }
+
+        return xhr;
+    };
+
+    _this.addRequest = function(url) {
+        var requests = _this.getRequests();
+        if(Object.keys(requests).length >= _this.requestQueueSize) return;
+        requests.push(url);
+        _this.setRequests(requests);
+    };
+
+    _this.clearRequests = function() {
+        _this.setRequests([]);
+    };
+
+    _this.getRequests = function() {
+        var data = sessionStorage.getItem(_this.sessionStorageKey);
+        return JSON.parse(data ? data : "[]");
+    };
+
+    _this.setRequests = function(requests) {
+        sessionStorage.setItem(_this.sessionStorageKey, JSON.stringify(requests));
+    };
+
+    _this.cacheBuster = function() {
+        return Math.round(Math.random() * 1999083012);
+    };
+
+    _this.extend = function() {
+        var extended = {};
+
+        for(var index = 0; index < arguments.length; index++) {
+            var source = arguments[index];
+
+            for(var prop in source) {
+                if(Object.prototype.hasOwnProperty.call(source, prop))
+                    extended[prop] = source[prop];
+            }
+        }
+
+        return extended;
+    };
+
+    _this.toQueryString = function(obj, skipNull) {
+        return _this.objectToString(obj, "&", skipNull);
+    };
+
+    _this.toCookieString = function(obj, skipNull) {
+        return _this.objectToString(obj, "; ", skipNull);
+    };
+
+    _this.objectToString = function(obj, delimeter, skipNull) {
+        var result = "";
+
+        for(var prop in obj) {
+            if(Object.prototype.hasOwnProperty.call(obj, prop)) {
+                if(skipNull && !obj[prop]) continue;
+
+                if(result.length > 0) result += delimeter;
+                result += prop + "=" + encodeURIComponent(obj[prop]);
+            }
+        }
+
+        return result;
+    };
+
+    return {
+        log: _this.log,
+        event: _this.event,
+        user: _this.user,
+        order: _this.order,
+        cancel: _this.cancel,
+        cancelAll: _this.cancelAll,
+        generateUuid: _this.generateUuid
+    };
+})();
+
+
+
+Ntm.Main = function() {
+    var preview = false;
+    var id = 61754;
+
+    if(!Ntm.Helper.isValidSettings()) return;
+
+    Ntm.Preview.init(preview, id);
+    Ntm.Event.firePageLoaded();
+    Ntm.Event.init();
+}();

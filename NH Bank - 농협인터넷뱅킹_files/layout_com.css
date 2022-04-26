@@ -1,0 +1,798 @@
+@charset "utf-8";
+
+
+/* 황금돼지 2019디금고  이경민 20190917 수정 시작 */
+@font-face {
+   font-family: "Noto Sans KR";
+   font-style: normal;
+   font-weight: 300;
+   src: url(/content/font/NotoSansKR-Regular.eot);
+   src: url(/content/font/NotoSansKR-Regular.eot?#iefix) format('embedded-opentype'),
+		url(/content/font/NotoSansKR-Regular.woff2) format('woff2'),
+        url(/content/font/NotoSansKR-Regular.woff) format('woff'),
+        url(/content/font/NotoSansKR-Regular.otf) format('opentype');
+ }
+@font-face {
+   font-family: "Noto Sans KR";
+   font-style: normal;
+   font-weight: 500;
+   src: url(/content/font/NotoSansKR-Medium.eot);
+   src: url(/content/font/NotoSansKR-Medium.eot?#iefix) format('embedded-opentype'),
+		url(/content/font/NotoSansKR-Medium.woff2) format('woff2'),
+        url(/content/font/NotoSansKR-Medium.woff) format('woff'),
+        url(/content/font/NotoSansKR-Medium.otf) format('opentype');
+ }
+@font-face {
+   font-family: "Noto Sans KR";
+   font-style: normal;
+   font-weight: 600;
+   src: url(/content/font/NotoSansKR-Bold.eot);
+   src: url(/content/font/NotoSansKR-Bold.eot?#iefix) format('embedded-opentype'),
+		url(/content/font/NotoSansKR-Bold.woff2) format('woff2'),
+        url(/content/font/NotoSansKR-Bold.woff) format('woff'),
+        url(/content/font/NotoSansKR-Bold.otf) format('opentype');
+ }
+ 
+/* 황금돼지 2019디금고  이경민 20190917 수정 끝 */
+/* 황금돼지 2019디금고  이경민 20191028 추가 시작 */
+.pdt32 {padding-top:32px;}
+.pdt36 {padding-top:36px;}
+.pdt38 {padding-top: 38px;}
+/* 황금돼지 2019디금고  이경민 20191030 추가 시작 */
+.pdt39 {padding-top: 39px;}
+.pdt48 {padding-top:48px;}
+/* 황금돼지 2019디금고  이경민 20191030 추가 끝 */
+.pdt50 {padding-top:50px;}
+.pdt53 {padding-top:53px;}
+.pdt55 {padding-top:55px;}
+/* 황금돼지 2019디금고  이경민 20191030 추가 시작 */
+.pdt56 {padding-top:56px;}
+/* 황금돼지 2019디금고  이경민 20191030 추가 끝 */
+.pdt58 {padding-top:58px;}
+.pdt60 {padding-top:60px;}
+/* 황금돼지 2019디금고  이경민 20191030 추가 시작 */
+.pdb13 {padding-bottom:13px;}
+.pdb16 {padding-bottom:16px;}
+/* 황금돼지 2019디금고  이경민 20191030 추가 끝 */
+.pdb23 {padding-bottom:23px;}
+.pdb32 {padding-bottom:32px;}
+.pdb36 {padding-bottom:36px;}
+.pdb40 {padding-bottom:40px;}
+.pdb42 {padding-bottom:42px;}
+/* 황금돼지 2019디금고  이경민 20191030 추가 시작 */
+.pdb48 {padding-bottom:48px;}
+/* 황금돼지 2019디금고  이경민 20191030 추가 끝 */
+.pdb50 {padding-bottom:50px;}
+.pdb54 {padding-bottom:54px;}
+.pdb60 {padding-bottom:60px;}
+.mgt48 {margin-top:48px !important;}
+.mgt68 {margin-top:68px !important;}
+.mgb25 {margin-bottom:25px !important;}
+/* 황금돼지 2019디금고  이경민 20191028 추가 끝 */
+/* 로그아웃 팝업 */
+.pop_logout_wrap {position:fixed; left:50%; top:110PX; margin-left:-329px; z-index:1000; padding:45px 0 50px; width:658px; background:#ffffff;border:1px solid #807676; text-align:center;}
+.pop_logout_wrap .pop_header {font-weight:500; font-size:32px; line-height:34px; color:#111; font-family: 'Noto Sans KR',sans-serif;}
+.pop_logout_wrap .sub_txt {margin-top:54px;}
+.pop_logout_wrap .sub_txt p {font-size:14px; line-height:24px; color:#666; margin-bottom:9px;}
+.pop_logout_wrap .sub_txt .txt_time {color:#111; font-size:20px; line-height:32px; font-weight:300; font-family: 'Noto Sans KR',sans-serif;}
+.pop_logout_wrap .sub_txt .txt_time em {color:#046fd9; font-size:40px; font-weight:500; font-family: 'Noto Sans KR',sans-serif;}
+.pop_logout_wrap .sub_txt .txt_info {margin-bottom:29px;}
+.pop_logout_wrap .sub_txt .txt_extension {font-size:14px; line-height:24px; color:#666; margin-bottom:22px;}
+.pop_logout_wrap .sub_txt .txt_extension em {font-weight:bold;}
+.pop_logout_wrap .btn_login {margin:0 4px; text-decoration:none; text-align:center; display:inline-block; border:1px solid #046fd9;  background-color:#046fd9; width:222px; line-height:50px; font-size:14px; color:#fff}
+.pop_logout_wrap .btn_login span {display:inline-block; font-weight:bold; padding-left:20px; background: url("/images/IP/global/ico_btn_login.png") no-repeat 0 center;}
+.pop_logout_wrap .btn_logout {margin:0 4px; text-decoration:none; text-align:center; display:inline-block; border:1px solid #666; background-color:#fff; width:222px; line-height:50px; font-size:14px; color:#666}
+.pop_logout_wrap .btn_logout span {display:inline-block; font-weight:bold; padding-left:20px; background: url("/images/IP/global/ico_btn_logout.png") no-repeat 0 center;}
+.pop_logout_wrap .btn_close {position:absolute; right:19px; top:21px;}
+
+.product_iprecom{position:relative;background:#f0f2f6;border-top:solid 1px #ddd;margin-bottom:-50px;margin-top:50px;padding:38px 0 60px;}
+.product_iprecom> .pd_tit{font-size: 16px;}
+.pd_list{text-align:left;margin:50px 0 0 50px;}
+.pd_list li a{background:url("/images/IP/global/icon_logarrow.png") 230px center no-repeat #fff;border:solid 1px #666;line-height: 20px;display: block; padding-top:9px; padding-bottom:9px; width:236px;padding-left:20px;margin-bottom:10px;font-size:16px;font-family: 'Noto Sans KR',sans-serif;color:#111;}
+.pd_list li a span {padding-right:35px; display:block;}
+.product_iprecom>.recom_img{position:absolute;top:80px;right: 45px;}
+
+/* 헤더 */
+#wrapper {border-top:none !important;overflow:hidden;min-width:1228px;}/* 금융인증서 2021-03-18 수정 */
+#header_new {z-index:999;position:relative;margin:0 auto;}
+#header_new.no_gnb {border-bottom:1px solid #ddd;}
+#header_new.m_height217 {min-height:217px;}
+#header_new  .head_gnb h4 {display:none;}
+#header_new .header_top {width:980px; position: relative; z-index:1000; min-height:110px; margin:0 auto;}
+#header_new .head_gnb.on .mask {background-color: rgba(0,0,0,.3); position:fixed; width:100%; height:100%}
+#header_new .logo {overflow:hidden;}
+#header_new .logo h1 {float:left; margin-top:22px; .margin-top:13px;}
+#header_new .logo ul {overflow:hidden; float:left; margin-left:20px; margin-top:20px;}
+#header_new .logo ul li {float:left; width:66px; height:38px;}
+#header_new .logo ul li.ic {margin-left:-4px;}
+#header_new .logo ul li.card {margin-left:-5px;}
+#header_new .logo ul li span {width:66px; height:38px;}
+
+/* 2020-11-12 추가 */
+#header_new .logo ul li.ip > ul { background:url('/images/IH/common/btn_big_on.png') no-repeat; padding:0; margin:0; width:112px; height:30px; overflow:hidden;}
+#header_new .logo ul li.ip > ul.big { background:url('/images/IH/common/btn_big.png') no-repeat; padding:0; margin:0; width:112px; height:30px; overflow:hidden;}
+#header_new .logo ul li.ip > ul > li {float:left;width:56px; height:30px;}
+#header_new .logo ul li.ip > ul > li  a {text-align:center; width:56px; height:30px; padding-top:3px;font-family: 'Noto Sans KR',sans-serif; font-weight:500; color:#666; font-size:16px; margin:0; text-indent:0;}
+#header_new .logo ul li.ip > ul > li.off  a {color:#fff; }
+#header_new .logo ul li.ip > ul.big > li  a {color:#fff;}
+#header_new .logo ul li.ip > ul.big > li.off  a {color:#666;}
+#header_new .logo {overflow:hidden;}
+#header_new .logo h1 {float:left; margin-top:22px;}
+#header_new .logo ul {overflow:hidden; float:left; margin-left:20px; margin-top:20px;}
+#header_new .logo ul li {float:left; width:66px; height:38px;}
+#header_new .logo ul li.ic {margin-left:-4px;}
+#header_new .logo ul li.card {margin-left:-5px;}
+#header_new .logo ul li span {width:66px; height:38px;}
+#header_new .logo ul li a {display:block; text-align:center; margin-top:4px; margin-left:4px; line-height:23px; width:52px; font-size:16px; font-weight:500; color:#111;}
+#header_new .logo ul li a:hover {text-decoration:none;}
+#header_new .logo ul li.on span {display:inline-block; background: url('/images/IH/common/bg_ip.png') no-repeat 0 0;}
+#header_new .logo ul li.on a {color:#fff;}
+#header_new .logo ul li.ip {width:112px; height:30px; background:url('/images/IH/common/btn_big_on.png') no-repeat; margin-right:15px;}
+#header_new .logo ul li.ip.on span { background-image:none; width:115px; }
+#header_new .logo ul li.ip a {width:115px;text-indent:-9999px;}
+
+
+/* 황금돼지 2019디금고  이경민 20191010 수정 시작 */
+/*#header_new .logo ul li a {display:block; text-align:center; margin-top:4px; margin-left:4px; line-height:24px; width:52px; font-size:16px; color:#111; font-family: 'Noto Sans KR',sans-serif;}*/
+#header_new .logo ul li a {display:block; text-align:center; margin-top:4px; margin-left:4px; line-height:23px; width:52px; font-size:16px; color:#111; font-family: 'Noto Sans KR',sans-serif;}
+/* 황금돼지 2019디금고  이경민 20191010 수정 끝 */
+#header_new .logo ul li a:hover {text-decoration:none;}
+#header_new .logo ul li.on span {display:inline-block; background: url('/images/IP/global/bg_ip.png') no-repeat 0 0;}
+#header_new .logo ul li.on a {color:#fff;}
+#header_new #session_info_new {}
+#header_new #session_info_new .stit a {text-decoration:none; display:inline-block; float:left; font-weight:500; font-family: 'Noto Sans KR',sans-serif; color:#046fd9; font-size:20px; line-height:26px; margin-top:9px; margin-right:22px;}
+#header_new #session_info_new h4{display:none;}
+#header_new #session_info_new #header_logout {background:none;}
+#header_new #session_info_new #header_logout .member {margin-top:9px; float:left; display:inline-block; color:#555;font-size:16px;height:auto;line-height: 26px; font-weight:300; padding:0 5px 0 0px; font-family: 'Noto Sans KR',sans-serif;}
+#header_new #session_info_new #header_logout .member strong {color:#555; font-weight:500;}
+#header_new #session_info_new #header_logout .btn {float:left; }
+#header_new #session_info_new .session {display:inline-block;color:#046fd9;font-size:13px;height:auto;line-height:26px;padding:0 15px 0 25px;}
+#header_new #session_info_new #header_logout .my_nh {margin-top:9px;  float:left; padding-right:13px; font-size:16px; line-height:26px; font-weight:300; font-family: 'Noto Sans KR',sans-serif; color:#046fd9; background: url('/images/IP/global/bl_my_arrow.png') no-repeat 100% 9px; margin-right:25px;}
+#header_new #session_info_new #header_logout .session {background:none; min-width:90px; padding:0; color:#046fd9; font-family: 'Noto Sans KR',sans-serif;}
+#header_new #session_info_new .btn {display:inline-block; *display:inline; *zoom:1; margin-top:9px; overflow:hidden; border:1px solid #bbb; background-color:#f8f8f8;}
+#header_new #session_info_new .btn li {float:left;text-align:center;color:#555555;border-left:none; }
+#header_new #session_info_new .btn li a {color:#555555;font-size:14px; background:#f8f8f8; font-family: 'Noto Sans KR',sans-serif;}
+#header_new #session_info_new .btn li.time a span {display:inline-block; min-width:70px;height:auto;padding:0;border-left:none;line-height:26px;}
+#header_new #session_info_new .btn li.login a span {display:inline-block;min-width:49px;height:auto;padding:0;line-height:26px;padding:0 15px 0 15px;border-left:none; background: url('/images/IP/global/bl_login_bar.gif') no-repeat 0 center;}
+
+/* GNB */
+#header_new .gnb_list_lay {position: relative; border-top:1px solid #ddd; border-bottom: 1px solid #ddd; background-color: #fff;}
+#header_new .gnb_list_lay .gnb_box {width:980px; margin:0 auto;}
+/* 황금돼지 2019디금고  이경민 20191010 수정 시작 */
+/*#gnb_com {height:50px;}*/
+#gnb_com {height:50px; width: 1100px;}
+/* 황금돼지 2019디금고  이경민 20191010 수정 끝 */
+#gnb_com h4 {display:none;}
+#gnb_com > li {float:left; text-align:center; padding-right:88px; box-sizing:border-box; height:50px; line-height:50px;}
+/* 황금돼지 2019디금고  이경민 20191017 추가 시작 */
+#gnb_com > *:first-child + * + * + * + * + * + * {padding-right:0;}
+#gnb_com:hover > *:first-child + * + * + * + * + * + * {padding-right:0;}
+/* 황금돼지 2019디금고  이경민 20191017 추가 끝 */
+#gnb_com > li:last-child {padding-right:0 !important;}
+#gnb_com > li.no_pr {padding-right:0 !important;}
+#gnb_com > li:hover {padding-right:33px;}
+/* gnb 공인인증 */
+#gnb_com.gnb_certification > li {padding-right:183px;}
+#gnb_com.gnb_certification > li:hover {padding-right:128px;}
+/* 황금돼지 2019디금고  이경민 20191017 추가 시작 */
+#gnb_com.gnb_certification > *:first-child + * + * + * {padding-right:0;}
+#gnb_com.gnb_certification:hover > *:first-child + * + * + * {padding-right:0;}
+/* 황금돼지 2019디금고  이경민 20191017 추가 끝 */
+/* 금융인증서2021-03-18 추가 시작 */
+#gnb_com.gnb_certification5 > li {padding-right:105px;}
+#gnb_com.gnb_certification5 > li:hover {padding-right:50px;}
+#gnb_com.gnb_certification5 > *:first-child + * + * + * + * {padding-right:0;}
+#gnb_com.gnb_certification5:hover > *:first-child + * + * + * + * {padding-right:0;}
+/* 금융인증서2021-03-18 추가 끝 */
+/* gnb 주택도시기금 */
+#gnb_com.gnb_housing > li {padding-right:227px;}
+#gnb_com.gnb_housing > li:hover {padding-right:172px;}
+/* 황금돼지 2019디금고  이경민 20191017 추가 시작 */
+#gnb_com.gnb_housing > *:first-child + * + * + * {padding-right:0;}
+#gnb_com.gnb_housing:hover > *:first-child + * + * + * {padding-right:0;}
+/* 황금돼지 2019디금고  이경민 20191017 추가 끝 */
+/* gnb 고객센터 */
+#gnb_com.gnb_customer > li {padding-right:113px;}
+#gnb_com.gnb_customer > li:hover {padding-right:58px;}
+/* 황금돼지 2019디금고  이경민 20191017 추가 시작 */
+#gnb_com.gnb_customer > *:first-child + * + * + * + * {padding-right:0;}
+#gnb_com.gnb_customer:hover > *:first-child + * + * + * + * {padding-right:0;}
+/* 황금돼지 2019디금고  이경민 20191017 추가 끝 */
+/* gnb 보안센터 */
+#gnb_com.gnb_security > li {padding-right:86px;}
+#gnb_com.gnb_security > li:hover {padding-right:31px;}
+/* 황금돼지 2019디금고  이경민 20191017 추가 시작 */
+#gnb_com.gnb_security > *:first-child + * + * + * + * {padding-right:0;}
+#gnb_com.gnb_security:hover > *:first-child + * + * + * + * {padding-right:0;}
+/* 황금돼지 2019디금고  이경민 20191017 추가 끝 */
+/* gnb 외환 */
+#gnb_com.gnb_forex > li {padding-right:61px;}
+#gnb_com.gnb_forex > li:hover {padding-right:6px;}
+/* 황금돼지 2019디금고  이경민 20191021 추가 시작 */
+#gnb_com.gnb_forex:hover > *:first-child + * + * + * + * + * + *:hover {padding-right:6px !important;}
+#gnb_com.gnb_forex:hover > *:first-child + * + * + * + * + * + * {padding-right:61px !important;}
+#gnb_com.gnb_forex > *:first-child + * + * + * + * + * + * + * {padding-right:0;}
+#gnb_com.gnb_forex:hover > *:first-child + * + * + * + * + * + * + * {padding-right:0;}
+/* 황금돼지 2019디금고  이경민 20191021 추가 끝 */
+#gnb_com .w_auto {width:auto;}
+#gnb_com .mgr70 {margin-right:70px;}
+#gnb_com > li.on > a,#gnb_com > li:focus > a  {display:block; text-decoration:none; height:50px; border:none; background:none; left:0; top:0;}
+#gnb_com > li:hover > a  {display:block; text-decoration:none; height:70px; border:none; left:-24px; top:12px; background: url('/images/IP/global/bg_gnb_l.png') no-repeat 0 0; padding-left:24px;}
+/* 황금돼지 2019디금고  이경민 20190919 수정 시작 */
+/*#gnb_com > li.on > a > span,#gnb_com > li:focus > a > span {display:block; position:relative; z-index: 100; height:50px; line-height:50px; color:#046fd9 !important; background:none;}*/
+#gnb_com > li.on > a > span,#gnb_com > li.focus_on > a > span,#gnb_com > li:focus > a > span {display:block; position:relative; z-index: 100; height:50px; line-height:50px; color:#046fd9 !important; background:none;}
+/* 황금돼지 2019디금고  이경민 20190919 수정 끝 */
+#gnb_com > li:hover > a > span {display:block; position:relative; z-index: 100; height:70px; line-height:65px; color:#fff !important; background: url('/images/IP/global/bg_gnb_r.png') no-repeat 100% 0; padding-right:31px;}
+#gnb_com > li > a {position:relative; left:0; top:0; z-index:100; display:inline-block; text-decoration:none; color:#111; line-height:50px; font-weight:300; text-align:center;font-size:17px; letter-spacing:-1px; *letter-spacing:-2px; font-family: 'Noto Sans KR',sans-serif;}
+#gnb_com .gnb_inner.on {display:block;}
+#gnb_com > li.on .gnb_inner,#gnb_com > li:hover .gnb_inner {left:0;}
+#gnb_com .gnb_inner{display:none; position:absolute; top:51px; left:0; right:0; z-index:10; background: url('/images/IP/global/bg_gnb_sub.png') repeat-x center 100%; width:100%;  padding-bottom:59px !important; }
+/* 황금돼지 2019디금고  이경민 20191008 수정 시작 */
+#gnb_com .gnb_inner .gnb_inner_bg{background-color:#fff;}
+#gnb_com .gnb_inner .gnb_inner_box{position:relative;width:1080px; padding-bottom:22px;border:none;margin:0 auto;overflow:hidden;position:relative;background-color:#fff;padding-right:0;text-align:left;}
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay{min-height:inherit;padding:30px 50px 0;}
+/* 황금돼지 2019디금고  이경민 20191008 수정 끝 */
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list{width:100%;min-height:inherit;}
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list:hover{background:none;}
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group {overflow:hidden;width:100%; padding-bottom:20px;}
+/* 황금돼지 2019디금고  이경민 20190917 수정 시작 */
+/*#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li{float:left; width:165px;min-height:40px; padding:0 30px 0 0;}*/
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li{float:left; width:20%;min-height:40px;}
+/* 황금돼지 2019디금고  이경민 20191008 수정 시작 */
+/* #gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > a{display:block; margin-bottom:13px; font-size:17px; line-height:36px; font-weight:300;color:#111;letter-spacing:-1px; text-decoration:none; font-family: 'Noto Sans KR',sans-serif;} */
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > a{display:block; margin-bottom:5px; font-size:16px; line-height:36px; font-weight:600;color:#111;letter-spacing:-1px; text-decoration:none; font-family: 'Noto Sans KR',sans-serif;}
+/* 황금돼지 2019디금고  이경민 20191008 수정 끝 */
+/* 황금돼지 2019디금고  이경민 20190917 수정 끝 */
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > a.active,
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > a:hover,
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > a:active,
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > a:focus{color:#111;}
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul{}
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li.lst{width:154px;border-right:none;}
+/* 황금돼지 2019디금고  이경민 20191008 수정 시작 */
+/*#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul li{margin-bottom:9px; line-height:24px; }*/
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul li{margin-bottom:7px; line-height:24px; }
+/* 황금돼지 2019디금고  이경민 20191008 수정 끝 */
+/* 황금돼지 2019디금고  이경민 20190919 수정 시작 */
+/*#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul li a{display:block; font-size:14px; line-height:18px;color:#555; font-weight:300; font-family: 'Noto Sans KR',sans-serif; text-decoration:none;} */
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul li a{display:block; padding-right:13%; font-size:14px; line-height:18px;color:#555; font-weight:300; font-family: 'Noto Sans KR',sans-serif; text-decoration:none;}
+/* 황금돼지 2019디금고  이경민 20190919 수정 끝 */
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul li.active a, 
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul li a:hover, 
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul li a:active,
+#gnb_com .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul li a:focus{color:#046fd9; text-decoration:none;}
+.gnb_close {text-indent:-9999px; width:1px; height:1px; position: absolute; top: 10px; right: 10px; z-index: 20; }
+
+
+
+/* 유틸메뉴 */
+
+#utilmenu_new {z-index:300;position:absolute;right:0;top:19px;}
+
+#utilmenu_new h4 {display:none;}
+#utilmenu_new .ico_setup {float:left;position:relative;width:23px; height:24px; padding-top:5px; margin-left:20px;}
+
+#utilmenu_new .ico_search {float:left;position:relative;width:23px; height:24px; padding-top:5px; margin-left:20px;}
+
+#utilmenu_new .ico_search .btn_search_close {display:none; position:absolute; right:-15px; top:-8px;}
+
+#utilmenu_new ul.ico_favorit {float:left;}
+
+#utilmenu_new ul.ico_favorit li{position:relative;float:left;margin-left:8px;}
+
+/* 황금돼지 2019디금고  이경민 20191021 수정 시작 */
+
+/*#utilmenu_new ul.ico_favorit li.fav { padding-top:4px; float:left; position:relative; margin:0;}*/
+
+#utilmenu_new ul.ico_favorit li.fav { padding-top:5px; float:left; position:relative; margin:0;}
+
+/*#utilmenu_new ul li a{display:block;height:19px;padding:6px 0 0 26px;line-height:1.17;color:#4b4e5a;}*/
+
+#utilmenu_new ul li a{display:block;height:19px;padding:6px 0 0 0;line-height:1.17;color:#4b4e5a;}
+
+/*#utilmenu_new ul.ico_favorit li.fav a.tog_list{text-indent:-9999px; font-size:0; line-height:0; background:url('/images/IP/global/ico_favorite_off.gif') no-repeat 0 0;}*/
+
+#utilmenu_new ul.ico_favorit li.fav a.tog_list{text-indent:-9999px; width:24px; height:23px; line-height:0; background:url('/images/IP/global/ico_favorite_off.gif') no-repeat 0 0;}
+
+/* 황금돼지 2019디금고  이경민 20191021 수정 끝 */
+#utilmenu_new ul.ico_favorit li.fav a.tog_list.on{text-decoration:none; background:url('/images/IP/global/ico_favorite_on.gif') no-repeat 0 0;}
+#utilmenu_new ul.ico_favorit li.fav .pre_fav_box {display:none; position:absolute;right:-10px;top:0px; height:39px; width:221px;padding-bottom:15px; background:url('/images/IP/global/bg_pre_fav.png') no-repeat 0 0;}
+#utilmenu_new ul.ico_favorit li.fav .no_login_fav {display:block !important; background:none !important;}
+#utilmenu_new ul.ico_favorit li.fav .no_login_fav .pre_fav_box .txt_pre_login {color:#fff; font-size:14px; line-height:32px; margin-top:7px; padding-left:16px; font-weight:300; font-family: 'Noto Sans KR',sans-serif;}
+#utilmenu_new ul.ico_favorit li.fav .no_login_fav .pre_fav_box .btn_pre_close {position:absolute;right:21px;top:14px;width:21px;height:21px;padding:0;text-indent:-9999px;background:url('/images/IP/global/btn_close_flist.png') no-repeat 50% 50%;}
+#utilmenu_new ul.ico_favorit li.fav .f_list {position:absolute;right:-44px;top:30px;}
+#utilmenu_new ul.ico_favorit li.fav .f_list .f_top {display:none;width:221px;padding-bottom:15px;background:url('/images/IP/global/bg_flist_bottom_new.png') no-repeat 0 100%;}
+#utilmenu_new ul.ico_favorit li.fav .f_list .f_bottom {padding:11px 16px 17px;background:url('/images/IP/global/bg_flist_top_new.png') no-repeat 0 0;}
+#utilmenu_new ul.ico_favorit li.fav .white_top {background:url('/images/IP/global/bg_white_bottom_new.png') repeat-x 0 100%; padding-bottom:9px;}
+#utilmenu_new ul.ico_favorit li.fav .white_top .white_bottom {background:url('/images/IP/global/bg_white_top_new.png') repeat-x 0 0;}
+#utilmenu_new ul.ico_favorit li.fav .f_list .no_data {color:#fff; font-size:14px; line-height:24px; text-align:left !important; font-weight:300; font-family: 'Noto Sans KR',sans-serif; margin-top:12px;}
+#utilmenu_new ul.ico_favorit li.fav .f_list ul{float:none;overflow:hidden; margin-top:30px; padding-top:9px; }
+#utilmenu_new ul.ico_favorit li.fav .f_list ul li{width:100%;margin:0;padding:0;}
+#utilmenu_new ul.ico_favorit li.fav .f_list ul li a{display:block; text-decoration:none; color:#222; height:auto; font-size:16px; line-height:26px; padding:0; font-weight:500; padding-left:16px; letter-spacing:-1px; font-family: 'Noto Sans KR',sans-serif;}
+#utilmenu_new ul.ico_favorit li.fav .f_list .set{display:block;width:221px; text-decoration:none; text-align:center; color:#fff; height:20px;margin:0 auto; font-size:16px; font-weight:500; font-family: 'Noto Sans KR',sans-serif; padding:9px 0 0 0;line-height:24px;letter-spacing:-.5px;background:none;}
+#utilmenu_new ul.ico_favorit li.fav .f_list .close{position:absolute;right:7px;top:14px;width:21px;height:21px;padding:0;text-indent:-9999px;background:url('/images/IP/global/btn_close_flist.png') no-repeat 50% 50%;}
+/* 2020-02-26 변경 START*/
+#utilmenu_new .global_menu {float:left; position:relative;margin-right:24px;width:159px;height:32px;border:1px solid #bbb; z-index:30;}
+#utilmenu_new .global_menu .global_menu_btn{display:block;width:119px;font-size:13px;color:#3b4147;cursor: pointer;padding:8px 0px 8px 20px; font-weight:300; font-family: 'Noto Sans KR',sans-serif; background:#f8f8f8 url('/images/IP/global/ico_sel_arrow.gif') no-repeat 130px 15px;padding-right:20px;text-decoration: none;}
+#utilmenu_new .global_menu.active .global_menu_btn {background:#f8f8f8 url('/images/IP/global/ico_sel_arrow_up.gif') no-repeat 130px 15px;}
+#utilmenu_new .global_menu ul{display:none;width:139px;overflow: hidden;position: absolute;left:-1px;top:32px;z-index: 100;border:1px solid #bfbfbf;background: #ffffff; padding:20px 10px;}
+#utilmenu_new .global_menu ul .title {font-family: 'Noto Sans KR',sans-serif; color: #3b4147; font-size: 13px; padding:14px 0 5px 10px;}
+#utilmenu_new .global_menu ul .titleglobal a {font-family: 'Noto Sans KR',sans-serif; color: #046fd9; font-size: 13px; padding:13px 0 5px 10px !important; background:url("/images/CN/main_e_new/icon_arrow.png") no-repeat 95% 65%;}
+#utilmenu_new .global_menu ul .titleNHBank a{font-family: 'Noto Sans KR',sans-serif; color: #3b4147; font-size: 13px; padding:13px 0 0 10px !important; background:url("/images/CN/main_e_new/icon_arrow.png") no-repeat 95% 79%;}
+#utilmenu_new .global_menu ul li {float:none; font-weight:300;}
+#utilmenu_new .global_menu ul li a {padding:0px !important; line-height:22px !important; font-weight:300; padding-left:27px !important; height:auto !important; font-family: 'Noto Sans KR',sans-serif;}
+#utilmenu_new .global_menu ul li a:hover {text-decoration: underline;}
+#utilmenu_new .global_menu ul li a.dotum_font {font-family: '돋움',Dotum,Helvetica,AppleGothic,sans-serif;}
+#utilmenu_new .global_menu ul li.country_01 a { background:url("/images/CN/main_e_new/icon_usa.png") no-repeat 0 50%;}
+#utilmenu_new .global_menu ul li.country_02 a {background:url("/images/CN/main_e_new/icon_japan.png") no-repeat 0 50%;}
+#utilmenu_new .global_menu ul li.country_03 a {background:url("/images/CN/main_e_new/icon_china.png") no-repeat 0 50%;}
+#utilmenu_new .global_menu ul li.country_04 a {background:url("/images/CN/main_e_new/icon_vietnam.png") no-repeat 0 50%;}
+#utilmenu_new .global_menu ul li.country_05 a {background:url("/images/CN/main_e_new/icon_th.png") no-repeat 0 50%;}
+#utilmenu_new .global_menu ul li.country_06 a {background:url("/images/CN/main_e_new/icon_indonesia.png") no-repeat 0 50%;}
+#utilmenu_new .global_menu ul li.country_07 a {background:url("/images/CN/main_e_new/icon_poccnr.png") no-repeat 0 50%;}
+#utilmenu_new .global_menu ul li.country_08 a {background:url("/images/CN/main_e_new/icon_mohron.png") no-repeat 0 50%;}
+#utilmenu_new .global_menu ul li.country_09 a {background:url("/images/CN/main_e_new/icon_cambodia.png") no-repeat 0 50%;}
+#utilmenu_new .global_menu ul li.country_10 a {background:none; padding-left:0 !important;}
+#utilmenu_new .global_menu ul li.country_11 a {background:url("/images/CN/main_e_new/icon_hanoi.png") no-repeat 0 50%;}
+#utilmenu_new .global_menu ul li.country_12 a {background:none; padding-left:4px !important;}
+#utilmenu_new .global_menu ul [class*="country_"] {padding-left:10px;}
+#utilmenu_new .global_menu ul li.border{border-top:1px solid #ededed;}
+/* 2020-02-26 변경 END*/
+#globalmenu_new {overflow:hidden; position:absolute; top:71px;right:0;z-index:20;}
+#globalmenu_new h4{display:none;}
+#globalmenu_new ul li{float:left;}
+#globalmenu_new ul li a {font-size:16px; line-height:20px; margin-left:15px; font-weight:300; color:#666; font-family: 'Noto Sans KR',sans-serif;}
+#globalmenu_new ul li.on a {color:#046fd9;}
+#globalmenu_new ul li:hover a {text-decoration:none; color:#046fd9;}
+#globalmenu_new ul li a strong {font-weight:600;}
+.search_box_area.on {display:block; border-top: 1px solid #ddd; height:280px; padding-bottom: 59px; background:url("/images/IP/global/bg_gnb_sub.png") repeat-x center 100%;}
+.search_box_area.on .mask {background-color: rgba(0,0,0,.3); position:fixed; width:100%;height: 100%; margin-top: 53px;}
+/* 황금돼지 2019디금고  이경민 20190925 수정 시작 */
+.search_box_area.fixed {top:0;}
+.search_box_area.fixed .mask {margin-top: 0;}
+/* 황금돼지 2019디금고  이경민 20190925 수정 끝 */
+.search_box_area {position:absolute; width:100%; min-width:1024px; top:65px; margin:0 auto; z-index:100000; display:none;}
+/* 황금돼지 2019디금고  이경민 20191010 수정 시작 */
+/*.search_box_area .btn_search_close {position:absolute; width:54px; left:50%; margin-left:453px; top:0; z-index:100;}*/
+.search_box_area .btn_search_close {position:absolute; width:54px; left:50%; margin-left:453px; top:-53px; z-index:100;}
+/* 황금돼지 2019디금고  이경민 20191010 수정 끝 */
+.search_box_area .search_inner_bg { width:100%; position:absolute; top:0; height:280px; background: #fff ;}
+.search_box_area .search_inner_box {width:980px; margin:0 auto;}
+#search_new {position:relative; width:680px; margin:60px auto 0;}
+#search_new .input_box {width:603px; border:1px solid #bbb; padding-right:60px;}
+#search_new input[type="text"] { border:none; padding-left:58px; width:603px; box-sizing:border-box; height:55px; .height:52px; font-family: 'Noto Sans KR',sans-serif; font-weight:300; color:#888; font-size:18px; line-height:56px; line-height:50px\9; background:#f8f8f8 url('/images/IP/global/ico_search.png') no-repeat 20px 17px; }
+#search_new .image {position:absolute; right:-20px; top:-4px; border:none; line-height:0; width:101px; background-color:none;}
+#search_new .search_select_box {overflow:hidden; margin-top:20px;}
+/* 황금돼지 2019디금고  이경민 20191021 수정 시작 */
+/*#search_new .search_select_box dt {float:left; margin-right:40px; .margin-right:26;}*/
+#search_new .search_select_box dt {float:left; margin-right:40px; .margin-right:26;}
+/* 황금돼지 2019디금고  이경민 20191021 수정 끝 */
+#search_new .search_select_box dt {letter-spacing: -2px; font-weight:600; color:#111; font-size:24px; line-height:38px; font-family: 'Noto Sans KR',sans-serif;}
+#search_new .search_select_box dd {float:left; width:520px; .width:540px;}
+#search_new .search_select_box dd ul {overflow:hidden;}
+/* 황금돼지 2019디금고  이경민 20191021 수정 시작 */
+/*#search_new .search_select_box dd ul li {float:left; margin-right:40px; .margin-right:35px;}*/
+#search_new .search_select_box dd ul li {float:left; margin-right:40px;}
+/* 황금돼지 2019디금고  이경민 20191021 수정 끝 */
+#search_new .search_select_box dd ul li.blue a {font-weight:500; color:#046fd9;}
+#search_new .search_select_box dd ul li a {letter-spacing: -.5px; .letter-spacing:-1px; font-size:16px; line-height:32px; color:#555; font-weight:300; font-family: 'Noto Sans KR',sans-serif;}
+
+
+/*전체메뉴*/
+.all_menu_wrap {text-indent:-9999px; font-size:0; height:0;}
+/* 황금돼지 2019디금고  이경민 20191010 수정 시작 */
+/*.all_menu_wrap .all_m {position:absolute; width:23px; height:19px; margin-left: 466px; left:50%; top:15px; background: url('/images/IP/global/bg_all_menu.png') no-repeat 0 0;}*/
+.all_menu_wrap .all_m {position:absolute; width:23px; height:19px; margin-left: 466px; left:50%; top:16px; background: url('/images/IP/global/bg_all_menu.png') no-repeat 0 0;}
+/* 황금돼지 2019디금고  이경민 20191010 수정 끝 */
+.pop_all_menu {display:none;}
+.pop_all_menu.on {display:block;}
+.pop_all_menu.on .mask {background-color: rgba(0,0,0,.3); position:fixed; top:65px; width:100%; height:100%; z-index: 1000;}
+.all_menu_layer {height:781px; border-top:1px solid #ddd; position:absolute; top:65px; left:0; right:0; z-index:1000; background: url('/images/IP/global/bg_gnb_sub.png') repeat-x center 100%; width:100%;  padding-bottom:59px !important;}
+.all_menu_layer .all_menu_cont {width:100%; background-color:#fff; padding-top:40px;}
+.all_menu_layer .all_menu_cont .all_menu_list {height:55px; width:980px; margin:0 auto; background:url("/images/IP/global/bg_tab_list.gif") repeat-x 0 100%;}
+.all_menu_layer .all_menu_cont .all_menu_list > li {float:left;}
+/* 황금돼지 2019디금고  이경민 20191008 수정 시작 */
+/*.all_menu_layer .all_menu_cont .all_menu_list > li > a {background-color: #fff; display:block; color:#111; text-decoration:none; box-sizing:border-box; font-size:20px; line-height:54px; font-weight:300; font-family: 'Noto Sans KR',sans-serif;}*/
+.all_menu_layer .all_menu_cont .all_menu_list > li > a {background-color: #fff; display:block; color:#111; text-decoration:none; box-sizing:border-box; font-size:18px; line-height:54px; font-weight:300; font-family: 'Noto Sans KR',sans-serif;}
+/* 황금돼지 2019디금고  이경민 20191008 수정 끝 */
+.all_menu_layer .all_menu_cont .all_menu_list > li:hover > a {color:#046fd9;}
+.all_menu_layer .all_menu_cont .all_menu_list > li.on > a {color:#046fd9; border-top:1px solid #bbb; border-left:1px solid #bbb; border-right:1px solid #bbb;}
+/* 황금돼지 2019디금고  이경민 20191008 수정 시작 */
+/*
+.all_menu_layer .all_menu_cont .all_menu_list > li.all_tab_01 > a {padding-left:50px; padding-right:50px;}
+.all_menu_layer .all_menu_cont .all_menu_list > li.all_tab_02 > a {padding-left:24px; padding-right:24px;}
+.all_menu_layer .all_menu_cont .all_menu_list > li.all_tab_03 > a {padding-left:45px; padding-right:45px;}
+.all_menu_layer .all_menu_cont .all_menu_list > li.all_tab_04 > a {padding-left:50px; padding-right:50px;}
+.all_menu_layer .all_menu_cont .all_menu_list > li.all_tab_05 > a {padding-left:35px; padding-right:35px;}
+.all_menu_layer .all_menu_cont .all_menu_list > li.all_tab_06 > a {padding-left:35px; padding-right:35px;}
+*/
+.all_menu_layer .all_menu_cont .all_menu_list > li > a {padding-left:30px; padding-right:30px;}
+/* 황금돼지 2019디금고  이경민 20191008 수정 끝 */
+.all_menu_layer .all_menu_cont .all_menu_list > li.on .d1_inr {display:block;}
+.all_menu_layer .all_menu_cont .all_menu_list > li .d1_inr {display:none; background-color:#fff; position:absolute; left:0; right:0; top:95px;}
+/* 황금돼지 2019디금고  이경민 20190920 수정 시작 */
+/*.all_menu_layer .all_menu_cont .all_menu_list > li .d1_inr .stit a {display:block; text-decoration:none; margin-top:30px; color:#046fd9; font-size:26px; line-height:28px; font-weight:300; font-family: 'Noto Sans KR',sans-serif;} */
+.all_menu_layer .all_menu_cont .all_menu_list > li .d1_inr .stit a {display:block; text-decoration:none; color:#046fd9; font-size:20px; line-height:24px; font-weight:600; font-family: 'Noto Sans KR',sans-serif;}
+/* 황금돼지 2019디금고  이경민 20190920 수정 끝 */
+.all_menu_layer .btn_all_menu_close {position:absolute; width:53px; height:54px; left:50%; top:41px; margin-left:437px;}
+/* 황금돼지 2019디금고  이경민 20190920 수정 시작 */
+.scroll_wrap {height:686px; position:relative; overflow-y:auto; overflow-x:hidden; width:980px; margin:0 auto;}
+.scroll_wrap {height:686px; position:relative; overflow-y:auto; overflow-x:hidden; width:980px; margin:0 auto; padding-top:49px;}
+/* 황금돼지 2019디금고  이경민 20190920 수정 끝 */
+/* 황금돼지 2019디금고  이경민 20190920 수정 시작 */
+/*.d1_inr .gnb_inner .gnb_inner_bg{background-color:#fff; padding-top:15px !important;}*/
+.d1_inr .gnb_inner .gnb_inner_bg{background-color:#fff; padding-top:23px !important; padding-bottom:20px;}
+/* 황금돼지 2019디금고  이경민 20190920 수정 끝 */
+/* 황금돼지 2019디금고  이경민 20190920 수정 시작 */
+/* .d1_inr .gnb_inner .gnb_inner_box{position:relative;width:980px; padding-bottom:22px;border:none;margin:0 auto;overflow:hidden;position:relative;background-color:#fff;padding-right:0;text-align:left;} */
+.d1_inr .gnb_inner .gnb_inner_box{position:relative;width:980px; border:none;margin:0 auto;overflow:hidden;position:relative;background-color:#fff;padding-right:0;text-align:left;}
+/* 황금돼지 2019디금고  이경민 20190920 수정 끝 */
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay{width:100%;min-height:inherit;padding: 0;}
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list{width:100%;min-height:inherit;}
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list:hover{background:none;}
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group {overflow:hidden;width:100%; padding-bottom:20px;}
+/* 황금돼지 2019디금고  이경민 20190919 수정 시작 */
+/*.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li{float:left; width:165px;min-height:40px; padding:0 30px 0 0;}
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > a{display:block; margin-bottom:11px; font-size:17px; line-height:36px; font-weight:300;color:#111;letter-spacing:-1px; text-decoration:none; font-family: 'Noto Sans KR',sans-serif;} */
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li{float:left; width:20%;min-height:40px; padding:0;}
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > a{display:block; margin-bottom:19px; font-size:16px; line-height:22px; font-weight:600;color:#111;letter-spacing:-1px; text-decoration:none; font-family: 'Noto Sans KR',sans-serif;}
+/* 황금돼지 2019디금고  이경민 20190919 수정 끝 */
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > a.active,
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > a:hover,
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > a:active,
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > a:focus{color:#111;}
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul{}
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li.lst{width:154px;border-right:none;}
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul li{margin-bottom:10px; line-height:24px; }
+/* 황금돼지 2019디금고  이경민 20190919 수정 시작 */
+/*.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul li a{display:block; font-size:14px; line-height:18px;color:#666; font-weight:300; font-family: 'Noto Sans KR',sans-serif; text-decoration:none;}*/
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul li a{display:block; font-size:14px; line-height:18px;color:#666; font-weight:300; font-family: 'Noto Sans KR',sans-serif; text-decoration:none; padding-right:13%;}
+/* 황금돼지 2019디금고  이경민 20190919 수정 끝 */
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul li.active a, 
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul li a:hover, 
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul li a:active,
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li > ul li a:focus{color:#046fd9; text-decoration:none;}
+/* 황금돼지 2019디금고  이경민 20190925 수정 시작 */
+.half_sec_wrap {overflow:hidden;}
+.half_sec_wrap .half_sec {float:left; width:50%;}
+.half_sec_wrap .half_sec .gnb_inner_box {width:auto;}
+.half_sec_wrap .half_sec .gnb_inner_box .gnb_inner_lay {width:auto;}
+.half_sec_wrap .half_sec .gnb_inner_box .gnb_inner_lay .gnb_inner_list {width:auto;}
+.half_sec_wrap .half_sec .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group {width:auto;}
+/* 황금돼지 2019디금고  이경민 20190925 수정 끝 */
+
+#footer {border-top:1px solid #ddd;}
+#footer .footer_list_wrap {border-bottom:1px solid #ddd;}
+#footer .footer_list {overflow:hidden; width:980px; margin:0 auto;}
+/* 황금돼지 2019디금고  이경민 20191029 수정 시작 */
+/* #footer .footer_list li {float:left; margin-right:108px; } */
+#footer .footer_list li {float:left; margin-right:98px; margin-right:90px \0/IE9; *margin-right:94px;}
+/* 황금돼지 2019디금고  이경민 20191029 수정 끝 */
+#footer .footer_list li.mr0 {margin-right:0;}
+#footer .footer_list li a {display:block; line-height:64px; font-size:14px; *letter-spacing:-1px; font-weight:300; color:#333; font-family: 'Noto Sans KR',sans-serif;}
+#footer .inner{width:980px; margin:0 auto; position:relative; padding-top:37px; padding-bottom:40px;}
+#footer .footermenu{ height:16px;}
+#footer .footermenu li{float:left; margin-right:20px;}
+/* 황금돼지 2019디금고  이경민 20191028 수정 시작 */
+/*#footer .footermenu li a{display:block; font-size:14px; font-weight:300; color:#555; font-family: 'Noto Sans KR',sans-serif; letter-spacing:-.5px;}*/
+#footer .footermenu li a{display:block; font-size:13px; font-weight:300; color:#555; font-family: 'Noto Sans KR',sans-serif; letter-spacing:-1px;}
+/* 황금돼지 2019디금고  이경민 20191028 수정 끝 */
+#footer .footermenu li:first-child a{margin-left:0;padding-left:0;background:none;}
+#footer .footermenu li .sns_list {position:absolute; right:164px; top:32px; overflow:hidden;}/*한별 201121 수정*/
+#footer .footermenu li .sns_list li {float:left; margin-right:10px;}
+#footer .banner_wa {position:absolute; right:0; top:86px;}
+address {margin-top:27px; font-size:12px; line-height:23px; font-weight:300; font-family: 'Noto Sans KR',sans-serif;}
+address em{width:16px; display:inline-block;}
+#familymenu {position:absolute; right:0; top:27px;}
+#familymenu h4 {display:none;}
+#familymenu .family_menu {float:left; position:relative; width:162px;height:32px;border:1px solid #bbb; z-index:30;}
+#familymenu .family_menu .btn_family_menu {display:block; font-size:14px;color:#555;cursor: pointer;padding:8px 0px 8px 10px; font-weight:300; font-family: 'Noto Sans KR',sans-serif; background:#f8f8f8 url('/images/IP/global/ico_sel_arrow.gif') no-repeat 140px 15px;padding-right:39px;text-decoration: none;}
+#familymenu .family_menu.active .btn_family_menu {background:#f8f8f8 url('/images/IP/global/ico_sel_arrow_up.gif') no-repeat 140px 15px;}
+/* 황금돼지 2019디금고  이경민 20191008 수정 시작 */
+#familymenu .family_menu ul{display:none;width:152px;overflow: hidden;position: absolute;left:-1px;bottom:32px;z-index: 100;border:1px solid #bfbfbf;background: #ffffff; padding:10px 0 10px 10px;}
+/* 황금돼지 2019디금고  이경민 20191008 수정 끝 */
+#familymenu .family_menu ul li {float:none; margin-right:0;}
+#familymenu .family_menu ul li a {line-height:22px !important; font-size:14px;color:#555; font-weight:300; font-family: 'Noto Sans KR',sans-serif;}
+
+/* 황금돼지 2019디금고  이경민 20191021 수정 시작 */
+/*.quick_ban {position:fixed; z-index: 100; top:217px; right:100px; padding-bottom:42px; background: url('/images/IP/global/bg_quick_bottom.png') no-repeat 0 100%;}*/
+.quick_ban {position:fixed; z-index: 100; top:217px; right:100px; padding-bottom:40px; background: url('/images/IP/global/bg_quick_bottom.png') no-repeat 0 100%;}
+/*.quick_ban ul {overflow:hidden; width:124px; padding-top:13px; background: url('/images/IP/global/bg_quick_top.png') no-repeat 0 0;}*/
+.quick_ban ul {overflow:hidden; width:124px; padding-top:10px; background: url('/images/IP/global/bg_quick_top.png') no-repeat 0 0;}
+/* 황금돼지 2019디금고  이경민 20191021 수정 끝 */
+.quick_ban ul li {padding-left:32px; padding-right:32px;}
+.quick_ban ul li a {display:block; text-decoration:none; letter-spacing:-1px; padding-top:10px; padding-bottom:9px; text-align:center; color:#111; font-size:14px; line-height:20px; border-bottom:1px solid #e7e7e7; font-weight:500; font-family: 'Noto Sans KR',sans-serif;}
+.quick_ban ul li.quick_customer {padding-left:18px; padding-right:18px;}
+/* 황금돼지 2019디금고  이경민 20191021 수정 시작 */
+/*.quick_ban ul li.quick_customer a {padding:0; border-bottom:none;}
+.quick_ban ul li dl { text-align:center;  font-size:14px;  font-weight:500; font-family: 'Noto Sans KR',sans-serif;}
+.quick_ban ul li dl dt {margin-top:16px; color:#111;}
+.quick_ban ul li dl dd {margin-top:7px; color:#009aca;}*/
+/* 황금돼지 2019디금고  이경민 20191031 수정 시작 */
+/*.quick_ban ul li.quick_customer a {border-bottom:none; padding-bottom:0;}*/
+.quick_ban ul li.quick_customer a {border-bottom:none; padding-bottom:0; overflow:hidden;}
+/* 황금돼지 2019디금고  이경민 20191031 수정 끝 */
+.quick_ban ul li dl { text-align:center;  font-size:14px;  font-weight:500; font-family: 'Noto Sans KR',sans-serif;}
+/* 황금돼지 2019디금고  이경민 20191031 수정 시작 */
+/*.quick_ban ul li dl dt {color:#111;}
+.quick_ban ul li dl dd {margin-top:3px; color:#009aca;}*/
+.quick_ban ul li dl dt {color:#111; font-size:14px; line-height:16px; overflow:hidden;}
+.quick_ban ul li dl dd {margin-top:3px; color:#009aca; }
+.quick_ban ul li dl dd span {font-size:14px; line-height:16px;}
+/* 황금돼지 2019디금고  이경민 20191031 수정 끝 */
+/* 황금돼지 2019디금고  이경민 20191021 수정 끝 */
+.quick_ban ul li dl dd span {display:block; margin-top:4px;}
+.quick_menu {display:none; position:fixed; z-index: 100; top:418px; right:100px; text-align:center;}
+.quick_menu .quick_scroll_top {margin-bottom:21px;}
+.quick_menu .btn_quick {position:relative; left:8px; width:124px; height:124px;background: url('/images/IP/global/bg_quick_menu.png') no-repeat 0 0;}
+/* 황금돼지 2019디금고  이경민 20191028 수정 시작 */
+/*.quick_menu .btn_quick a {color:#111; display:block; text-decoration:none; text-align:left; padding:49px 40px 30px 30px; font-size:14px; line-height:20px; font-weight:500; font-family: 'Noto Sans KR',sans-serif;}*/
+.quick_menu .btn_quick a {color:#111; display:block; text-decoration:none; text-align:left; padding:49px 20px 30px 30px; font-size:14px; line-height:20px; font-weight:500; font-family: 'Noto Sans KR',sans-serif; letter-spacing: -1px \0/IE9;}
+/* 황금돼지 2019디금고  이경민 20191028 수정 끝 */
+@media only screen and (max-width:1300px) {
+	.quick_menu {right:0;}
+	.quick_ban {right:0;}
+	#container.main_prev .sec_01 .bx-controls-direction {display:none;}
+}
+@media only screen and (max-width:1200px) {
+	.quick_menu {display:none !important;}
+	.quick_ban {display:none !important;}
+}
+@media only screen and (min-width:1201px) {
+	.quick_ban {display:block;}
+}
+@media only screen and (max-width:1670px) {
+	#container.main_prev .sec_01 .bx-controls-direction {display:none;}
+}
+/* 황금돼지 2019디금고  이경민 20191010 추가 끝 */
+
+/* 황금돼지 2019디금고  이경민 20191017 추가 시작 */
+/* 황금돼지 2019디금고  이경민 20191106 수정 시작 */
+/*.pop_common_wrap {position:absolute; left:50%; margin-left:-321px; top:-5px; z-index:100; padding-bottom:37px; background: url('/images/IP/global/bg_pop_bottom.png') no-repeat 0 100%;}*/
+.pop_common_wrap {position:absolute; left:50%; margin-left:-510px; top:162px; z-index:100; padding-bottom:37px; width:376px;}
+/* 황금돼지 2019디금고  이경민 20191106 수정 끝 */
+.pop_common_wrap .pop_common_layout {overflow:hidden; border: 2px solid #046fd9; font-family: 'Noto Sans KR',sans-serif; background-color:#fff;}
+.pop_common_wrap .pop_common_layout .pop_header {padding: 30px 0 0 30px; text-align:left; font-size:24px; line-height:1.2; color:#046fd9; font-weight:bold; }
+.pop_common_wrap .pop_common_layout .pop_content {padding:25px 30px 30px 30px; font-weight:300; color:#666; font-size:14px; line-height:18px;}
+.pop_common_wrap .pop_common_layout .pop_content a {font-family: 'Noto Sans KR',sans-serif; font-weight:300; font-size:14px; line-height:18px; color:#19a647; padding-right:15px; background: url('/images/IP/global/bl_arrow.png') no-repeat right 6px;}
+.pop_common_wrap .pop_common_layout .pop_content p {color:#444;}
+.pop_common_wrap .pop_common_layout .pop_content .textBox {padding:18px; background-color:#f8f8f8; border-radius: 0 10px; color:#111; }
+.pop_common_wrap .pop_common_layout .pop_content .textBox li {padding-top:3px;}
+.pop_common_wrap .pop_common_layout .pop_content .textBox li:first-child: {padding-top:0;}
+.pop_common_wrap .pop_common_layout .pop_content .bdt{border-top:1px solid #ddd; padding-top:10px;}
+.pop_common_wrap .pop_common_layout .pop_content .info {padding-left:16px; background: url('/images/IP/global/bl_info.png') no-repeat 0 3px; font-size:12px; line-height:16px; color:#666; margin-top:40px;}
+.pop_common_wrap .pop_common_layout .pop_footer {padding:14px 20px; position:relative; overflow:hidden; background-color:#046fd9;}
+.pop_common_wrap .pop_common_layout .pop_footer label {position:absolute; right:74px; top:14px; cursor:pointer;}
+.pop_common_wrap .pop_common_layout .pop_footer label input {width:16px; height:16px; color: #0f6ecb;}
+.pop_common_wrap .pop_common_layout .pop_footer label span {margin-left:7px; font-size:14px; line-height:16px; color:#c2dffb; font-weight:300; }
+.pop_common_wrap .pop_common_layout .pop_footer .btn_close {display:inline-block; float:right; background: url('/images/IP/global/bg_pop_footer.png') no-repeat 0 center;}
+.pop_common_wrap .pop_common_layout .pop_footer .btn_close a {display:inline-block; float:right; font-size:14px; line-height:16px; color:#c2dffb;padding-left :15px; font-weight:300; font-family: 'Noto Sans KR',sans-serif; }
+.pop_common_wrap .pop_common_layout .btn_top_close {position:absolute; right:50px; top:32px;}
+/* 황금돼지 2019디금고  이경민 20191017 추가 끝 */
+
+/* 20200922 캐시백 그래프 추가 */
+.myCashbackDescBox {border-radius: 7px;text-align: center;color: #fff;font-size: 14px;font-weight: bold;line-height: 1.4;min-height: 65px;position:relative;margin-bottom:15px;background:#046fd9 url(/images/IP/nl/img_cashback.png) no-repeat 50px center;}
+.myCashbackDescBox:before {content:'';width: 0px;height: 0px;border-top: 13px solid #046fd9;border-right: 10px solid transparent;border-left: 10px solid transparent;position:absolute;bottom:-13px;left:0;right:0;margin:0 auto;}
+.myCashbackDescBox span {display:inline-block;padding:13px;}
+.myCashbackDescBox em {color:#fff000;}
+.myCashbackGraphWrap {border-bottom: 2px solid #838383;margin-top: 20px;}
+.myCashbackGraph {margin: 0 8%;overflow: hidden;position: relative;padding-top: 50px;margin-top:-50px;}
+.myCashbackGraph .priceTxt {text-align:right;font-weight:bold;font-size:14px;color:#046fd9;margin-bottom:5px;}
+.myCashbackGraph .graphTerm {min-height: 0;position:relative;}
+.myCashbackGraph .graphTerm:before {content:'';position: absolute;top: 0;right:0;width: 41%;border-bottom:1px solid #e4e4e4;}
+.myCashbackGraph .graphTerm li.sub {position: absolute;bottom: 0;text-align: center;width: 50%;height:137px;z-index:1}
+.myCashbackGraph .graphTerm li.sub .graphBarWrap {position:relative;height:100%;}
+.myCashbackGraph .graphTerm li.sub .graphBar {position: absolute;bottom: 0;margin: 0 auto;left: 0;right: 0;height: 0;}
+.myCashbackGraph .graphTerm li.sub .graphBar .scoreH {position: absolute;bottom: 0;width: 40px;right: 38px;left: 0;margin: 0 auto;background: #f68b1f;height: 100%;}
+.myCashbackGraph .graphTerm li.sub span.price {bottom: -1px;color: #f68b1f;position: absolute;font-weight: bold;margin-bottom: 5px;left: 0;width: 100%;padding-left: 6px;padding-right: 45px;box-sizing: border-box;-o-box-sizing: border-box;-ms-box-sizing: border-box;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;}
+.myCashbackGraph .graphTerm li.sub span.price:before {content: '';background: url(/images/IP/nl/img_arrow.png) no-repeat right center;position: absolute;width: 61px;height: 13px;right: 48px;bottom: -12px;}
+.myCashbackGraph .graphTerm li.cont {position: relative;text-align: center;float: left;width: 100%;}
+.myCashbackGraph .graphTerm li.cont .graphType dd {position: absolute;width: 41%;text-align: right;bottom: 0;right: 0;margin-left: 0;line-height: 1.2;font-size: 12px;z-index: 0;border-bottom: 1px solid #e4e4e4;color: #838383;font-weight: bold;padding-bottom: 5px;}
+.myCashbackGraph .graphTerm li.cont .graphType {position: relative;}
+.myCashbackGraph .graphTerm li.cont .graphType  dt {display: block;position: relative;width: 90px;height: 45px;overflow: hidden;margin: 0 auto;}
+.myCashbackGraph .graphTerm li.cont .graphList .graphType:nth-child(1) .graphBar {background: #0060be;}
+.myCashbackGraph .graphTerm li.cont .graphList .graphType:nth-child(2) .graphBar {background: #178cff;}
+.myCashbackGraph .graphTerm li.cont .graphList .graphType:nth-child(3) .graphBar {background: #53a4f4;}
+.myCashbackGraph .graphTerm li.cont .graphList .graphType:nth-child(4) .graphBar {background: #87c4ff;}
+.myCashbackGraph .graphTerm li.cont .graphType .graphBar {height: 100%;width: 100%;position: absolute;bottom: -55px;z-index:1;}
+.myCashbackGraph .graphTerm li.cont .graphBar span {line-height:1.3;display: inline-block;margin-top: 9px;color:#fff;}
+
+/* 설정 */
+#header_new #session_info_new .btn { height: auto; }
+#popSetup .pop_wrap {
+    width:660px;
+    font-family: 'Noto Sans KR',sans-serif;
+    z-index: 1000;
+    background: #ffffff;
+    border: 2px solid #046fd9; 
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+	padding-bottom:0 !important;
+}
+#popSetup .pop_wrap .pop_header {
+    position: relative;
+    height: 60px;
+    background-color: #046fd9;
+    cursor: move;
+}
+#popSetup .pop_wrap .pop_header .h1_pop {
+    float: left;
+    padding-left: 29px;
+    margin-top: 12px;
+    margin-right: 15px;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.15px;
+}
+
+#popSetup .pop_wrap .pop_content {
+    position: relative;
+    max-height:100%;
+    color: #666;
+    font-size: 16px;
+    font-weight: 100;
+    line-height: 25px;
+    box-sizing: border-box;
+    padding: 30px 50px;
+    overflow: hidden;    
+}
+#popSetup .pop_wrap .pop_close {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    background: url(/images/IH/common/btn-close-w.png) no-repeat;
+    border: 0;
+    text-indent: -9999px;
+}
+
+#popSetup .btn {
+    position: relative;
+    font-family: 'Noto Sans KR',sans-serif;
+    min-width: 136px;
+    line-height:36px;
+    background-color: #eee;
+    border: 1px solid #eee;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -o-border-radius: 4px;
+    border-radius: 4px;
+    color: #666;
+    font-size: 18px;
+    letter-spacing: -0.05em;
+    padding: 0 10px;
+    margin-right: 10px;
+    text-align: center;
+    text-shadow: rgba(0, 0, 0, 0.01) 0 0 1px;
+    cursor: pointer;
+}
+#popSetup .btn:hover {
+    border-color: #ddd;
+    background-color: #ddd;
+    -webkit-transition: all .5s ease-in-out;
+    -moz-transition: all .5s ease-in-out;
+    -ms-transition: all .5s ease-in-out;
+    -o-transition: all .5s ease-in-out;
+    transition: all .5s ease-in-out;
+}
+#popSetup .btn.btn-blue {
+    background-color: #046fd9;
+    border: 1px solid #046fd9;
+    color: #fff;
+}
+#popSetup .btn.btn-blue:hover {
+    border-color: #0045a2;
+    background-color: #0045a2;
+}
+#popSetup .btn.btn-bordered {
+    border-color: #999;
+    background-color: #fff;
+    color: #111;
+}
+#popSetup .btn.btn-bordered:hover { background-color: #eee; }
+
+#popSetup p { margin: 0; }
+#popSetup .text-bold { font-weight: bold !important; }
+#popSetup .text-black { color: #111 !important; }
+#popSetup .text-right { position:absolute; top:38px; right:10px; }
+#popSetup .text-center { text-align: center !important; }
+#popSetup .mr15 { margin-right: 15px !important; }
+#popSetup .mt30 { margin-top: 30px !important; }
+#popSetup .pt20 { padding-top: 20px !important; }
+#popSetup .pb20 { padding-bottom: 20px !important; }
+#popSetup .border-top { border-top: 1px solid #bfbfbf; }
+#popSetup .border-bottom { border-bottom: 1px solid #bfbfbf; }
+#popSetup .d-table {
+    width: 100%;
+    height:115px;
+    position:relative;
+}
+#popSetup .d-table-cell { 
+    display: table-cell;
+    width: auto;
+    vertical-align: middle;
+}
+
+#popSetup .main-set {
+    display: inline-block;
+    margin:0 5px;
+    padding:0;
+    min-width: 250px;
+    min-height: 164px;
+    color: #111;
+    font-size: 18px;
+    font-family:'Noto Sans KR',sans-serif;
+    text-decoration:none;
+    background: url(/images/IH/common/icon-radio-mainset.png) no-repeat 0 0;
+}
+#popSetup .main-set.on {
+    background-position: 0 -164px;
+    transition: none;
+    -webkit-transition: none;
+    -moz-transition: none;
+    -ms-transition: none;
+    -o-transition: none;   
+}
+
+#popSetup .main-set span {
+    display:inline-block;
+    margin-top: 55px;
+    padding: 54px 0 10px;
+    text-align: center;
+}
+#popSetup .main-set span.txt-personal{ background: url(/images/IH/common/icon-personal-bank.png) no-repeat center 0;}
+#popSetup .main-set span.txt-big {background: url(/images/IH/common/icon-txt-big.png) no-repeat center 0;}
+
+/* 2021-03-18 lnb수정*/
+#lnb ul li a:only-child{background-image:none;}
+
+/* 큰글뱅킹 화면 확대 방법 안내*/
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li .expand_desc_box {background: #046fd9;padding: 26px;width: 130px;box-shadow: 3px 5px 10px rgba(0, 0, 0, 0.2);box-sizing: border-box;-o-box-sizing: border-box;-ms-box-sizing: border-box;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;display:block;}
+.d1_inr .gnb_inner .gnb_inner_box .gnb_inner_lay .gnb_inner_list .gnb_group .gnb_list > li .expand_desc_box span {padding-top: 62px;display: block;color: #fff;font-size: 18px;font-weight: 300;font-family: 'Noto Sans KR',sans-serif;line-height: 1.3;background: url(/images/IP/global/expand_guide_icn.png) no-repeat center top;letter-spacing:0;}
+
+/* 큰글뱅킹 화면 확대 방법 안내 팝업*/
+.expand_desc_wrap {font-family:'맑은 고딕',Malgun Gothic;padding-bottom:20px}
+.expand_desc_wrap .expand_tit {font-size:21px;font-weight:bold;color:#e2632e;line-height:1;padding-bottom:20px;border-bottom:2px solid #919baa}
+.expand_desc_wrap .expand_desc_box {padding-top:16px}
+.expand_desc_wrap .expand_desc_box.line {margin-top:60px;border-top:1px solid #919baa}
+.expand_desc_wrap .expand_p {position:relative;padding-left:62px;font-size:16px;color:#2f3743;line-height:1.5}
+.expand_desc_wrap .expand_p span.fix_p {position: absolute;left: 4px;top: 0;color:#1776c5;font-weight:bold}
+.expand_desc_wrap .visual_box {padding-top:230px;margin-top: 20px;border:1px solid #eeeeee}
+.expand_desc_wrap .visual_box.v1 {background:url("/images/IP/global/keybord1_desc.png") 40px 26px no-repeat;}
+.expand_desc_wrap .visual_box.v2 {background:url("/images/IP/global/keybord2_desc.png") 34px 41px no-repeat;}
+.expand_desc_wrap .visual_box .desc {position:relative;font-size: 16px;color: #4b4e5a;background: #f9f9f9;padding: 20px 20px 15px 29px;border-top:1px solid #eeeeee}
+.expand_desc_wrap .visual_box .desc:before{content:'';width: 2px;height: 2px;background: #000000;display:inline-block;position:absolute;left: 21px;top: 31px;border-radius:50;}
+.expand_desc_wrap .visual_box .desc span {color:#005bac;font-weight: bold}
+
+
+
+/* 2021 NH모바일인증서 */
+.nBdWBox{padding:16px 25px;border:1px solid #d5d6d8;border-radius:8px}
+.nBdWBox p+p{margin-top:10px}
+.nBdGBox{padding:16px 25px;border:1px solid #d5d6d8;background-color:#f8f8f8;border-radius:8px}
+.nBdWBox em{color:#1776b4}
+.nBdWBox img{max-width:100%}
+.nBdWBox .nGBox{margin:16px -25px -16px;padding:20px;border-radius:0 0 8px 8px;background-color:#f7f7f7;font-family:'Noto Sans KR'}
+.nBoxList{display:table;width:100%;table-layout:fixed;margin-top:10px;border:1px solid #ccc;color:#666;background-color:#fff}
+.nBoxList+.nBoxList{margin-top:0;border-top:none}
+.nBoxList dt{display:inline-block;position:relative;padding:10px 20px;*padding-bottom:0;width:160px;*width:100%;color:#111;vertical-align:top}
+.nBoxList dd{display:inline-block;width:300px;*width:100%;padding:10px 20px;vertical-align:top}
+.nBoxList dt:after{content:'';position:absolute;width:1px;height:16px;top:10px;right:0;background-color:#eee}
+
+.nTxtType01{font-family:'Noto Sans KR', sans-serif;font-size:18px;line-height:26px;color:#2f3743;letter-spacing:-.02em}
+.nTxtType02{font-family:'Noto Sans KR', sans-serif;font-weight:bold;font-size:16px;line-height:26px;color:#4b4e5a;letter-spacing:-.05em}
+.nTxtType03{font-family:'Noto Sans KR', sans-serif;font-size:15px;line-height:26px;color:#4b4e5a;font-weight:100;letter-spacing:-.02em}
+.nTxtType04{font-family:'Noto Sans KR', sans-serif;font-size:13px;line-height:20px;color:#4b4e5a;font-weight:100;letter-spacing:-.02em}
+
+.nKeyPop .pinBankLogin{padding:12px 0 0 0;margin-top:30px;font-family:'Noto Sans KR', sans-serif;font-weight:300;border:1px solid #d5d6d8;border-radius:10px;}
+.nKeyPop .pinBankLogin > .inner {margin:0 0px 10px 0; padding:0 0px 0 15px;min-height:120px;}
+.nKeyPop .pinBankLogin > .inner:after{content:'';display:block;clear:both;height:0;font-size:0;visibility:hidden;}
+.nKeyPop .pinBankLogin .icon {background:url("/images/IP/global/godo_bg_icon_auth01.png") left 3px no-repeat;line-height:20px;padding-left:20px;text-align:left}
+.nKeyPop .pinBankLogin .time {background:#edfaff;width:286px;margin:20px auto; padding:12px 0;border-radius:30px}
+.nKeyPop .pinBankLogin .time strong {background: url("/images/IP/global/godo_bg_icon_auth02.png") left 0px no-repeat;padding-left:22px;display:inline-block}
+.nKeyPop .pinBankLogin .time span {font-size:14px;color:#267bb3;font-weight:bold;margin-left:10px}
+.nKeyPop .pinBankLogin .time p {font-size:14px; color:#267bb3;font-weight:bold}
+.nKeyPop .pinBankLogin strong, .nKeyPop .pinBankLogin em{vertical-align:baseline}

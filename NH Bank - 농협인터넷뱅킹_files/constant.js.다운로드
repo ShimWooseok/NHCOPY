@@ -1,0 +1,56 @@
+/* ########################################################
+ * 2016. 12. 27 
+ * constants.js 실제 운영 Copy 시 주의 - 아래 사항 필독
+ * 운영임시도메인, 검증도메인, 개발도메인 제거 후 Copy
+ * Copy 이후 운영임시도메인, 검증도메인, 개발도메인 복구 수행 필요
+ * 문의 : 김환희 계장
+ * !!!!!!!! 소스 이관시 개발도메인 삭제 필수
+ * ########################################################
+ */
+
+var DOMAINCODE = new Array();
+
+//운영 도메인
+DOMAINCODE['IP00']= 'https://banking.nonghyup.com';      // 운영_개인뱅킹
+DOMAINCODE['IP01']= 'https://branch.nonghyup.com';       // 운영_영업점개인뱅킹
+DOMAINCODE['IP02']= 'http://www.nhbank.com';  	 		 // 운영_농협은행
+DOMAINCODE['IP03']= 'https://info.nonghyup.com';         // 운영_농축협
+DOMAINCODE['IP04']= 'https://happy.nonghyup.com';        // 운영_해피뱅킹
+DOMAINCODE['IP05']= 'https://mybank.nonghyup.com';   	 // 운영_개인뱅킹_D
+DOMAINCODE['CC00']= 'https://card.nonghyup.com';         // 운영_개인카드
+DOMAINCODE['IH00']= 'https://banking.nonghyup.com';      // 운영_펀뱅킹
+DOMAINCODE['IC00']= 'https://ibz.nonghyup.com';          // 운영_기업대표
+//DOMAINCODE['IC00']= 'https://ibzbranch.nonghyup.com';  // 운영_기업대표_D
+DOMAINCODE['IC01']= 'https://ibzbranch.nonghyup.com';    // 운영_영업점 접속
+DOMAINCODE['PS00']= 'https://pension.nonghyup.com';      // 운영_NH퇴직연금
+DOMAINCODE['SD00']= 'https://sdt.nonghyup.com';          // 운영_상점결제
+DOMAINCODE['ES00']= 'https://escrow.nonghyup.com';       // 운영_에스크로
+DOMAINCODE['IM00']= 'https://img.nonghyup.com';          // 운영_이미지
+DOMAINCODE['SF00']= 'https://smartmarket.nonghyup.com';  // 운영_스마트금융센터
+
+DOMAINCODE['MP00']= 'https://m.nonghyup.com';        	 // 운영_농협 m사이트
+DOMAINCODE['MC00']= 'https://mbiz.nonghyup.com';         // 운영_기업뱅킹 m사이트
+DOMAINCODE['MPDN']= 'https://m.nonghyup.com';        	 // 운영_NH비대면 기부서비스
+DOMAINCODE['MPSM']= 'https://smartbank.nonghyup.com';	 // 운영_NH비대면 기부서비스(스마트)
+DOMAINCODE['MPOA']= 'https://onepassin.nonghyup.com';    // 운영_NH비대면 기부서비스(원패스)
+DOMAINCODE['MPLI']= 'https://nhlink.nonghyup.com';    // 운영_NH비대면 기부서비스(NHLink)
+/*2020 (공통) 디지털금융 서비스 확대 개편 추가*/
+DOMAINCODE['EH00']= 'https://ebizhub.nonghyup.com';      // 운영_수집서버
+
+//INDEX PAGE CONFIG TABLE
+var PC_INDEX_CONFIG_TABLE = {};
+//PC index page에서 각 도메인별 접속 device type에 따른 forward url 설정.
+//각 도메인 별 device type이 허용된다면 null 설정.
+PC_INDEX_CONFIG_TABLE['IP00']= {"MOBILE" : common_cfGetDomain("MP00") + '/index_mobile.html', "TABLET" : null, "NORMAL" : null, "INITSERVICE" : true}; // 운영_개인뱅킹
+PC_INDEX_CONFIG_TABLE['IP01']= {"MOBILE" : common_cfGetDomain("MP00") + '/index_mobile.html', "TABLET" : null, "NORMAL" : null, "INITSERVICE" : true}; // 운영_영업점개인뱅킹
+PC_INDEX_CONFIG_TABLE['IP02']= {"MOBILE" : common_cfGetDomain("IP02") + '/content/html/ip/cn/nosupport.html', "TABLET" : null, "NORMAL" : null, "INITSERVICE" : true}; // 운영_농협은행
+PC_INDEX_CONFIG_TABLE['IP03']= {"MOBILE" : common_cfGetDomain("IP03") + '/content/html/ip/cn/nosupport.html', "TABLET" : null, "NORMAL" : null, "INITSERVICE" : true}; // 운영_농축협
+PC_INDEX_CONFIG_TABLE['IP04']= {"MOBILE" : common_cfGetDomain("MP00") + '/index_mobile.html', "TABLET" : null, "NORMAL" : null, "INITSERVICE" : true}; // 운영_해피뱅킹
+PC_INDEX_CONFIG_TABLE['CC00']= {"MOBILE" : null, "TABLET" : null, "NORMAL" : null, "INITSERVICE" : true}; // 운영_개인카드
+PC_INDEX_CONFIG_TABLE['IH00']= {"MOBILE" : common_cfGetDomain("MP00") + '/index_mobile.html', "TABLET" : null, "NORMAL" : null, "INITSERVICE" : true}; // 운영_펀뱅킹
+
+var MOBILE_INDEX_CONFIG_TABLE = {};
+//Mobile(M 사이트) index page에서 각 도메인별 접속 device type에 따른 forward url 설정.
+MOBILE_INDEX_CONFIG_TABLE['MP00']= {"MOBILE" : null, "TABLET" : common_cfGetDomain("IP00"), "NORMAL" : common_cfGetDomain("IP00"), "INITSERVICE" : false}; // 운영_농협 m사이트
+MOBILE_INDEX_CONFIG_TABLE['MPDN']= {"MOBILE" : null, "TABLET" : common_cfGetDomain("IP00"), "NORMAL" : common_cfGetDomain("IP00"), "INITSERVICE" : true}; 	// 운영_NH비대면 기부서비스
+

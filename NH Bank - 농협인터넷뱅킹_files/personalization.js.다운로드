@@ -1,0 +1,224 @@
+/*****************************************************************************************
+* 업무명 : 개인인터넷뱅킹
+* 세부업무명 : 공통
+* 설명 : 나만의 은행주소 서비스
+* 작성자 : FA 정영탁(SI303162)
+* 작성일 : 2013.10.29
+* -----------------------------------------------------------------------------------------
+*  변경이력 
+* -----------------------------------------------------------------------------------------
+*  No 날짜        	작성자  내용
+*  1  2013.10.29	정영탁  최초작성
+******************************************************************************************/
+
+/**
+ * '나만의 은행주소 서비스' 표시용 값 설정
+ */
+function setPersonalizationPage(option) {
+
+    var psnl_iconName_on_top; 	// 이미지파일명
+    var psnl_text_on_top; 		// 개인식별문구명
+    var psnl_colorSeq_on_top;  	// 개인화페이지색상명
+    var psnl_address; 			// 개인화주소
+	
+	if(option != undefined && option.PSN_ID_C){
+		psnl_iconName_on_top = option['IMG_FLNM']; 
+	    psnl_text_on_top     = option['PSN_ID_TXTNM']; 
+	    psnl_colorSeq_on_top = option['PSNZ_PAGE_COLONM'];
+	    psnl_address 		 = option['PSN_ID_C'];
+	}else{
+	    psnl_iconName_on_top = util_cfGetCookie('IMG_FLNM');
+	    psnl_text_on_top     = util_cfGetCookie('PSN_ID_TXTNM');
+	    psnl_colorSeq_on_top = util_cfGetCookie('PSNZ_PAGE_COLONM');
+	    psnl_address 		 = util_cfGetCookie('PSN_ID_C');
+	}
+    
+    if(psnl_colorSeq_on_top != "") {
+    	psnl_text_on_top = unescape(psnl_text_on_top);
+    	
+    	var iconImageName = psnl_iconName_on_top.substring(0 , psnl_iconName_on_top.indexOf('.'));
+    	var numberForIcon = "";
+    	
+    	if(iconImageName.indexOf("new") > -1){ //신규이미지
+    		numberForIcon = iconImageName.substring(14);
+    	}else{
+    		numberForIcon = iconImageName.substring(10);
+    	}
+    	
+    	var seqOfIcon = Number(numberForIcon); // 아이콘의 순번을 가져옴 (1 ~ 10)
+    	
+    	// 이미지사이즈정보 : 92 X 82 (고정이미지),  116 X 116 (살아있는 캐릭터)
+        var widthOfImgType1  = 92;   // 고정이미지       width 
+        var heightOfImgType1 = 82;   // 고정이미지       height
+        var widthOfImgType2  = 116;  // 살아있는 이미지  width
+        var heightOfImgType2 = 116;  // 살아있는 이미지  height
+        
+        var widthOfDivForPersonalization      = 0;
+        var heightOfDivForPersonalization     = 0;
+        var widthOfDivForPersonalizationIcon  = 0;
+        var heightOfDivForPersonalizationIcon = 0;
+        var leftOfDivForPersonalizationText   = 0; // 말풍선 위치
+        
+        var leftOfBtnClose = 0;  // 닫기버튼
+        var topOfBtnClose  = 0;  // 닫기버튼
+        
+        if(seqOfIcon > 10) { // 살아있는 캐릭터일 경우 
+        	widthOfDivForPersonalization  = widthOfImgType2  + 2; 
+            heightOfDivForPersonalization = heightOfImgType2 + 2;
+            
+            widthOfDivForPersonalizationIcon  = widthOfImgType2;
+            heightOfDivForPersonalizationIcon = heightOfImgType2;
+            
+            leftOfDivForPersonalizationText  = -15; // 말풍성 위치
+            //leftOfDivForPersonalizationText  = -60; // 말풍성 위치
+            
+            leftOfBtnClose = 102;  // 닫기 버튼 위치(네모 이미지용)
+            topOfBtnClose  =  -5;  // 닫기 버튼 위치(네모 이미지용)
+            
+        } else {            // 고정이미지일 경우
+        	widthOfDivForPersonalization  = widthOfImgType1  + 2; 
+            heightOfDivForPersonalization = heightOfImgType1 + 2;
+            
+            widthOfDivForPersonalizationIcon  = widthOfImgType1;            
+            heightOfDivForPersonalizationIcon = heightOfImgType1;
+            
+            leftOfDivForPersonalizationText  = -20; // 말풍선 위치
+            
+            
+            leftOfBtnClose = 86;   // 닫기 버튼 위치
+            topOfBtnClose  = -8;   // 닫기 버튼 위치
+        }
+
+
+        // showPersonalizationPage() 를 사용하는 페이지에서 공통으로 사용하고 소스 수정하기 위해
+        /////////////////////////////////////////////// div for personalization ///////////////////////////////////////////////////
+        var htmlCodeForPsnl  = "";
+        htmlCodeForPsnl += "<div id='divForPersonalization' style='display:none; position:absolute; top:300px; left:0px; width:"+ widthOfDivForPersonalization +"px; height:"+ heightOfDivForPersonalization +"px;'>";
+        htmlCodeForPsnl += "    <span style='position:absolute; left:"+ leftOfBtnClose +"px; top:"+ topOfBtnClose +"px; width:17px; height:17px; z-index:10000;'><a href='javascript:void(0);' id='btnForClosingPersonalization'><img src='/images/CN/cal_btn_close.gif' alt='닫기'/></a></span>"; // 닫기버튼
+        htmlCodeForPsnl += "    <div id='divForPersonalizationIcon' style='position:relative; left:0px; top:0px; width:"+ widthOfDivForPersonalizationIcon +"px; height:"+ heightOfDivForPersonalizationIcon +"px; text-align:center;'></div>"; // 식별이미지 표시용
+        htmlCodeForPsnl += "    <div id='divForPersonalizationText' style='display:none; position:relative; left:"+ leftOfDivForPersonalizationText +"px; top:-1px; width:150px; color:#fff; padding:3px 0 2px; line-height:1; text-align:center;'> </div>";  // 식별문구 표시용, 배경이미지는 배경색상 표시
+        htmlCodeForPsnl += "</div>";
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        // 나만의 은행주소(개인화페이지) 영역 설정
+    	var objForm = document.getElementById('containerForPersonalization');
+    	if (objForm == null || objForm == undefined || typeof(objForm) != 'object') {
+    		$('<div id="containerForPersonalization"></div>').html(htmlCodeForPsnl).appendTo('body');
+    	} else {
+    		$('#containerForPersonalization').html(htmlCodeForPsnl);
+    	}
+
+
+        // 식별문구 배경이미지 색상변경 처리
+        var bgPosition = "";
+        switch(psnl_colorSeq_on_top) {
+            case  "1" : bgPosition = "0 0";          break;
+            case  "2" : bgPosition = "-148px 0";     break;
+            case  "3" : bgPosition = "-296px 0";     break;
+            case  "4" : bgPosition = "-444px 0";     break;
+            case  "5" : bgPosition = "-592px 0";     break;
+            case  "6" : bgPosition = "0 -61px";      break;
+            case  "7" : bgPosition = "-148px -61px"; break;
+            case  "8" : bgPosition = "-296px -61px"; break;
+            case  "9" : bgPosition = "-444px -61px"; break;
+            case "10" : bgPosition = "-592px -61px"; break;
+        }
+
+        if($("#divForPersonalizationText").length > 0) {
+            $("#divForPersonalizationText").css("background-position", bgPosition);                          // 배경이미지
+            if( seqOfIcon > 80){    // 인덱스 80번초과는 고정이미지
+            	$("#divForPersonalizationIcon").html("<img src"+"='/images/IP/mb/"+ iconImageName + ".gif" + "' height='" + heightOfDivForPersonalizationIcon + "' width='" + widthOfDivForPersonalizationIcon + "' alt='나만의은행주소 캐릭터' />");   // 식별이미지
+            }else if( seqOfIcon > 50 && ( navigator.userAgent.toLowerCase().indexOf("msie") > -1) ){    // 인덱스 50번초과는 플래시
+            	$("#divForPersonalizationIcon").html("<embed src"+"='/images/IP/mb/"+ iconImageName + ".swf" + "' height='" + heightOfDivForPersonalizationIcon + "' width='" + widthOfDivForPersonalizationIcon + "' tyle='application/x-shockwave-flash' wmode='transparent' alt='나만의은행주소 캐릭터'></embed>");   // 식별이미지
+            } else {
+            	$("#divForPersonalizationIcon").html("<img src"+"='/images/IP/mb/"+ iconImageName + ".gif" + "' height='" + heightOfDivForPersonalizationIcon + "' width='" + widthOfDivForPersonalizationIcon + "' alt='나만의은행주소 캐릭터' />");   // 식별이미지
+            }
+            $("#divForPersonalizationText").css({'background-color':'#'+psnl_colorSeq_on_top});              // 식별문구 배경색
+            $("#divForPersonalizationText").html(psnl_text_on_top); // 식별문구
+            //$("#divForPersonalizationText").html(psnl_text_on_top + "<br/>" + "http://banking.nonghyup.com/" + psnl_address + ".nh");                                          // 식별문구
+            
+            $("#btnForClosingPersonalization").click(function() { // 닫기 버튼 클릭했을 때
+                $("#divForPersonalization").hide(); 
+            });
+        }
+    }
+}
+ 
+/**
+ * '나만의 은행주소 서비스' 아이콘을 화면에서 이동 처리
+ */
+function moveFromLeftToRight(iMarginLeft, iMarginTop, iZIndex) {
+    $("#divForPersonalization").css("z-index", iZIndex).fadeIn();
+    
+    $("#divForPersonalization").animate({marginLeft:iMarginLeft}, 1000);
+    $("#divForPersonalization").animate({marginTop:iMarginTop}, 1000, function() {
+        $("#divForPersonalizationText").show();
+        
+    });
+}
+
+
+/**
+ * '나만의 은행주소 서비스'를 화면에 표시 ( 쿠키 )
+ */
+function showPersonalizationPage(iMarginLeft, iMarginTop, iZIndex) {
+    var psnl_iconName = util_cfGetCookie('IMG_FLNM'); // 이미지파일명
+
+	if (psnl_iconName.length > 0) {
+		////////////////////////
+		setPersonalizationPage();
+		////////////////////////
+
+		// 애니메이션을 위한 처리
+		moveFromLeftToRight(iMarginLeft, iMarginTop, iZIndex);
+	}
+}
+
+/**
+ * '나만의 은행주소 서비스'를 화면에 표시 ( 세션에서 얻어온값으로 )
+ */
+function showPersonalizationPageByValue(iMarginLeft, iMarginTop, iZIndex, option) {
+	if(option != undefined && option.PSN_ID_C){
+
+		setPersonalizationPage(option);
+		// 애니메이션을 위한 처리
+		moveFromLeftToRight(iMarginLeft, iMarginTop, iZIndex);
+	}
+}
+
+/**
+ * '나만의 은행주소 서비스' 데이터를 세션에 저장
+ */
+function setPersonalizationPageData() {
+
+	var psnl_iconName = util_cfGetCookie('IMG_FLNM'); // 이미지파일명
+	if (psnl_iconName.length > 0) {
+	    var psnl_text_on_top     = util_cfGetCookie('PSN_ID_TXTNM');
+	    var psnl_colorSeq_on_top = util_cfGetCookie('PSNZ_PAGE_COLONM');
+	    var psnl_address 		 = util_cfGetCookie('PSN_ID_C');
+	    
+	    httpSendIP("IPCN0501S", {
+	    	PSN_ID_C 		 :unescape(psnl_address),
+	    	IMG_FLNM 		 :psnl_iconName,
+	    	PSN_ID_TXTNM 	 :unescape(psnl_text_on_top),
+	    	PSNZ_PAGE_COLONM :psnl_colorSeq_on_top
+	    }).done(function(){
+	    	util_cfDelCookie('IMG_FLNM');
+	    	util_cfDelCookie('PSN_ID_TXTNM');
+	    	util_cfDelCookie('PSNZ_PAGE_COLONM');
+	    	util_cfDelCookie('PSN_ID_C');
+	    });
+	}
+	
+}
+
+/**
+ * 나만의 은행주소 닫기
+ */
+
+function closePersonalizationPage() {
+	if($("#divForPersonalizationText").length > 0) {
+      $("#divForPersonalization").hide(); 
+    }
+}

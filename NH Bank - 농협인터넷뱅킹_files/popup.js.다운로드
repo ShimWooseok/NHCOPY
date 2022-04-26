@@ -1,0 +1,1079 @@
+/*****************************************************************************************
+* 업무명 : 공통
+* 세부업무명 : 공통
+* 설명 : 공통 팝업 처리
+*        레이어 팝업
+*        윈도우 팝업
+* 작성자 : FA 정영탁(SI303162)
+* 작성일 : 2013.03.11 
+* -----------------------------------------------------------------------------------------
+*  변경이력 
+* -----------------------------------------------------------------------------------------
+*  No 날짜        	작성자  내용
+*  1  2013.03.11	정영탁  최초작성
+******************************************************************************************/
+
+
+var popup_LAYER_ID = 'LAYER_POPUP_DIV';
+var popup_MODAL_ID = 'modal-popup';
+var popup_LAYER_ID_NOCLOSE = 'LAYER_POPUP_DIV_NOCLOSE';
+var popup_CHILD_ID = 'CHILD_POPUP_DIV';
+var popup_FOCUS_LAYER_ID = null;
+var popup_FOCUS_CHILD_ID = null;
+
+function popup_cfLayerCreate(objId) {
+	var targetObj = $('body');
+	if (objId == null || objId == undefined) {
+		objId = popup_LAYER_ID;
+	} else {
+		targetObj = $('#'+popup_LAYER_ID);
+	}
+	var html = '';
+	html += '<div id="'+objId+'" data-type="dialog"></div>';
+	var objForm = document.getElementById(objId);
+	if (objForm == null || objForm == undefined || typeof(objForm) != 'object') {
+		$('body').append(html);
+		$('#'+objId).dialog();
+	}
+	return $('#'+objId).css({
+		'position':'fixed'
+	});
+}
+function popup_cfIsLayerCreate(objId) {
+	if (objId == null || objId == undefined) {
+		objId = popup_LAYER_ID;
+	}
+	var objForm = document.getElementById(objId);
+	
+	if ( (objForm == null || objForm == undefined || typeof(objForm) != 'object' ? false : true) == false){
+		objId = popup_LAYER_ID_NOCLOSE;
+		objForm = document.getElementById(objId);
+		return (objForm == null || objForm == undefined || typeof(objForm) != 'object' ? false : true); 
+	} else {
+		return true;														
+	}
+}
+
+/**
+ * <pre>
+ * 레이어 팝업 호출
+ * </pre>
+ * @param {String} targetpath : navigate API의 targetpath {String} Required 이동하고자 하는 경로값
+ * @param {Object} param : navigate API의 param {Object} 페이지 전환시 다음 페이지로 넘기고자 하는 파라메터 값
+ * @param {Object} option : navigate API의 option {Object} 부가적인 정보
+ * @return {Object} navigate Object 
+ */
+function popup_cfLayerOpen(targetpath, param, option , targetID) {
+	var _this = popup_cfLayerCreate(targetID);
+
+	// 현재 포커스 저장
+	popup_FOCUS_LAYER_ID = $('*:focus');
+
+	return _this.navigate(targetpath, param, option).done(function(){
+			if (window.browser && window.browser != 'mobile') {
+				_this.close();
+			}
+			_this.find('.pop_wrap').css({
+				'position':'static'
+			});
+			
+		/* 2019-07-26 웹 접근성 개선 시작 */
+			_this.find('.pop_wrap').attr('aria-hidden', 'false');
+			_this.find('.pop_wrap > h1').attr('tabindex', '-1');
+			_this.find('.close_pop').click( function(){popup_cfLayerClose(targetID);} );
+		/* 2019-07-26 웹 접근성 개선 끝 */
+
+//			_this.find('.close_pop').tap( popup_cfLayerClose );
+
+			// 팝업 옵션 설정
+			var _option = {modal : true, movable : true};
+			if ( typeof(option) != 'undefined' && option != null ) {
+				if ( typeof(option.movable) != 'undefined' && option.movable != null ) {
+					_option.movable = option.movable;
+				}
+				if ( typeof(option.modal) != 'undefined' && option.modal != null ) {
+					_option.modal = option.modal;
+				}
+			}
+			_this.open( _option );
+
+			// 포커스를 레이어팝업으로 이동
+			/* 황금돼지 임재흥 2019-09-23 팝업의 h1으로 포커스 이동 시작 */
+				_this.find('h1').focus();
+			/* 황금돼지 임재흥 2019-09-23 팝업의 h1으로 포커스 이동 끝 */
+
+			// ajax 거래시에 complete js 실행(content영역에서 사용 - 퍼블리싱)
+			try {
+				contentLoadComplete();
+			} catch (e) {}
+
+		});
+}
+
+/**
+ * <pre>
+ * 레이어 팝업 호출
+ * </pre>
+ * @param {String} targetpath : navigate API의 targetpath {String} Required 이동하고자 하는 경로값
+ * @param {Object} param : navigate API의 param {Object} 페이지 전환시 다음 페이지로 넘기고자 하는 파라메터 값
+ * @param {Object} option : navigate API의 option {Object} 부가적인 정보
+ * @return {Object} navigate Object 
+ */
+function popup_cfLayerOpenNoClose(targetpath, param, option) {
+	var _this = popup_cfLayerCreate(popup_LAYER_ID_NOCLOSE);
+
+	// 현재 포커스 저장
+	popup_FOCUS_LAYER_ID = $('*:focus');
+
+	return _this.navigate(targetpath, param, option).done(function(){
+			if (window.browser && window.browser != 'mobile') {
+				_this.close();
+			}
+			_this.find('.pop_wrap').css({
+				'position':'static'  
+			});
+			_this.find('.close_pop').tap( popup_cfLayerClose );
+
+			// 팝업 옵션 설정
+			var _option = {modal : true, movable : true};
+			if ( typeof(option) != 'undefined' && option != null ) {
+				if ( typeof(option.movable) != 'undefined' && option.movable != null ) {
+					_option.movable = option.movable;
+				}
+				if ( typeof(option.modal) != 'undefined' && option.modal != null ) {
+					_option.modal = option.modal;
+				}
+			}
+			_this.open( _option );
+
+			// 포커스를 레이어팝업으로 이동
+			/* 황금돼지 임재흥 2019-09-23 팝업의 h1으로 포커스 이동 시작 */
+				_this.find('h1').focus();
+			/* 황금돼지 임재흥 2019-09-23 팝업의 h1으로 포커스 이동 끝 */
+			// ajax 거래시에 complete js 실행(content영역에서 사용 - 퍼블리싱)
+			try {
+				contentLoadComplete();
+			} catch (e) {}
+
+		});
+}
+
+/**
+ * <pre>
+ * 레이어 팝업의 서브 팝업 호출
+ * </pre>
+ */
+function popup_cfLayerSubOpen(targetpath, param, option) {
+	if (!popup_cfIsLayerCreate()) {
+		return popup_cfLayerOpen(targetpath, param, option);
+	}
+
+	var _this = popup_cfLayerCreate(popup_CHILD_ID);
+
+	// 현재 포커스 저장
+	popup_FOCUS_CHILD_ID = $('*:focus');
+
+	return _this.navigate(targetpath, param, option).done(function(){
+			if (window.browser && window.browser != 'mobile') {
+				_this.close();
+			}
+			_this.find('.pop_wrap').css({
+				'position':'static'
+			});
+			_this.find('.close_pop').tap( popup_cfLayerSubClose );
+
+			// 팝업 옵션 설정
+			var _option = {modal : true, movable : true};
+			if ( typeof(option) != 'undefined' && option != null ) {
+				if ( typeof(option.movable) != 'undefined' && option.movable != null ) {
+					_option.movable = option.movable;
+				}
+				if ( typeof(option.modal) != 'undefined' && option.modal != null ) {
+					_option.modal = option.modal;
+				}
+			}
+			_this.open( _option );
+
+			// 포커스를 레이어팝업으로 이동
+			/* 황금돼지 임재흥 2019-09-23 팝업의 h1으로 포커스 이동 시작 */
+				_this.find('h1').focus();
+			/* 황금돼지 임재흥 2019-09-23 팝업의 h1으로 포커스 이동 끝 */
+			// ajax 거래시에 complete js 실행(content영역에서 사용 - 퍼블리싱)
+			try {
+				contentLoadComplete();
+			} catch (e) {}
+
+		});
+}
+
+/**
+ * 레이어 팝업 닫기
+ */
+function popup_cfLayerClose(targetID) { 
+	var deviceType = common_cfGetDeviceType();
+
+	if(typeof targetID == 'undefined'){
+		targetID = popup_LAYER_ID;
+	}
+	
+	if(typeof targetID != 'string'){
+		targetID = popup_LAYER_ID;
+	}
+	
+	if (!popup_cfIsLayerCreate(targetID)) {
+
+		return false;
+	}
+	
+	if(targetID){
+		$('#'+targetID).close();
+		$('#'+targetID).remove();
+		
+	}else{
+
+		$('#'+popup_LAYER_ID).close();
+		$('#'+popup_LAYER_ID).remove();
+		
+	}
+	// 저장된 포커스로 이동
+	if (popup_FOCUS_LAYER_ID != null) {
+		popup_FOCUS_LAYER_ID.focus();
+		popup_FOCUS_LAYER_ID = null;
+	}
+	if(deviceType == "MOBILE"){
+		$('.mask').css("display", "none");
+		
+		/* 2019-07-29 웹 접근성 개선 시작 */
+		$('.pop_wrap').attr('aria-hidden', 'true');
+		/* 2019-07-29 웹 접근성 개선 끝 */
+	}
+	return false;
+}
+
+/**
+ * 레이어 팝업 닫기
+ */
+function popup_cfLayerAllClose() { 
+	var deviceType = common_cfGetDeviceType();
+	if (!popup_cfIsLayerCreate()) {
+		return false;
+	}
+
+	$('#'+popup_LAYER_ID).close();
+	$('#'+popup_LAYER_ID).remove();
+	$('#'+popup_LAYER_ID_NOCLOSE).close();
+	$('#'+popup_LAYER_ID_NOCLOSE).remove();
+	// 저장된 포커스로 이동
+	if (popup_FOCUS_LAYER_ID != null) {
+		popup_FOCUS_LAYER_ID.focus();
+		popup_FOCUS_LAYER_ID = null;
+	}
+	if(deviceType == "MOBILE"){
+		$('.mask').css("display", "none");
+	}
+	return false;
+}
+
+/**
+ * 레이어 팝업의 서브 팝업 닫기
+ */
+function popup_cfLayerSubClose() {
+	if (!popup_cfIsLayerCreate(popup_CHILD_ID)) {
+		return popup_cfLayerClose();
+	}
+
+	$('#'+popup_CHILD_ID).close();
+	$('#'+popup_CHILD_ID).remove();
+
+	// 저장된 포커스로 이동
+	if (popup_FOCUS_CHILD_ID != null) {
+		popup_FOCUS_CHILD_ID.focus();
+		popup_FOCUS_CHILD_ID = null;
+	}
+	return false;
+}
+
+/**
+ * <pre>
+ * 레이어 팝업 호출(html)
+ * </pre>
+ * @param {String} targetpath : 호출할 URL
+ * @param {Object} option : option {Object} 부가적인 정보
+ */
+function popup_cfLayerLoad(targetpath, option) {
+	var _this = popup_cfLayerCreate();
+
+	// 현재 포커스 저장
+	popup_FOCUS_LAYER_ID = $('*:focus');
+
+	var deviceType = common_cfGetDeviceType();
+	
+	return _this.load(targetpath, function(response,status,xhr){
+			if (window.browser && window.browser != 'mobile') {
+				_this.close();
+			}
+			_this.find('.pop_wrap').css({
+				'position':'static'
+			});
+			_this.find('.pop_wrap .pop_header').attr('data-dialog-movecursor', 'true');
+			_this.find('.close_pop').click( popup_cfLayerClose );	// 2019 고도화 : 웹접근성
+
+			// 팝업 옵션 설정
+			var _option = {modal : true, movable : true};
+			if ( typeof(option) != 'undefined' && option != null ) {
+				if ( typeof(option.movable) != 'undefined' && option.movable != null ) {
+					_option.movable = option.movable;
+				}
+				if ( typeof(option.modal) != 'undefined' && option.modal != null ) {
+					_option.modal = option.modal;
+				}
+			}
+			
+			if(deviceType == "MOBILE"){
+				$('.mask').css("display", "block");
+			}
+			
+			
+			_this.open( _option );
+
+			// 포커스를 레이어팝업으로 이동
+			/* 황금돼지 임재흥 2019-09-23 팝업의 h1으로 포커스 이동 시작 */
+				_this.find('h1').focus();
+			/* 황금돼지 임재흥 2019-09-23 팝업의 h1으로 포커스 이동 끝 */
+			// ajax 거래시에 complete js 실행(content영역에서 사용 - 퍼블리싱)
+			try {
+				contentLoadComplete();
+			} catch (e) {}
+
+		});
+}
+
+/**
+ * <pre>
+ * 레이어 팝업의 서브 팝업 호출(html)
+ * </pre>
+ */
+function popup_cfLayerSubLoad(targetpath, option) {
+	if (!popup_cfIsLayerCreate()) {
+		return popup_cfLayerLoad(targetpath);
+	}
+
+	var _this = popup_cfLayerCreate(popup_CHILD_ID);
+
+	// 현재 포커스 저장
+	if (popup_FOCUS_CHILD_ID == null) {
+		popup_FOCUS_CHILD_ID = $('*:focus');
+	}
+
+	return _this.load(targetpath, function(response,status,xhr){
+			if (window.browser && window.browser != 'mobile') {
+				_this.close();
+			}
+			_this.find('.pop_wrap').css({
+				'position':'static'
+			});
+			_this.find('.pop_wrap .pop_header').attr('data-dialog-movecursor', 'true');
+			_this.find('.close_pop').tap( popup_cfLayerSubClose );
+
+			// 팝업 옵션 설정
+			var _option = {modal : true, movable : true};
+			if ( typeof(option) != 'undefined' && option != null ) {
+				if ( typeof(option.movable) != 'undefined' && option.movable != null ) {
+					_option.movable = option.movable;
+				}
+				if ( typeof(option.modal) != 'undefined' && option.modal != null ) {
+					_option.modal = option.modal;
+				}
+			}
+			_this.open( _option );
+
+			// 포커스를 레이어팝업으로 이동
+			/* 황금돼지 임재흥 2019-09-23 팝업의 h1으로 포커스 이동 시작 */
+				_this.find('h1').focus();
+			/* 황금돼지 임재흥 2019-09-23 팝업의 h1으로 포커스 이동 끝 */
+			// ajax 거래시에 complete js 실행(content영역에서 사용 - 퍼블리싱)
+			try {
+				contentLoadComplete();
+			} catch (e) {}
+
+		});
+}
+
+/**
+ * <pre>
+ * content페이지 레이어 팝업 호출
+ * </pre>
+ * @param {String} url : 호출할 URL
+ */
+function popup_cfContentLayerOpen(url, option) {
+	var _this = popup_cfLayerCreate();
+
+	var urlPrefix = '/content/html';
+	var contentURL = ( url.substring(0,urlPrefix.length) == urlPrefix ? url : urlPrefix + url );
+
+	// 현재 포커스 저장
+	popup_FOCUS_LAYER_ID = $('*:focus');
+	var deviceType = common_cfGetDeviceType();
+	return _this.load(contentURL, function(response,status,xhr){
+			if (window.browser && window.browser != 'mobile') {
+				_this.close();
+			}
+			_this.find('.pop_wrap').css({	
+				'position':'static'
+			});
+			if(deviceType == "MOBILE"){
+				_this.find('.pop_wrap').css({
+					'width':'300px'
+				});
+			}
+			_this.find('.pop_wrap .pop_header').attr('data-dialog-movecursor', 'true');
+			_this.find('.close_pop').tap( popup_cfLayerClose );
+
+			// 팝업 옵션 설정
+			var _option = {modal : true, movable : true};
+			if ( typeof(option) != 'undefined' && option != null ) {
+				if ( typeof(option.movable) != 'undefined' && option.movable != null ) {
+					_option.movable = option.movable;
+				}
+				if ( typeof(option.modal) != 'undefined' && option.modal != null ) {
+					_option.modal = option.modal;
+				}
+			}
+			_this.open( _option );
+
+			// 포커스를 레이어팝업으로 이동
+			//_this.focus();
+			_this.find('h1').focus();
+
+			// ajax 거래시에 complete js 실행(content영역에서 사용 - 퍼블리싱)
+			try {
+				contentLoadComplete();
+			} catch (e) {}
+
+		});
+}
+
+/**
+ * <pre>
+ * content페이지 레이어 팝업의 서브 팝업 호출
+ * </pre>
+ * @param {String} url : 호출할 URL
+ */
+function popup_cfContentLayerSubOpen(url, option) {
+	if (!popup_cfIsLayerCreate()) {
+		return popup_cfContentLayerOpen(url);
+	}
+	var _this = popup_cfLayerCreate(popup_CHILD_ID);
+
+	var urlPrefix = '/content/html';
+	var contentURL = ( url.substring(0,urlPrefix.length) == urlPrefix ? url : urlPrefix + url );
+
+	// 현재 포커스 저장
+	popup_FOCUS_CHILD_ID = $('*:focus');
+
+	return _this.load(contentURL, function(response,status,xhr){
+			if (window.browser && window.browser != 'mobile') {
+				_this.close();
+			}
+			_this.find('.pop_wrap').css({
+				'position':'static'
+			});
+			_this.find('.pop_wrap .pop_header').attr('data-dialog-movecursor', 'true');
+			_this.find('.close_pop').tap( popup_cfLayerSubClose );
+
+			// 팝업 옵션 설정
+			var _option = {modal : true, movable : true};
+			if ( typeof(option) != 'undefined' && option != null ) {
+				if ( typeof(option.movable) != 'undefined' && option.movable != null ) {
+					_option.movable = option.movable;
+				}
+				if ( typeof(option.modal) != 'undefined' && option.modal != null ) {
+					_option.modal = option.modal;
+				}
+			}
+			_this.open( _option );
+
+			// 포커스를 레이어팝업으로 이동
+			/* 황금돼지 임재흥 2019-09-23 팝업의 h1으로 포커스 이동 시작 */
+				_this.find('h1').focus();
+			/* 황금돼지 임재흥 2019-09-23 팝업의 h1으로 포커스 이동 끝 */
+			// ajax 거래시에 complete js 실행(content영역에서 사용 - 퍼블리싱)
+			try {
+				contentLoadComplete();
+			} catch (e) {}
+
+		});
+}
+
+/**
+ * <pre>
+ * content페이지 레이어 팝업 호출
+ * </pre>
+ * @param {String} url : 호출할 URL
+ */
+function popup_cfContentLayerOpen_Global(url, option) {
+	var _this = popup_cfLayerCreate();
+
+	var urlPrefix = "/content/html/i18n/" + window["LOCALE_INFO"];
+	var contentURL = urlPrefix + url;
+
+	// 현재 포커스 저장
+	popup_FOCUS_LAYER_ID = $('*:focus');
+
+	return _this.load(contentURL, function(response,status,xhr){
+			if (window.browser && window.browser != 'mobile') {
+				_this.close();
+			}
+			_this.find('.pop_wrap').css({
+				'position':'static'
+			});
+			_this.find('.pop_wrap .pop_header').attr('data-dialog-movecursor', 'true');
+			_this.find('.close_pop').tap( popup_cfLayerClose );
+
+			// 팝업 옵션 설정
+			var _option = {modal : true, movable : true};
+			if ( typeof(option) != 'undefined' && option != null ) {
+				if ( typeof(option.movable) != 'undefined' && option.movable != null ) {
+					_option.movable = option.movable;
+				}
+				if ( typeof(option.modal) != 'undefined' && option.modal != null ) {
+					_option.modal = option.modal;
+				}
+			}
+			_this.open( _option );
+
+			// 포커스를 레이어팝업으로 이동
+			_this.focus();
+
+			// ajax 거래시에 complete js 실행(content영역에서 사용 - 퍼블리싱)
+			try {
+				contentLoadComplete();
+			} catch (e) {}
+
+		});
+}
+
+/**
+ * <pre>
+ * content페이지 레이어 팝업의 서브 팝업 호출
+ * </pre>
+ * @param {String} url : 호출할 URL
+ */
+function popup_cfContentLayerSubOpen_Global(url, option) {
+	if (!popup_cfIsLayerCreate()) {
+		return popup_cfContentLayerOpen_Global(url);
+	}
+	var _this = popup_cfLayerCreate(popup_CHILD_ID);
+
+	var urlPrefix = "/content/html/i18n/" + window["LOCALE_INFO"];
+	var contentURL = urlPrefix + url;
+
+	// 현재 포커스 저장
+	popup_FOCUS_CHILD_ID = $('*:focus');
+
+	return _this.load(contentURL, function(response,status,xhr){
+			if (window.browser && window.browser != 'mobile') {
+				_this.close();
+			}
+			_this.find('.pop_wrap').css({
+				'position':'static'
+			});
+			_this.find('.pop_wrap .pop_header').attr('data-dialog-movecursor', 'true');
+			_this.find('.close_pop').tap( popup_cfLayerSubClose );
+
+			// 팝업 옵션 설정
+			var _option = {modal : true, movable : true};
+			if ( typeof(option) != 'undefined' && option != null ) {
+				if ( typeof(option.movable) != 'undefined' && option.movable != null ) {
+					_option.movable = option.movable;
+				}
+				if ( typeof(option.modal) != 'undefined' && option.modal != null ) {
+					_option.modal = option.modal;
+				}
+			}
+			_this.open( _option );
+
+			// 포커스를 레이어팝업으로 이동
+			/* 황금돼지 임재흥 2019-09-23 팝업의 h1으로 포커스 이동 시작 */
+				_this.find('h1').focus();
+			/* 황금돼지 임재흥 2019-09-23 팝업의 h1으로 포커스 이동 끝 */
+			// ajax 거래시에 complete js 실행(content영역에서 사용 - 퍼블리싱)
+			try {
+				contentLoadComplete();
+			} catch (e) {}
+
+		});
+}
+
+/**
+ * <pre>
+ * 윈도우 팝업 호출
+ * 
+ * (사용예)
+ * popup_cfWindowOpen('IPMS0051R.view', $('#f1'), {'width':'500px', 'height':'400px', 'scrollbars':'yes'});
+ * popup_cfWindowOpen('IPMS0051R.view', {'acno':'계좌번호'}, {'width':'500px', 'height':'400px', 'scrollbars':'yes'});
+ * </pre>
+ * @param {Object} 
+ * @param {String} path : 이동하고자 하는 경로값
+ * @param {Object} param : 페이지 전환시 다음 페이지로 넘기고자 하는 파라메터 값(FORM or JSON)
+ * @param {JSON} option : window.open API의 specs
+ */
+function popup_cfWindowOpen(path, param, option) {
+	// option의 기본값
+	var settings = {
+		width : 250,
+		height : 250,
+		location : 'no',
+		menubar : 'no',
+		toolbar : 'no',
+		scrollbars : 'no',
+		status : 'no',
+		resizable : 'no',
+		titlebar : 'no'
+	};
+
+	// window.open 옵션 설정
+	var _option = $.extend({}, settings, option || {});
+	var _param = null;
+	if (param && $(param).length > 0 && $(param)[0].tagName == 'FORM') {
+		_param = param;
+	}
+	var _target = path.split('.')[0];
+	if (_target.indexOf('/') > -1) {
+		_target = _target.substring(_target.lastIndexOf('/') + 1, _target.length);
+	}
+	var specs = '';
+	if (_option && typeof _option == typeof {}) {
+		for (var prop in _option) {
+			specs += ('' + prop + '=' + _option[prop] + ', ');
+		}
+		specs = specs.substring(0, specs.length - 2);
+	}
+
+	// window open
+	var ret = false;
+	ret = window.open('', _target, specs);
+
+	// 전송할 form param 셋팅
+	var submitform = document.createElement('form');
+
+	if (_param) {
+		$.each([ 'action', 'enctype', 'acceptCharset' ], function(i, v) {
+			if (v == 'action' && path) {
+				return;
+			}
+			if ($(_param)[0][v] && $(_param)[0][v] != "null") {
+				$(submitform).attr(v, $(_param)[0][v]);
+			}
+		});
+	}
+	if (_param && $(_param).length > 0 && $(_param)[0].tagName == 'FORM') {
+		$(_param).find('input,select,textarea').clone().appendTo(submitform);	// 부모창 form의 input 태그가 사라지는 버그 수정
+	}
+	else if (param && typeof param == typeof {}) {
+		for (var prop in param) {
+			$('<input type="hidden" name="' + prop + '"/>').val(param[prop]).appendTo(submitform);
+		}
+	}
+
+	// window에 form 전송
+	if (ret) {
+		$(submitform).attr("method", "POST");
+		document.body.appendChild(submitform);
+
+		submitform.action = path;
+		submitform.target = _target;
+		submitform.submit();
+		document.body.removeChild(submitform);
+	}
+
+	return ret;
+}
+
+/**
+ * 부모창에 링크 열기
+ */
+function popup_cfParentOpen(path, param) {
+	var _param = null;
+	if (param && $(param).length > 0 && $(param)[0].tagName == 'FORM') {
+		_param = param;
+	}
+
+	// 전송할 form param 셋팅
+	var form = $('<form style="display:none;"></form>');
+	form.attr('method', 'POST');
+	form.attr('action', path);
+
+	if (_param) {
+		$.each([ 'action', 'enctype', 'acceptCharset' ], function(i, v) {
+			if (v == 'action' && path) {
+				return;
+			}
+			if ($(_param)[0][v] && $(_param)[0][v] != "null") {
+				form.attr(v, $(_param)[0][v]);
+			}
+		});
+	}
+	if (_param && $(_param).length > 0 && $(_param)[0].tagName == 'FORM') {
+		$(_param).find('input,select,textarea').clone().appendTo(form);	// 부모창 form의 input 태그가 사라지는 버그 수정
+	}
+	else if (param && typeof param == typeof {}) {
+		for (var prop in param) {
+			$('<input type="hidden" name="' + prop + '"/>').val(param[prop]).appendTo(form);
+		}
+	}
+
+
+	opener.document.location.href = path + '?' + $(form).serialize();
+
+}
+/**
+ * 부모창에 링크 열기(SANDBOX 적용시 사용 - 현재 빠른조회서비스 대학등록금 화면 적용)
+ */
+function popup_cfParentOpen_new(path, param) {
+	var _param = null;
+	
+	if (param && $(param).length > 0 && $(param)[0].tagName == 'FORM') {
+		_param = param;
+	}
+
+	// 전송할 form param 셋팅
+	var form = $('<form style="display:none;"></form>');
+	form.attr('method', 'POST');
+	form.attr('action', path);
+
+	if (_param) {
+		$.each([ 'action', 'enctype', 'acceptCharset' ], function(i, v) {
+			if (v == 'action' && path) {
+				return;
+			}
+			if ($(_param)[0][v] && $(_param)[0][v] != "null") {
+				form.attr(v, $(_param)[0][v]);
+			}
+		});
+	}
+	if (_param && $(_param).length > 0 && $(_param)[0].tagName == 'FORM') {
+		$(_param).find('input,select,textarea').clone().appendTo(form);	// 부모창 form의 input 태그가 사라지는 버그 수정
+	}
+	else if (param && typeof param == typeof {}) {
+		for (var prop in param) {
+			$('<input type="hidden" name="' + prop + '"/>').val(param[prop]).appendTo(form);
+		}
+	}
+	
+	if(opener == null){
+		window.open(path + '?' + $(form).serialize(), '_blank', "");
+	}
+	else{
+		opener.document.location.href = path + '?' + $(form).serialize();
+	}
+}
+
+/**
+ * 이용안내 팝업 호출
+ */
+function popup_cfWindowOpenHelp(path) {
+	// window open
+	var ret = false;
+	ret = window.open('/content/html/ip/sg/help.html?url='+path, 'userguide_popup', 'width=825px, height=681px, scrollbars=no');
+	return ret;
+}
+
+/**
+ * 스마트도우미 팝업 호출
+ */
+function popup_cfWindowOpenSmartHelp(path) {
+	// window open
+	var ret = false;
+	ret = window.open(path, 'userguide_popup', 'width=830px, height=680px, scrollbars=no');
+	return ret;
+}
+
+/**
+ * 빠른조회서비스 팝업 호출
+ */
+function popup_cfQuickOpen(path) {
+	var urlPrefix = '/servlet/';
+	var url = ( path.substring(0,urlPrefix.length) == urlPrefix ? path : urlPrefix + path );
+	if (path.indexOf('.') == -1) {
+		url += '.view';
+	}
+	popup_cfWindowOpen(url, null, {'width':'820px', 'height':'678px', 'scrollbars':'yes'});
+	return false;
+}
+
+function popup_cfModalCreate(objId, type) {
+	var targetObj = $('body');
+	var html = '';
+	if (objId == null || objId == undefined) {
+		objId = popup_MODAL_ID;
+	} else {
+		targetObj = $('#'+popup_MODAL_ID);
+	}
+	
+	if(type == null || type == undefined || type=='modal'){	//기존팝업
+		html +='<section id="'+objId+'" class="modal-wrap" ></section>';
+	} else if (type == 'slide'){		// 
+		html +='<div class="in-popup" id="'+objId+'"></div>'
+	}
+	
+	var objForm = document.getElementById(objId);
+	if (objForm == null || objForm == undefined || typeof(objForm) != 'object') {
+		if(type == null || type == undefined || type=='modal'){
+			$('body').append(html);
+			$('#'+objId).dialog();
+		}else if(type == 'slide'){
+			$('.modal-wrap').last().find('.modal-popup').append(html);
+		}
+	}
+	return $('#'+objId).css({
+		'position':'absolute'
+	});
+}
+/**
+* 이지뱅킹 팝업 호출
+* @param {String} type : 팝업종류 (modal-모달팝업, slide-인팝업)
+*/
+function popup_cfModalOpen(targetpath, param, popupID, type, errorFunc) {
+	var _this = '';
+	if(type == null || type == undefined || type == 'modal'){
+		_this = popup_cfModalCreate(popupID, 'modal');	
+	}else if(type == 'slide'){
+		_this = popup_cfModalCreate(popupID, 'slide');
+	}
+	// 현재 포커스 저장
+	popup_FOCUS_LAYER_ID = $('*:focus');
+	
+	return _this.navigate(targetpath, param).done(function(){
+		window["H_WEB_POP"] = "true";
+		if(type == null || type == undefined || type == 'modal'){	// 모달팝업
+			$("#"+popupID).show();
+			$('body').addClass('position-fixed');
+			progressStepAndBar();
+			$('.modal-close').on('click', function() {
+				window["H_WEB_POP"] = "false";
+				$(".modal-close").parents().find('.modal-wrap').hide();
+				$('body').removeClass('position-fixed');
+				$('#'+popupID).remove();
+				// 저장된 포커스로 이동
+				if (popup_FOCUS_LAYER_ID != null) {
+					popup_FOCUS_LAYER_ID.focus();
+					popup_FOCUS_LAYER_ID = null;
+				}
+			});
+			
+			modalPopupOpen();	// 퍼블접근성관련 메소드(2020.10.21)
+			
+		}else if(type == 'slide'){	// 인팝업
+			$("#"+popupID).show();
+			$("#"+popupID).stop().animate({
+				bottom: 0
+			}, 300, function(){
+				$("#"+popupID).attr('tabindex', 0).focus(); 
+			});
+			$('.modal-dim').css('z-index', 1);
+			
+			$('.in-popup .in-popup-close').on('click', function(e) {
+				e.preventDefault();
+				$(this).closest('.in-popup').animate({
+					bottom: '-100%'
+				}, 300);
+				$('.modal-dim').css('z-index', 0);
+				$("#"+popupID).remove();
+			});
+		}
+		
+		
+	}).fail(function(data, status, xhr){
+		if (errorFunc && typeof errorFunc == 'function') {
+			errorFunc(data, status, xhr);
+		} else {
+			common_cfUserDefinedErrorPop(data, status, xhr);
+		}
+	});
+}
+
+/**
+* 이지뱅킹 팝업 호출 - 사용자임의로 생성한 레이어팝업 띄우기
+* @param {String} popupID : 띄울 팝업ID
+* @param {String} type : 팝업종류 (modal-모달팝업, slide-인팝업)
+*/
+function popup_cfModalOpenCustCont(popupID, type) {
+	window["H_WEB_POP"] = "true";
+	if(type == null || type == undefined || type == 'modal'){	// 모달팝업
+		$("#"+popupID).show();
+		progressStepAndBar();
+		$('body').addClass('position-fixed');
+		$('.modal-close').on('click', function() {
+			window["H_WEB_POP"] = "false";
+			$(".modal-close").parents().find('.modal-wrap').hide();
+			$('body').removeClass('position-fixed');
+		});
+		
+		modalPopupOpen();		// 퍼블접근성관련 메소드(2020.10.21)
+		
+	}else if(type == 'slide'){	// 인팝업
+		$("#"+popupID).show();
+		$("#"+popupID).stop().animate({
+			bottom: 0
+		}, 300, function(){
+			$("#"+popupID).attr("tabindex", "0").focus();
+		});
+		$('.modal-dim').css('z-index', 1);
+		
+		$('.in-popup .in-popup-close').on('click', function(e) {
+			e.preventDefault();
+			$(this).closest('.in-popup').animate({
+				bottom: '-100%'
+			}, 300);
+			$('.modal-dim').css('z-index', 0);
+			$("#"+popupID).hide();
+		});
+	}
+}
+
+/**
+* 이지뱅킹 모달팝업 닫기
+* @param {String} targetID : 닫을팝업 ID
+*/
+function popup_cfModalClose(targetID) {
+	window["H_WEB_POP"] = "false";
+	if(typeof targetID == 'undefined'){
+		targetID = popup_MODAL_ID;
+	}
+	if(typeof targetID != 'string'){
+		targetID = popup_MODAL_ID;
+	}
+	
+	$('#'+targetID).hide();
+	$('#'+targetID).remove();
+
+
+	
+	// 저장된 포커스로 이동
+		if (popup_FOCUS_LAYER_ID != null) {
+			popup_FOCUS_LAYER_ID.focus();
+			popup_FOCUS_LAYER_ID = null;
+		}
+	return false;
+}
+
+/**
+* 이지뱅킹 IN-팝업 닫기
+* @param {String} targetID : 인팝업 ID
+*/
+function in_popup_cfModalClose(targetID) {
+	if(typeof targetID == 'undefined'){
+		targetID = popup_MODAL_ID;
+	}
+	
+	if(typeof targetID != 'string'){
+		targetID = popup_MODAL_ID;
+	}
+	
+	$('#'+targetID).animate({
+		bottom: '-100%'
+	}, 500);
+	$('.modal-dim').css('z-index', 0);
+	
+	$('.in-popup .in-popup-close').on('click', function(e) {
+		e.preventDefault();
+
+		$(this).closest('.in-popup').animate({
+			bottom: '-100%'
+		}, 500);
+		$('.modal-dim').css('z-index', 0);
+	});
+
+	$('#'+targetID).remove();
+
+	// 저장된 포커스로 이동
+//		if (popup_FOCUS_LAYER_ID != null) {
+//			popup_FOCUS_LAYER_ID.focus();
+//			popup_FOCUS_LAYER_ID = null;
+//		}
+	return false;
+}
+
+function popup_pmLayerCreate(objId, type) {
+	var targetObj = $('body');
+	var html = "";
+	if (objId == null || objId == undefined) {
+		objId = popup_LAYER_ID;
+	} else {
+		targetObj = $('#'+popup_LAYER_ID);
+	}
+	 if(type == null || type == undefined){
+ 		type = "";
+	 }
+	html +='<div class="lypopWrap ' +type+'';
+	html +=' fade" id="'+objId+'" role="dialog"></div>';
+	var objForm = document.getElementById(objId);
+	if (objForm == null || objForm == undefined || typeof(objForm) != 'object') {
+		$('body').append(html);
+		$('#'+objId).dialog();
+	}
+	return $('#'+objId).css({
+		'position':'fixed'
+	}); 
+}
+
+/**
+ * m-site팝업 호출
+ * @param {String} type : 팝업종류 (공백-레이어팝업, full-풀팝업, bottom-슬라이드팝업)
+ */
+function popup_pmLayerOpen(targetpath, param, popupID, type) {
+	var _this = popup_pmLayerCreate(popupID, type);
+	// 현재 포커스 저장
+	popup_FOCUS_LAYER_ID = $('*:focus');
+	return _this.navigate(targetpath, param).done(function(){
+		$("#"+popupID+"").addClass("show");
+		$("#"+popupID+"").css("display", "block");
+		var popZIndex = '5000';
+		var $wrap = $('#wrap');
+		var $content = $('.content').add('footer').add('header'); // 웹접근성 대응
+		var $popObj = $("#"+popupID);
+		var $maxPopH = window.innerHeight;
+		if($popObj.length>0){
+			$popObj.css({zIndex:popZIndex++}).show();
+			$content.attr('aria-hidden', true);
+			setTimeout(function() {
+				$popObj.addClass('show');
+			}, 300);
+			setTimeout(function() {
+				if($popObj.find('.lypopHeader .tit').length){
+					$popObj.find('.lypopHeader .tit').attr('tabindex', 0).focus();
+				} else{
+					$popObj.find('.lypopCont').attr('tabindex', 0).focus();
+				}
+			}, 300);
+
+			if($wrap.find('.lypopFade').length<1) {
+				$wrap.append('<div class="lypopFade fade"></div>');
+			}
+			
+			var dimIndex = $popObj.css('zIndex') - 1;
+			$('.lypopFade').css({zIndex:dimIndex}).addClass('show');
+			$('html').addClass('lypopOpen');
+		
+			if($popObj.hasClass('full')){
+	    		var $header = $popObj.find('.lypopHeader').length > 0 ? $popObj.find('.lypopHeader').outerHeight() : 0 ;
+				var $footer = $popObj.find('.lypopFooter').length > 0 ? $popObj.find('.lypopFooter').outerHeight() : 0 ;
+				var $space = 2 * (parseFloat(getComputedStyle(document.body).fontSize)/1.4);
+				$space = Math.floor($space);
+				$popObj.find('.lypopBody').css({'overflowY' : 'scroll', height : $maxPopH - ($header + $footer + $space)});
+			}
+			$(".jsClose").on('click', function(){
+				$(this).parents('.lypopWrap').trigger('closePopup');
+				$("#"+popupID+"").remove();
+				$('.lypopFade').remove();
+				$content.attr('aria-hidden', false); // 웹접근성 대응
+				// 저장된 포커스로 이동
+				if (popup_FOCUS_LAYER_ID != null) {
+					popup_FOCUS_LAYER_ID.focus();
+					popup_FOCUS_LAYER_ID = null;
+				}
+			});
+		}
+	});
+}

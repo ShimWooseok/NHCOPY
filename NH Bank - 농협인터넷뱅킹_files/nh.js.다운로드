@@ -1,0 +1,26 @@
+/*****************************************************************************************
+* 업무명 : 공통
+* 세부업무명 : 공통
+* 설명 : common.js, date.js, format.js, util.js, validation.js include
+* 작성자 : 공통팀
+* 작성일 : 2013.01.30 
+* -----------------------------------------------------------------------------------------
+*  변경이력 
+* -----------------------------------------------------------------------------------------
+*  No 날짜        작성자  내용
+*  1  2013.01.30 공통팀  최초작성
+******************************************************************************************/
+
+
+/*
+ * JS 파일이 변경되면 
+ */
+var publishLastUpdated = (new Date().getYear() + 1900) + '' + (new Date().getMonth() + 1) + '' + new Date().getDate() + '' + new Date().getHours();
+
+document.write ( "<script type='text/javascript' charset='utf-8' src='/service/js/common/common.js?"+publishLastUpdated+"'></script>" ); 
+document.write ( "<script type='text/javascript' charset='utf-8' src='/service/js/common/date.js?"+publishLastUpdated+"'></script>" ); 
+document.write ( "<script type='text/javascript' charset='utf-8' src='/service/js/common/format.js?"+publishLastUpdated+"'></script>" ); 
+document.write ( "<script type='text/javascript' charset='utf-8' src='/service/js/common/util.js?"+publishLastUpdated+"'></script>" ); 
+document.write ( "<script type='text/javascript' charset='utf-8' src='/service/js/common/validation.js?"+publishLastUpdated+"'></script>" ); 
+document.write ( "<script type='text/javascript' charset='utf-8' src='/service/js/common/popup.js?"+publishLastUpdated+"'></script>" ); 
+document.write ( "<script type='text/javascript' charset='utf-8' src='/service/js/common/constant.js?"+publishLastUpdated+"'></script>" ); 

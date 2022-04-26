@@ -1,0 +1,3150 @@
+/*****************************************************************************************
+* 업무명 : 개인인터넷뱅킹
+* 세부업무명 : 공통
+* 설명 : 공통 Util 
+*       - 조회기간 달력 선택
+*       - 이체 관련 공통 유틸(한글금액 등)
+*       - 공통 팝업 호출
+* 작성자 : FA 정영탁(SI303162)
+* 작성일 : 2013.03.11 
+* -----------------------------------------------------------------------------------------
+*  변경이력 
+* -----------------------------------------------------------------------------------------
+*  No 날짜        	작성자  내용
+*  1  2013.03.11	정영탁  최초작성
+******************************************************************************************/
+
+
+/*****************************************************************************************
+ * 공통 Util
+ *****************************************************************************************/
+/**
+ * 현재의 위치를 판단하여, 변환된 URL을 반환한다.
+ */
+function ipcn_cfGetCurrentGlobalPath(path) {
+	if (path.length <= 2) {
+		return path;
+	}
+	var _pathname = document.location.pathname;
+	_pathname = _pathname.substring(_pathname.lastIndexOf('/') + 1, _pathname.length);
+	var _firstPath = _pathname.substring(0,2);
+	if (_firstPath == 'IP' || _firstPath == 'WS' || _firstPath == 'IH') {
+		return (path.substring(0,2) == 'IP' ? _firstPath + path.substring(2, path.length) : path);
+	} else {
+		return path;
+	}
+}
+
+/**
+ * 현재의 URL을 반환한다.(서비스ID)  
+ */
+function ipcn_cfGetCurrentPath() {
+	var _pathname = document.location.pathname;
+	_pathname = _pathname.substring(_pathname.lastIndexOf('/') + 1, _pathname.length);
+	return _pathname;
+}
+
+
+/*****************************************************************************************
+ * 유틸리티
+ *****************************************************************************************/
+
+/**
+ * $('#content').navigateIP 실행 후 수행할 스크립트
+ */
+function ipcn_cfContentNavigateComplete(data, status, xhr) {
+	// Tooltip 버튼
+	var tooltipElem = $('.tooltip *');
+	if (tooltipElem.length > 0) {
+		$(tooltipElem).unbind('click');
+	    $(tooltipElem).click(function () {
+	        var elm = $(this).parent().nextAll().eq(0);
+	        var wrapBox = $(this).parent().parent();
+	        var pPos = $(this).parent().position().left;
+	        var posx = (pPos > 400 ? pPos - elm.width() + $(this).parent().width() + 2 : pPos);
+	        var posy = $(this).position().top + $(this).parent().height() + 0;
+	        elm.css({ left: posx, top: posy });
+	        (pPos > 400) ? elm.addClass('right') : elm.addClass('left');
+	        (elm.hasClass('on') ? tipOff() : tipOn());
+			$(this).parents('div').eq(0).scroll(function(){tipOff();}); 
+			function tipOn() { $('.tip_type1').hide(); elm.show(); elm.addClass('on'); }
+	        function tipOff() { $('.tip_type1').hide(); }
+	        $(this).parent().nextAll().eq(0).mouseleave(function () { $(this).hide(); });
+			$(".tip_type1 ul").find("li:last-child").focusout(function() { tipOff(); }); // 접근성 점검 오류로 추가 2013-09-24
+			if (!elm.find('a').length && !elm.find('button').length) { // 접근성 점검 오류로 추가 2013-09-26
+				$(this).focusout(function() { tipOff(); });
+			}
+			$('.tip_type1').removeClass('on');
+	        return false;
+	    });
+	}
+
+	// ajax 거래시에 complete js 실행(content영역에서 사용 - 퍼블리싱)
+	try {
+		contentLoadComplete();
+	} catch (e) {}
+
+	common_FavoriteButtonInit();	// Body영역의 타이틀 옆 즐겨찾기 버튼(별표) 클릭시
+}
+
+/**
+ * <pre>
+ * 조회기간 설정의 날짜 초기화
+ * </pre>
+ * @param {String} calBtnId : 달력 버튼 ID
+ * @param {String} selectName : SelectBox 이름
+ * @param {String} formId : form 태그 ID
+ */
+function ipcn_fInitDate(calBtnId, selectName, formId) {
+	var fm = document.getElementById(formId);
+	var $year  = $(fm[selectName+'_year']);
+	var $month = $(fm[selectName+'_month']);
+	var $date  = $(fm[selectName+'_date']);
+	var $week  = $('#'+selectName+'_week');
+	
+	var _pathname = document.location.pathname;
+	_pathname = _pathname.substring(_pathname.lastIndexOf('/') + 1, _pathname.length);
+	var _firstPath = _pathname.substring(0,2);
+
+	if (calBtnId != null && calBtnId != undefined) {
+		// 조회기간(시작날짜) 날력 셋팅
+		$('#'+calBtnId).bind('singletap', function() {
+			var option = {
+				themeClass : "af-default",
+				date : {
+					year : $year.val(),
+					month : $month.val(),
+					day : $date.val()
+				}
+			};
+			$('#'+calBtnId).showDatePicker(function(date,dateStr,name){
+					// select box의 option에 항목이 없을 경우 추가
+					if (fm[selectName+'_year']) {
+						var isYearVal = false;
+						for (var i = 0; i < fm[selectName+'_year'].options.length; i++) {
+							if (fm[selectName+'_year'].options[i].value == dateStr.substr(0,4)) {
+								isYearVal = true;
+								break;
+							}
+						}
+						if (!isYearVal) {
+							//ipcn_fSetYear(fm[selectName+'_year'], dateStr.substr(0,4));
+							alert("선택 불가능한 년도입니다.");
+							return false;
+						}
+					}
+					// select box에 값 셋팅
+					$year.val(dateStr.substr(0,4));  // 년 셋팅
+					$month.val(dateStr.substr(4,2)); // 월 셋팅
+					date_cfLeapRule(selectName);     // 일 selectbox 목록 초기화
+					$date.val(dateStr.substr(6,2));  // 일 셋팅
+					$('#'+calBtnId).parent().find('span').removeClass('on');	// 기간 선택버튼 음영 초기화
+					
+					if(_firstPath == 'PM') {	// M사이트 거래내역조회 옵션팝업
+						$('input[name=radioPeriodSet]').removeAttr("checked");
+						$('input[name=radioPeriodSet]').parents("span").removeClass("active on");	
+					}
+					
+					if ($week) {
+						$week.html(date_cfGetWeekName($year.val(), $month.val(), $date.val()));
+					}
+				}, option);
+			return false;
+		});
+
+		// select box의 onchange 이벤트 발생시, 기간 버튼 비활성화
+		$('#'+selectName+'_year, #'+selectName+'_month, #'+selectName+'_date').bind('change', function(){
+			$(this).parents('td').find('span').removeClass('on');
+		});
+	}
+}
+
+/**
+ * 년도 select box에 option 추가
+ * @param obj : select box Object
+ * @param year : 년도
+ */
+function ipcn_fSetYear(obj, year) {
+	var minYear = Number(year), maxYear = Number(year);
+	for (var i = 0; i < obj.options.length; i++) {
+		if (minYear > Number(obj.options[i].value)) {
+			minYear = Number(obj.options[i].value);
+		}
+		if (maxYear < Number(obj.options[i].value)) {
+			maxYear = Number(obj.options[i].value);
+		}
+	}
+	obj.options.length = (obj.options[0].value == '' ? 1 : 0);
+	for (var i = minYear; i <= maxYear; i++) {
+		obj.add(new Option(i, i));
+	}
+}
+
+/**
+ * <pre>
+ * 조회기간 설정의 요일표시 초기화
+ * </pre>
+ * @param {String} selectName : SelectBox 이름
+ * @param {String} formId : form 태그 ID
+ */
+function ipcn_fInitDateWeek(selectName, formId) {
+	var fm = document.getElementById(formId);
+	var $year  = $(fm[selectName+'_year']);
+	var $month = $(fm[selectName+'_month']);
+	var $date  = $(fm[selectName+'_date']);
+	var $week  = $('#'+selectName+'_week');
+
+	$year.bind('change', function(){
+		$week.html(date_cfGetWeekName($year.val(), $month.val(), $date.val()));
+	});
+	$month.bind('change', function(){
+		$week.html(date_cfGetWeekName($year.val(), $month.val(), $date.val()));
+	});
+	$date.bind('change', function(){
+		$week.html(date_cfGetWeekName($year.val(), $month.val(), $date.val()));
+	});
+}
+
+/**
+ * <pre>
+ * 조회기간 설정의 날짜 선택
+ * </pre>
+ * @param {String} day : 선택할 날짜기간(예: 0, 7, 15, 30, 90, 180, 365)
+ * @param {String} todate : 오늘의 날짜 yyyyMMdd (NHBDateUtil.getCurrentDate()) 
+ * @param {String} systime : 시스템 시간 (System.currentTimeMillis())
+ * @param {String} formId : form 태그 ID
+ * @param {Object} btnObj : 버튼 Object
+ */
+function ipcn_fSetDate(day, todate, systime, formId, btnObj) {
+
+	// 선택된 버튼만 활성화
+	if (btnObj != null && btnObj != undefined) {
+		$('span', $(btnObj).parent().parent()).removeClass('on');
+		$(btnObj).parent().addClass('on');
+	}
+
+	var fm = document.getElementById(formId);
+	var sYear = fm['start_year'];
+	var sMonth = fm['start_month'];
+	var sDate = fm['start_date'];
+	var eYear = fm['end_year'];
+	var eMonth = fm['end_month'];
+	var eDate = fm['end_date'];
+
+	var day = Number(day);
+	var todate = todate;
+	var systime = systime;
+
+	// 오늘 날짜
+	var toYear = Number( todate.substring(0, 4) );
+	var toMonth = Number( todate.substring(4, 6) );
+	var toDay = Number( todate.substring(6, 8) );
+
+	// 날짜 계산(1,3,6,12개월을 날짜로 계산)
+	newt = new Date;
+	switch (day) {
+	case 30: 	newt = new Date(toYear, toMonth - 1 - 1, toDay + 1);	break;
+	case 90: 	newt = new Date(toYear, toMonth - 3 - 1, toDay + 1);	break;
+	case 180: 	newt = new Date(toYear, toMonth - 6 - 1, toDay + 1);	break;
+	case 365: 	newt = new Date(toYear, toMonth - 12 - 1, toDay + 1);	break;
+	default:
+		newtime = systime - (day * 24 * 60 * 60 * 1000);
+		newt.setTime(newtime);
+		break;
+	}
+
+	// 시작 년도 선택
+	newYear = Number(newt.getFullYear());
+	$(sYear).val( newYear );
+	date_cfLeapRule('start');
+
+	// 시작 월 선택
+	newMonth = Number(newt.getMonth()) + 1;
+	$(sMonth).val( (newMonth < 10 ? '0'+newMonth : newMonth) );
+	date_cfLeapRule('start');
+
+	// 시작 일 선택
+	newDay = Number(newt.getDate());
+	$(sDate).val( (newDay < 10 ? '0'+newDay : newDay) );
+
+	// 종료 년,월,일 선택
+	$(eYear).val( toYear );
+	$(eMonth).val( (toMonth < 10 ? '0'+toMonth : toMonth) );
+	date_cfLeapRule('end');
+	$(eDate).val( (toDay < 10 ? '0'+toDay : toDay) );
+
+}
+
+/**
+ * <pre>
+ * 조회기간유효성 체크
+ * </pre>
+ * 
+ * @param {String} todate : 오늘의 날짜 yyyyMMdd (NHBDateUtil.getCurrentDate())
+ * @param {String} formId : form 태그 ID
+ * @return {String} 에러번호
+ */
+function ipcn_fCheckDate(todate, formId) {
+	var fm = document.getElementById(formId);
+	var sYear  = fm['start_year'];
+	var sMonth = fm['start_month'];
+	var sDate  = fm['start_date'];
+	var eYear  = fm['end_year'];
+	var eMonth = fm['end_month'];
+	var eDate  = fm['end_date'];
+
+	var todate = todate;
+	var toYear = todate.substring(0, 4);
+	var toMonth = todate.substring(4, 6);
+	var toDay = todate.substring(6, 8);
+	var year1 = eYear.value;
+	var year2 = sYear.value;
+	var temp1 = toYear + '' + toMonth + '' + toDay; // 현재 년월일
+	var temp2 = sYear.value + sMonth.value + sDate.value; // 시작 년월일
+	var temp3 = eYear.value + eMonth.value + eDate.value; // 종료 년월일
+
+	if (sYear.value.length != 4) {
+		return '4'; // 시작 년도
+	}
+	if (sMonth.value > 12) {
+		return '5'; // 시작 월
+	}
+	if (sDate.value > 31) {
+		return '6'; // 시작 일
+	}
+	if (eYear.value.length != 4) {
+		return '7'; // 종료 년도
+	}
+	if (eMonth.value > 12) {
+		return '8'; // 종료 월
+	}
+	if (eDate.value > 31) {
+		return '9'; // 종료 일
+	}
+
+	if (sYear.value == '' || sMonth.value == '' || sDate.value == '' || eYear.value == '' || eMonth.value == '' || eDate.value == '') {
+		return '3'; // 조회날짜가 입력안됨.
+	}
+	if (year1 == '0000') {
+		return '4'; // 조회시작날짜가 잘못 입력됨.
+	}
+	if ((Number(temp1) - Number(temp2)) < 0 || (Number(temp1) - Number(temp3)) < 0) {
+		return '10'; // 조회날짜가 오늘보다 미래일 경우
+	}
+	if ((Number(temp3) - Number(temp2)) < 0) {
+		return '2'; // 조회시작날짜가 조회종료날짜보다 미래일 경우
+	}
+	if (year1 != year2 && Number(year2) < Number(year1) && Number(toYear) > Number(year2) + 1) {
+		return '1'; // 조회기간이 2년 초과할 경우
+	}
+	return '0';
+}
+
+/**
+ * formid : 폼이름 (ex. 'f') baseday : 기준일자 (ex. 20130312) daytype : daytyp.length ==
+ * 8 일 경우 종료일자로 셋팅. (ex. 20130430) daytyp.length != 8 일 경우 ipcn_getTermDate 함수
+ * 참조
+ */
+function ipcn_lfselectPeriod(formid, baseday, daytype){
+	//if( !selCode) return;
+	if(baseday.length != 8){
+		alert('올바른 날짜가 아닙니다.');
+		return;
+	}
+	
+	if(daytype == ''){
+		return;
+	}
+	
+	var s_date;
+	var e_date;
+	
+	if(daytype.length == 8){
+		s_date = baseday;
+		e_date = daytype;
+	}else{	
+		s_date = ipcn_getTermDate( daytype, baseday, '');	
+		e_date = baseday;
+	}
+	
+	var frm = document.getElementById(formid);
+	
+	if(s_date != '00000000'){
+		frm['start_year'].value = s_date.substring(0,4);
+		frm['start_month'].value = s_date.substring(4,6);
+		frm['start_date'].value = s_date.substring(6,8);
+	
+		frm['end_year'].value = e_date.substring(0,4);
+		frm['end_month'].value = e_date.substring(4,6);
+		frm['end_date'].value = e_date.substring(6,8);
+	}else{
+		return;
+	}
+
+}
+
+/**
+ * [설명]
+ * 오늘, 어제, 1주전, 2주전, 3주전, 4주전 데이타를 가져옴
+ * 기준일은 항상 오늘임.
+ * yyyy-mm-dd 의 형식임.
+ *
+ * 일 기준으로 조회를 할 경우는 d를 붙인다.
+ * ex) ipcn_getTermDate("3d", '20130304','');// 미래
+ *     ipcn_getTermDate("-7d", '20130304', '');// 과거
+ *
+ * 월 기준으로 조회를 할 경우는 m을 붙인다.
+ * ex) ipcn_getTermDate("2m", '20130304', '');// 미래
+ *     ipcn_getTermDate("-1m", '20130304', '');// 과거
+ *
+ * 년 기준으로 조회를 할 경우는 y을 붙인다.
+ * ex) ipcn_getTermDate("3y", '20130304', '');// 미래
+ *     ipcn_getTermDate("-2y", '20130304', '');// 과거
+ *
+ * @param val 요청 값
+ * @param curdate 기준일자
+ * @param pattern 패턴
+ * @return 결과
+ */
+function ipcn_getTermDate(val, curdate, pattern) {
+    if(curdate.length != 8){
+    	if(pattern == null) {
+            return "0000"+"-"+"00"+"-"+"00";
+        } else {
+            return "0000"+pattern+"00"+pattern+"00";
+        }
+    }
+	
+	var year = curdate.substring(0,4)*1;
+	var month = curdate.substring(4,6)*1;
+	var date = curdate.substring(6,8)*1;
+	
+
+    if(val == "") return val;
+    var term = 0;
+    try {
+        var s = val.substring(0, val.length-1);
+        if(s.length == 0) return val;
+        term = parseInt(s, 10);
+    } catch(e) {
+        return val;
+    }
+    var oDate;// 계산 결과 객체 선언
+    var cDate;// 계산에 사용할 날짜 객체 선언
+    if(val.toLowerCase().lastIndexOf("d") != -1) {// 일 계산 요청함
+        date = (date*1) + (term*1); // 날짜 계산
+        month--; // 월은 0~11 이므로 하나 빼준다
+    } else if(val.toLowerCase().lastIndexOf("m") != -1) {// 월 계산 요청함
+        var cDate; // 계산에 사용할 날짜 객체 선언
+        var cYear, cMonth, cDay; // 계산된 날짜값이 할당될 변수
+        month = month*1 + ((term*1)-1); // 월은 0~11 이므로 하나 빼준다
+        cDate = new Date(year, month, date); // 계산된 날짜 객체 생성 (객체에서 자동 계산)
+        cYear = cDate.getFullYear(); // 계산된 년도 할당
+        cMonth = cDate.getMonth(); // 계산된 월 할당
+        cDay = cDate.getDate(); // 계산된 일자 할당
+        oDate = (date == cDay) ? cDate : new Date(cYear, cMonth, 0); // 넘어간 월의 첫쨋날 에서 하루를 뺀 날짜 객체를 생성한다.
+    } else if(val.toLowerCase().lastIndexOf("y") != -1) {// 년 계산 요청함
+        year = year + parseInt(term, 10);
+        month--; // 월은 0~11 이므로 하나 빼준다
+    }
+   	oDate = new Date(year, month, date+1);// 계산된 날짜 객체 생성 (객체에서 자동 계산)
+    year = oDate.getFullYear();
+    month = (oDate.getMonth()+1) < 10 ? '0'+(oDate.getMonth()+1) : (oDate.getMonth()+1);
+    date = oDate.getDate() < 10 ? '0'+oDate.getDate() : oDate.getDate();
+    if(pattern == null) {
+        return year+"-"+month+"-"+date;
+    } else {
+        return year+pattern+month+pattern+date;
+    }
+}
+
+/**
+ * 날짜비교(yyyyMMdd 의 string 인자)
+ */
+function ipcn_CompareDate( input1, input2) {
+	if( !input1 || input1.length != 8 || !input2 || input2.length != 8) return null;  // 오류시 null 반환(수정:이경진(SI304122))
+	var input1Date = new Date( input1.substring(0,4), input1.substring(4,6) -1, input1.substring(6,8));
+	var input2Date = new Date( input2.substring(0,4), input2.substring(4,6) -1, input2.substring(6,8));
+
+	return parseInt( input1Date - input2Date, 10);
+
+}
+
+/**
+ * 현재 월 로부터 몇년(yearCnt) 후까지 Select Item 생성 ex) ipcn_makeYearCombo('year', <%=Now.getYear()%>, 5);
+ * @param id	  		Select ID
+ * @param nowYear 		현재 서버 Date정보의 년도
+ * @param yearCnt 		몇년 후 까지 표시 할껀지.
+ * @label defaultLabel	index 0 값(기본값: 'YYYY') 
+ *
+ */
+function ipcn_makeYearCombo(id, nowYear, yearCnt, defaultLabel) {
+	var makeStr = "";
+	makeStr += "<select id='" + id + "' name='" + id + "' data-type='select' title='유효기간 시작 년도 선택'>";
+	
+	var label = "YYYY";
+	if(defaultLabel){
+		label = defaultLabel;
+	}
+	var curYear = nowYear;
+		
+	makeStr += "<option value=''>" + label + "</option>";
+	for( var i=curYear; i<=(curYear+yearCnt); i++) {
+		makeStr += "<option value='" + i + "'>" + i + "</option>";
+	}
+	makeStr += "</select>";
+	document.write( makeStr );
+}
+
+/**
+ * 이체금액 입력시 한글로 표시
+ * @param {String} numString : 금액
+ * @param {String} PriID : 한글금액표시 span ID
+ * @param {String} isAmtHighlights : 금액에 색상으로 하이라이트 표시 여부(기본값: false)
+ * @returns {Boolean}
+ */
+function ipcn_fSetHangulAmount(numString, PriID, HangulIchAmtID, isAmtHighlights) {
+	var numString = format_cfOnlyNumFormat(numString);
+	var len = numString.length;
+
+	if (isAmtHighlights == null || isAmtHighlights == undefined) {
+		isAmtHighlights = false;
+	}
+
+	// 한글금액 처리
+	var delimiter = ' ';
+	var bPos = 0; // 만, 억, 조
+	var sPos = 0; // 십, 백, 천
+	var digit = 0;
+	var szDigit = '';
+	var is_start = false;
+	var appendFF = false;
+	var szHan = '';
+
+	for (var i = len - 1; i >= 0; i--) {
+		szDigit = numString.substring(i, i + 1);
+		digit = parseInt(szDigit);
+
+		if (digit != 0) {
+			if (bPos != 0 && sPos == 0) {
+				if (is_start == true) {
+					szHan += delimiter;
+				}
+				szHan += format_fourFour[bPos]; // 만, 억
+				appendFF = false;
+			}
+			if (bPos != 0 && appendFF == true) {
+				if (is_start == true) {
+					szHan += delimiter;
+				}
+				szHan += format_fourFour[bPos]; // 만, 억
+				appendFF = false;
+			}
+
+			if (sPos != 0) {
+				szHan += format_fourDigit[sPos]; // 십, 백, 천
+			}
+			szHan += format_hanNumber[digit]; // 일, 이, 삼
+			is_start = true;
+		} else if (sPos == 0 && bPos != 0) {
+			appendFF = true;
+		}
+		sPos++;
+		if (sPos % 4 == 0) {
+			sPos = 0;
+			bPos++;
+			if (bPos >= 4) {
+				return false; // (범위초과)
+			}
+		}
+	}
+	if (is_start == false) {
+		$('#'+PriID).html('');
+		if (HangulIchAmtID) {
+			$('#'+HangulIchAmtID).val('');
+		}
+	} else {
+		rslt = '';
+		for ( var i = szHan.length - 1; i >= 0; i--) {
+			rslt += szHan.substring(i, i + 1);
+		}
+		if (isAmtHighlights) {
+			$('#'+PriID).html( '[금 <span class="txt_point">' + $.trim(rslt) + '</span>원]' );
+		} else {
+			$('#'+PriID).html( '[금 ' + $.trim(rslt) + '원]' );
+		}
+		if (HangulIchAmtID) {
+			$('#'+HangulIchAmtID).val( $.trim(rslt)+'원' );
+		}
+	}
+
+	return true;
+}
+
+/**
+ * 이체금액 하단 버튼링크
+ * 
+ * @param {String}
+ *            mode : 모드(BM: 100만원, SM5: 50만원, MA10: 10만원, MA5: 5만원, BM1: 1만원)
+ * @param {String}
+ *            IcheAmtId : 이체금액 input ID
+ * @param {String}
+ *            PriId : 한글금액표시 span ID
+ * @param {String} 
+ * 			  isAmtHighlights : 금액에 색상으로 하이라이트 표시 여부(기본값: false)            
+ */
+function ipcn_fSetIcheAmount(mode, IcheAmtId, PriId, sHangulIchAmt, isAmtHighlights) {
+	
+	if (isAmtHighlights == null || isAmtHighlights == undefined) {
+		isAmtHighlights = false;
+	}
+	/*###########################################################
+	 * Non ActiveX 수정 
+	 * 이체 금액 입력시 direct 모드로 변경
+	 ###########################################################*/
+	ipcn_fDirectInputIchAmt(IcheAmtId);
+	/*###########################################################
+	 * Non ActiveX 수정 
+	 * 이체 금액 입력시 direct 모드로 변경
+	 ###########################################################*/	
+	var amt = $('#'+IcheAmtId).val();
+	if (amt == '') {
+		amt = '0';
+	}
+	var IchAmt = parseInt( format_cfOnlyNumFormat(amt), 10 );	// 이체금액
+
+	switch (mode) {
+	case 'BM':		$('#'+IcheAmtId).val( format_cfFormatNumber(""+(IchAmt+1000000)) );	break;
+	case 'SM5':		$('#'+IcheAmtId).val( format_cfFormatNumber(""+(IchAmt+500000)) );	break;
+	case 'MA10':	$('#'+IcheAmtId).val( format_cfFormatNumber(""+(IchAmt+100000)) );	break;
+	case 'MA5':		$('#'+IcheAmtId).val( format_cfFormatNumber(""+(IchAmt+50000)) );	break;
+	case 'BM1':		$('#'+IcheAmtId).val( format_cfFormatNumber(""+(IchAmt+10000)) );	break;
+	}
+	ipcn_fSetHangulAmount($('#'+IcheAmtId).val(), PriId, sHangulIchAmt, isAmtHighlights);
+	
+}
+
+
+
+/*****************************************************************************************
+ * 공통 페이지 바로가기
+ *****************************************************************************************/
+
+/**
+ * <pre>
+ * 계좌 기본정보조회
+ * </pre>
+ * @param {String} acno : 계좌번호
+ * @param {String} io_tr_ds : 거래구분
+ * @param {String} wrs_c : 상품코드
+ * @return {boolean} true : 성공, false : 실패
+ */
+function ipcn_fBasicInfoAccount(acno, io_tr_ds, wrs_c) {
+    var sAcctType = common_cfGetAccountType(acno);		// 계좌 타입
+    var sGwamok = common_cfGetNewAccountGwamok(acno);	// 계좌 과목코드
+    
+    var serviceId = '';
+    
+	if (sAcctType=='0' || sAcctType=='1') {
+	// 입출금 pibpbap2102_ajax
+	serviceId = 'IPCN0221R';
+    }
+    else if(sGwamok == '090') {
+    	// 퇴직연금
+    	serviceId = 'IPCN0361R';
+    }
+    else if (sAcctType == '3') {
+    	// 카드
+    	var sGbn = acno.substring(0, 6);
+    	if (sGbn == '498819' || sGbn == '498820' || sGbn == '517823' || sGbn == '448555' ||
+    			sGbn == '517808' || sGbn == '464022' || sGbn == '448537' || sGbn == '941016') {
+    		// 비자카드
+        	serviceId = 'IPCN0281R';
+    	}
+    	else {
+    		// BC카드
+        	serviceId = 'IPCN0281R';
+    	}
+    }
+    else if (sAcctType == '7' || sAcctType == '8') {
+    	// 대출 pibpbelp0101_ajax
+    	serviceId = 'IPEL0012P';
+    }
+    else if (sAcctType == '6') {
+    	// 공제 pibpbfi0110_popup
+    	serviceId = 'IPCN0271R';
+    }
+    else if (sGwamok == '058') { // as-is : (sAcctType == '5' && sGwamok == '058')
+    	// 신탁(농업금융채권)
+    	serviceId = 'IPCN0261R';
+    }
+    else if (sAcctType == '5' && ( sGwamok == '028' || sGwamok == '077')) {
+    	// 펀드(수익증권)
+    	serviceId = 'IPCN0261R';
+    }
+    else if (sAcctType == '5') {
+    	// 신탁,저축성,자유로정기예금,환매채
+    	serviceId = 'IPCN0261R';
+    }
+    else if (sAcctType == '9' && (sGwamok == '431' || sGwamok == '432' || sGwamok == '433' || sGwamok == '434' || sGwamok == '435' || sGwamok == '419')) {
+    	// 외환 대출 pibpbefp0101_ajax
+    	serviceId = 'IPEL0012P';
+    }
+    else if (sAcctType == '9') {
+    	// 외환 cibGA040300
+    	serviceId = 'IPCN0231R';
+    }
+    else {
+    	// pibpbap0102_ajax
+    	serviceId = 'IPCN0261R';	// IPAI9031R, IPAI9051R
+	}
+    
+    popup_cfLayerOpen(serviceId, {
+			'acno' : acno,			// 계좌번호
+			'io_tr_ds' : io_tr_ds,	// 거래구분("1":잔액조회, "2":거래내역상세조회, "3":거래내역조회)
+			'inq_dsc' : '1',			// 조회구분코드(1:전체, 2:입금, 3:출금)
+			'wrs_c' : wrs_c        // 상품코드 (2016.05.30 e금융고도화)
+		});
+
+     
+}
+
+/**
+ * <pre>
+ * ELT/DLT운용자산조회
+ * </pre>
+ * @param {String} acno : 계좌번호
+ * @return {boolean} true : 성공, false : 실패
+ */
+function ipcn_fEltDltInfoAccount(acno) {
+	popup_cfLayerOpen('IPCN0269R', {
+		'acno' : acno			// 계좌번호
+	});
+}
+
+/**
+ * <pre>
+ * ELT/DLT운용자산조회(글로벌)
+ * </pre>
+ * @param {String} acno : 계좌번호
+ * @return {boolean} true : 성공, false : 실패
+ */
+function ipcn_fEltDltInfoAccount2(acno) {
+	popup_cfLayerOpen('PGCN0269R', {
+		'acno' : acno			// 계좌번호
+	});
+}
+
+/**
+ * 하나로 가족 등급 조회
+ * 
+ * @param {String} InqGbn1 : 조회구분코드
+ * @param {String} InqGbn2 : 중앙회조합구분코드
+ */
+function ipcn_fOpenHanaroPoint(InqGbn1, InqGbn2) {
+    popup_cfLayerOpen('IPAI0012R', {
+	    	'nh_code' : InqGbn1,
+	    	'nn_code' : InqGbn2
+	    });
+}
+
+
+/** 수수료면제 여부/횟수 조회
+ * 
+ * @param {String} InqGbn1 : 조회구분코드
+ * @param {String} InqGbn2 : 중앙회조합구분코드
+ */
+function ipcn_fOpenHanaroSusuInquiry(InqGbn1, InqGbn2) {
+    popup_cfLayerOpen('IPAI0013R', {
+	    	'io_ea_inq_ds1' : InqGbn1,
+	    	'io_ea_naac_dsc1' : InqGbn2
+	    });
+}
+
+
+
+/**
+ * 공인인증센터
+ */
+function ipcn_fAuthCenter() {
+	common_navigateToContent("/ip/ca/ipca1171c.thtml", null);
+}
+
+/**
+ * 계좌순서변경 페이지로 링크
+ */
+function ipcn_fAccountOrderChange() {
+	popup_cfLayerOpen('IPAM0481R');
+}
+
+/**
+ * 우대금리조회
+ *
+ * @param {String} linkStr : 링크 문자열(계좌번호/과목코드/거래일자/원장잔액/비밀계좌여부/레이어번호/별칭/상품명/예금주명)
+ */
+function ipcn_fInterestRate(linkStr) {
+	aField = linkStr.split("/");
+	var acno = aField[0];
+	var dprnm = aField[8];
+
+	popup_cfLayerOpen('IPAI0026R', {'acno' : acno, 'dprnm':dprnm});
+}
+
+/**
+ * 금리변경내역조회
+ *
+ * @param {String} linkStr : 링크 문자열(계좌번호/과목코드/거래일자/원장잔액/비밀계좌여부/레이어번호/별칭/상품명/예금주명)
+ */
+function ipcn_fRageChangeList(linkStr) {
+	aField = linkStr.split("/");
+	var acno = aField[0];
+	var dprnm = aField[8];
+	var wrs_c = aField[9];
+
+	popup_cfLayerOpen('IPAI0027R', {'acno' : acno, 'wrs_c' : wrs_c});
+}
+
+/**
+ * 적용금리내역조회(외화예금_저축성)
+ *
+ * @param {String} acno : 계좌번호
+ */
+function ipcn_fApprateList(acno) {
+
+	popup_cfLayerOpen('IPEF0532R', {'acno' : acno});
+}
+/**
+ * 인쇄 및 엑셀 저장 팝업호출 
+ * 
+ * @param {String} rpxFile : RPX 파일
+ * @param {String} xmlData : XML 데이터
+ */
+function ipcn_fPrintExcel(rpxFile, xmlData) {
+	var reportTitle = '';
+	if (rpxFile.indexOf('.rpx') > -1) {
+		rpxFile = rpxFile.substring(0, rpxFile.indexOf('.rpx'));
+	}
+	if (xmlData == null || xmlData == undefined) {
+		xmlData = $('#xmldata').val();
+		reportTitle = $($.parseXML(xmlData)).find('title').text();
+	}
+
+	var reportSendFrm = document.getElementById ( "reportSendFrm" ) ;
+	if (reportSendFrm == null || reportSendFrm == undefined || typeof(reportSendFrm) != 'object') {
+		common_cfReportFormInit();
+	}
+
+	common_cfReportPrint(reportTitle, rpxFile, xmlData);
+}
+
+/**
+ * 인쇄 및 엑셀 저장 도움말
+ */
+function ipcn_fPrintExcelHelp() {
+	popup_cfLayerSubOpen('IPCN0011P');
+}
+
+/**
+ * 엑셀 저장
+ * 
+ * @param {String} xmlData : XML 데이터
+ */
+function ipcn_fDownloadExcel(xmlData) {
+	//as-is : new nh.lnj.js.utils.doDownLoadExcel(xmlData);
+	navigate('IPCN9001R', {
+		'dType' : '2',		// 데이터타입(1=파일, 2=엑셀, 3=텍스트)
+		'xmlData' : xmlData,
+		'saac' : 'saac'
+	}, {
+		'useProgress' : false
+	});
+}
+
+/**
+ * 파일 다운로드
+ * (as-is: onDownload)
+ * 
+ * @param filename : 파일명 또는 전체파일경로
+ */
+function ipcn_fOnDownload(filename) {
+	var fPath = (filename.indexOf('/') > -1 ? filename.substring(0, filename.lastIndexOf('/')) : '');
+	filename = (filename.indexOf('/') > -1 ? filename.substring(filename.lastIndexOf('/') + 1, filename.length) : filename);
+	var fName = (filename.indexOf('.') > -1 ? filename.substring(0, filename.lastIndexOf('.')) : '');
+	var fExt = (filename.indexOf('.') > -1 ? filename.substring(filename.lastIndexOf('.') + 1, filename.length) : '');
+
+	// 다운로드
+	navigate('IPCN9001R', {
+		'dType' : '1',		// 데이터타입(1=파일, 2=엑셀, 3=텍스트)
+		'fPath' : fPath,	// 경로(CodeDic 코드 또는 특정경로)
+		'fName' : filename,	// 다운로드할 파일명(파일.확장자)
+		'dFName' : fName,	// 파일명(확장자 제외)
+		'dFExt' : fExt,		// 확장자
+		'saac' : 'saac'
+	}, {
+		'useProgress' : false
+	});
+}
+
+/**
+ * 조회기간 버튼 클릭에 따른 DatePicker From/To 년, 월, 일 설정
+ * 조회기간 버튼 div id='btnDateSetGrp' 필요 
+ * 
+ * @param option
+ * 
+ * ex) base의 val을 기준으로 term 만큼 날짜 연산 실행 (type: d(일),m(월),y(년))
+ *	ipcn_fSetDateElement({
+ *		setBtnGrp : {
+ *			term :['0' ,'-6' ,'-30' , '-6'],
+ *			type :['d' ,'d' , 'd', 'm'],
+ *			base :{id:"end" ,val:'<%=endDate%>'},
+ *			btnType : ''  button 또는 radio default 는 button
+ *			 > btnType 이 radio 일때 radio를 감싸는 label 에 이벤트 부여
+ *		}
+ *	});	
+ */
+function ipcn_fSetDateElement(option){
+	var dOpt = {
+		pair_id :['start' ,'end']
+	};
+	$.extend(dOpt ,option);
+	$.each(dOpt.pair_id , function(i , id){
+		ipcn_fSetDatePicker(id);
+	});
+	
+
+	if(dOpt.setBtnGrp){
+		var btnOpt = {
+				id:"#btnDateSetGrp",
+				btnType : 'button'	
+		};
+		$.extend(btnOpt ,dOpt.setBtnGrp);
+		
+		var tElemGrp = null;
+		
+		if(btnOpt.btnType === 'button'){
+			tElemGrp = $(btnOpt.id).find("button");
+		}else if(btnOpt.btnType === 'radio'){
+			tElemGrp = $(btnOpt.id).find("label");
+		}
+
+		var type;
+		
+		tElemGrp.each(function(i){
+			$(this).tap(function() {
+				
+				if(btnOpt.type==null){
+					type = 'd';
+				}else{
+					type = btnOpt.type[i];
+				}
+				
+				if(btnOpt.sDt!=null){					
+					ipcn_SetDateSelect(dOpt.pair_id[0]+'_year',
+									   dOpt.pair_id[0]+'_month',
+									   dOpt.pair_id[0]+'_date',
+									   btnOpt.sDt[i],
+									   type,
+									   btnOpt.term[i],
+									   dOpt.pair_id[1]+'_year',
+									   dOpt.pair_id[1]+'_month',
+									   dOpt.pair_id[1]+'_date');
+				}else{
+					ipcn_SetDateSelect(dOpt.pair_id[0]+'_year',
+							           dOpt.pair_id[0]+'_month',
+							           dOpt.pair_id[0]+'_date',
+							           btnOpt.base.val,
+							           type,
+							           btnOpt.term[i],
+							           dOpt.pair_id[1]+'_year',
+							           dOpt.pair_id[1]+'_month',
+							           dOpt.pair_id[1]+'_date');
+				}
+				
+				if(btnOpt.btnType === 'button'){	
+					$(btnOpt.id).find("span").removeClass("on");
+					$(this).parent().addClass("on");
+					console.log($(this).parent().attr('class'));
+				}
+			});	
+		});
+						
+	}
+	
+}
+
+/**
+ * <pre>
+ * 달력 이벤트 
+ * </pre>
+ * @param idHeader 	: 달력버튼의 id에서 '_datepicker' 를 제외한 string 		 
+ */
+
+function ipcn_fSetDatePicker(idHeader , localeInfo){
+	var yearId 	= idHeader+"_year";
+	var monthId = idHeader+"_month";
+	var dateId 	= idHeader+"_date";
+	
+	var locale  = localeInfo || 'ko';
+	if(locale == "ko_KR") locale = 'ko';
+	if(locale == "en_US") locale = 'en';
+	
+	$('#'+idHeader+'_datepicker').tap(function(){
+		if($("#"+yearId).prop('disabled')) return false;
+		
+		var dpOpt = {
+			themeClass: "af-default",
+			date : {		
+				year  : $("#"+yearId).val(), 
+				month : $("#"+monthId).val(),
+				day   : $("#"+dateId).val()
+			},
+			locale : locale
+		};
+		$(this).showDatePicker(function(date, dateStr, name){
+			var cY 	 = Number(dateStr.substring(0,4));
+			var flag = false;
+			$("#"+yearId).find("option").each(function(){
+				if(cY == $(this).val()){
+					flag = true;
+					return false;  // break
+				}
+			});
+			
+			if(!flag){
+				alert("선택 불가능한 날짜입니다.");
+				return false;
+			}else{
+				$("#"+yearId).val(dateStr.substring(0,4));
+				$("#"+monthId).val(dateStr.substring(4,6));
+				date_cfLeapRule(idHeader);
+				$("#"+dateId).val(dateStr.substring(6,8));
+			}
+			return false;
+			
+		}, dpOpt);
+	});
+
+}
+/**
+ * <pre>
+ * 입력받은 날짜에서 시작일, 종료일 select설정(종료일은 필수값이 아님)	
+ * </pre>
+ * @param s_yy : 시작 년(id)
+ * @param s_mm : 시작 월(id)
+ * @param s_dd : 시작 일(id)
+ * @param defaultDate : 기준날짜(yyyymmdd) ===> 오늘날짜
+ * @param type : 년, 월, 일 (y, m, d) 년단위면 "y", 월단위면 "m", 일단위면 "d"
+ * @param num : 설정할 일수 (기준날짜에서 dateChoice 기준으로 해당하는 일자 또는 월, 또는 년) -1, 1, 10, -15등등
+ * @param e_yy : 종료 년(id)
+ * @param e_mm : 종료 월(id)
+ * @param e_dd : 종료 일(id)
+ * @param idx : 버튼 하이라이팅(클릭시 색상변경할 버튼의 순서:0,1,2,3....)
+ * @return
+ * 예) fSetDate("sDate_year", "sDate_month", "sDate_date", "20130318", "d", "-100", "eDate_year", "eDate_month", "eDate_date"); 오늘날짜 기준 100일전
+ * 예) fSetDate("sYear_year", "sDate_month", "sDate_date", "20130318", "m", "-10", "eDate_year", "eDate_month", "eDate_date"); 오늘날짜 기준 10달전
+ * 
+ * 관련함수 : iccn_ShiftDate
+ */
+function ipcn_SetDateSelect(s_YY, s_MM, s_DD, defaultDate, type, num, e_YY, e_MM, e_DD, idx){
+
+	var iPreDate = parseInt(num);
+	var setDate = "";
+	if (type == "y") {
+		setDate = ipcn_ShiftDate(defaultDate, iPreDate, 0, 0, "");
+	} else if(type == "m") {
+		setDate = ipcn_ShiftDate(defaultDate, 0, iPreDate, 0, "");
+	} else if(type == "d"){
+		setDate = ipcn_ShiftDate(defaultDate, 0, 0, iPreDate, "");
+	}else {
+		setDate = ipcn_ShiftDate(defaultDate, 0, 0, iPreDate, "");
+	}
+	
+	//일자의 term이 양수일경우 조회종료일을 +시킨다
+	//(조회시작일이변경안되고 종료일 변경되게 수정: 2013-09-11 원영탁)
+	if(num < 0){
+		$("#"+s_YY).val(setDate.substring(0,4));				/*시작년도*/
+		$("#"+s_MM).val(setDate.substring(4,6));				/*시작월*/
+		s_day = s_DD.substring(0, s_DD.indexOf("_date"));	/*날짜 id */
+		date_cfLeapRule(s_day);									/*해당월에 대해 일자를 다시불러온다*/
+		$("#"+s_DD).val(setDate.substring(6,8));				/*시작일*/
+	
+		$("#"+e_YY).val(defaultDate.substring(0,4));	/*종료년도*/
+		$("#"+e_MM).val(defaultDate.substring(4,6));	/*종료월*/
+		$("#"+e_DD).val(defaultDate.substring(6,8));	/*종료일*/
+	}else{
+		$("#"+s_YY).val(defaultDate.substring(0,4));	/*종료년도*/
+		$("#"+s_MM).val(defaultDate.substring(4,6));	/*종료월*/
+		$("#"+s_DD).val(defaultDate.substring(6,8));	/*종료일*/
+		
+		$("#"+e_YY).val(setDate.substring(0,4));				/*시작년도*/
+		$("#"+e_MM).val(setDate.substring(4,6));				/*시작월*/
+		s_day = e_DD.substring(0, e_DD.indexOf("_date"));	/*날짜 id */
+		date_cfLeapRule(s_day);									/*해당월에 대해 일자를 다시불러온다*/
+		$("#"+e_DD).val(setDate.substring(6,8));				/*시작일*/
+		
+	}
+}
+	/**
+	 * <pre>
+	 * 주어진 Time 과 y년 m월 d일 차이나는 Time을 리턴
+	 * </pre>
+	 * @param time 	: 년월일 (20130318)
+	 * @param y		: 년 
+	 * @param m		: 월
+	 * @param d 	: 일
+	 * @param dele	: 날짜포맷
+	 * @reutn
+	 * ex) var time = form.time.value; //'20000101'
+	 *     alert(shiftTime(time,0,0,-100));
+	 *     => 2000/01/01 00:00 으로부터 100일 전 Time
+	 *     
+	 * 관련함수 : iccn_GetDateObject, iccn_GetDateString
+	 */
+	function ipcn_ShiftDate(time,y,m,d, dele) {
+	    var date = ipcn_GetDateObject(time);
+	    date.setFullYear(date.getFullYear() + y);
+	    date.setMonth(date.getMonth() + m);
+	    date.setDate(date.getDate() + d);
+
+	    return ipcn_GetDateString(date, dele);
+	}
+	
+	/**
+	 * <pre>
+	 * 자바스크립트 Date 객체를 Time 스트링으로 변환
+	 * </pre>
+	 * @param date 	: Date객체
+	 * @param dele	: 날짜포맷
+	 * @reutn
+	 */
+	function ipcn_GetDateString(date, dele) {
+	    var year  = date.getFullYear();
+	    var month = date.getMonth() + 1;
+	    var day   = date.getDate();
+
+	    if (("" + month).length == 1) { month = "0" + month; }
+	    if (("" + day).length   == 1) { day   = "0" + day;   }
+	    return ("" + year + dele + month + dele + day);
+	} 
+
+/**
+ * 계좌 구분을 받아서 계좌 타입을 리턴해준다.
+ * @param {String} mode : 계좌 타입
+ */
+function ipcn_fGjaTypeCheck(mode) {
+	var gjatype   = '';   // 계좌 타입 변수
+	switch(mode){
+	case "1"   : gjatype=1; break;
+	case "1-1" : gjatype=1; break;
+	case "1-2" : gjatype=1; break;
+	case "1-3" : gjatype=1; break;
+	case "1-4" : gjatype=1; break;
+	case "1-5" : gjatype=1; break;
+	case "1-6" : gjatype=1; break; // 자계좌 표시않함
+	case "1-7" : gjatype=1; break; // 자계좌 표시않함
+	case "1-8" : gjatype=1; break; // 자계좌 표시않함
+	case "1-9" : gjatype=1; break; // 자계좌 표시않함
+	case "1-10": gjatype=1; break; // 자계좌 표시않함
+	case "2"   : gjatype=2; break;
+	case "2-1" : gjatype=2; break;
+	case "2-2" : gjatype=2; break;
+	case "2-3" : gjatype=2; break;
+	case "3"   : gjatype=3; break;
+	case "3-1" : gjatype=3; break;
+	case "3-2" : gjatype=3; break;
+	case "4"   : gjatype=4; break;
+	case "4-1" : gjatype=4; break;
+	case "4-2" : gjatype=4; break;
+	case "4-3" : gjatype=4; break;
+	case "5"   : gjatype=5; break;
+	case "6"   : gjatype=6; break;
+	case "6-1" : gjatype=6; break;
+	case "7"   : gjatype=7; break;
+	case "7-1" : gjatype=9; break; // 전체계좌중 요구불계좌
+	case "8-1" : gjatype=8; break; // 자계좌 제외,농·축협 계좌 제외하기 위해 새로 만듬
+	case "9-1" : gjatype=1; break; // (추가 2004.10.05)
+	}
+	return ''+gjatype;
+}
+
+/**
+ * 출금계좌번호 유효성 체크
+ * 
+ * @param {String} mode : 계좌 타입
+ * @param {String} fMode : 
+ * @param {String} acno : 출금계좌번호
+ * @param {String} msg : alert 메시지
+ * @param {String} IgmGjaNbr : 입금계좌번호 
+ */
+function ipcn_fIsValidOutAcct(mode, fMode, acno, msg, IgmGjaNbr) {
+	// 출금계좌리스트의 40건 이상 보유 고객은 체크로직에서 제외함
+	var sReturn = false;
+	var sGjaType = ipcn_fGjaTypeCheck(mode);  //계좌 타입 변수
+	var Igmacctno = "";
+
+	var sAcctType = common_cfGetAccountType(acno);		// 계좌 타입
+    var sGwamok = common_cfGetNewAccountGwamok(acno);	// 계좌 과목코드
+
+    if (fMode == '2' || fMode == '4') {
+    }
+    else if (fMode == '5') {
+    	Igmacctno = IgmGjaNbr;
+    }
+
+	httpSend('IPAI0011R', {'session':'true'}, callBackSuccess, callBackError, {async:false, 'useProgress' : false});
+
+	function callBackSuccess(responseJson) {
+		var outAllAcctList = responseJson['list']['IB_OUT_ALL_ACCT'];
+		var iAcctnoCnt = 0;
+
+		for (var i = 0; i < outAllAcctList.length; i++) {
+			var ACNO1 = $.trim(outAllAcctList[i]['ACNO1']);			// 계좌번호
+			var AC_STS1 = $.trim(outAllAcctList[i]['AC_STS1']);		// 계좌상태
+			var AC_DS = $.trim(outAllAcctList[i]['AC_DS']);			// 계좌구분
+
+			if (fMode == '' || fMode == '1') {
+				if (sGjaType == '1') {
+					if (ACNO1 == acno) {
+						sReturn = true;
+						break;
+					}
+				}
+			}
+			else if (fMode == '2') {	// 이체 조회의 직접입력의 경우에만 사용됨
+				if (ACNO1 == acno) {
+					sReturn = true;
+					break;
+				}
+			}
+			else if (fMode == '3') {	// 자계좌 제외하는 valid check
+				if (sGjaType == '1') {
+					if (ACNO1 == acno && AC_STS1 != '2' && AC_DS != '3') {
+						sReturn = true;
+						break;
+					}
+				}
+			}
+			else if (fMode == '4') {	// 이체 조회의 직접입력의 경우에만 사용됨
+				if (ACNO1 == acno && AC_STS1 != '2' && AC_DS != '3') {
+					sReturn = true;
+					break;
+				}
+			}
+			else if (fMode == '5') {	// 모계좌가 비밀계좌일 경우 이체시 모계좌 인지 정당성 체크
+				if (ACNO1 == acno && AC_STS1 != '2' && AC_DS != '3') {
+					sReturn = true;
+					break;
+				} else if (AC_STS1 != '2' && AC_DS != '3') {
+					iAcctnoCnt++;
+				}
+			}
+		}
+
+		if (iAcctnoCnt > 0) {
+			for (var i = 0; i < outAllAcctList.length; i++) {
+				var AC_STS1 = $.trim(outAllAcctList[i]['AC_STS1']);		// 계좌상태
+				var AC_DS = $.trim(outAllAcctList[i]['AC_DS']);			// 계좌구분
+				if (AC_STS1 != '2' && AC_DS != '2') {
+					sReturn = true;
+					break;
+				}
+			}
+		}
+
+		if (!sReturn) {
+			if (fMode == '' || fMode == '1') {
+				if (ipcn_fIsValidOutAcct.arguments.length > 3) {
+					alert(msg);
+				} else {
+					alert('출금 계좌번호가 정확하지 않습니다.');
+				}
+			}
+			else if (fMode == '2') {	// 이체 조회의 직접입력의 경우에만 사용됨
+				alert('출금 계좌번호가 정확하지 않습니다.');
+			}
+			else if (fMode == '3') {	// 자계좌 제외하는 valid check
+				if (sGjaType == '8') {
+					if (common_cfGetNewJoongJo(acno) == '2') {
+						alert('출금 계좌번호는 농협은행 계좌만 가능합니다.');
+					} else {
+						if (ipcn_fIsValidOutAcct.arguments.length > 3) {
+							alert(msg);
+						} else {
+							alert('잘못된 출금계좌번호입니다.\n정확한 출금계좌를 선택하시거나 입력하세요.');
+						}
+					}
+				} else if (sGjaType == '1') {
+					if (ipcn_fIsValidOutAcct.arguments.length > 3) {
+						alert(msg);
+					} else {
+						alert('잘못된 출금계좌번호입니다.\n정확한 출금계좌를 선택하시거나 입력하세요.');
+					}
+				}
+			}
+			else if (fMode == '4') {	// 이체 조회의 직접입력의 경우에만 사용됨
+				if (ipcn_fIsValidOutAcct.arguments.length > 3) {
+					alert(msg);
+				} else {
+					alert('출금 계좌번호가 정확하지 않습니다.');
+				}
+			}
+			else if (fMode == '5') {	// 모계좌가 비밀계좌일 경우 이체시 모계좌 인지 정당성 체크
+				if (ipcn_fIsValidOutAcct.arguments.length > 3) {
+					alert(msg);
+				} else {
+					alert('잘못된 출금계좌번호입니다.\n정확한 출금계좌를 선택하시거나 입력하세요.');
+				}
+			}
+		}
+	}
+	function callBackError(responseJson) { 
+		sReturn = false;
+	}
+
+	return sReturn;
+}	
+	
+	/**
+	 * 2019.09.03
+	 * 오픈뱅킹 - 집금계좌번호 유효성 체크
+	 * 
+	 * @param {String} mode : 계좌 타입
+	 * @param {String} fMode : 
+	 * @param {String} acno : 입금(충전)계좌번호
+	 * @param {String} msg : alert 메시지
+	 * @param {String} IgmGjaNbr : 입금계좌번호 
+	 */
+	function ipcn_fIsValidInAcct(mode, fMode, acno, msg, IgmGjaNbr) {
+		// 계좌리스트의 40건 이상 보유 고객은 체크로직에서 제외함
+		var sReturn = false;
+		var sGjaType = ipcn_fGjaTypeCheck(mode);  //계좌 타입 변수
+		var Igmacctno = "";
+
+		var sAcctType = common_cfGetAccountType(acno);		// 계좌 타입
+	    var sGwamok = common_cfGetNewAccountGwamok(acno);	// 계좌 과목코드
+
+	    if (fMode == '2' || fMode == '4') {
+	    }
+	    else if (fMode == '5') {
+	    	Igmacctno = IgmGjaNbr;
+	    }
+
+		httpSend('IPAI0011R', {'session':'true'}, callBackSuccess, callBackError, {async:false, 'useProgress' : false});
+
+		function callBackSuccess(responseJson) {
+			var outAllAcctList = responseJson['list']['IB_OUT_ALL_ACCT'];
+			var iAcctnoCnt = 0;
+
+			for (var i = 0; i < outAllAcctList.length; i++) {
+				var ACNO1 = $.trim(outAllAcctList[i]['ACNO1']);			// 계좌번호
+				var AC_STS1 = $.trim(outAllAcctList[i]['AC_STS1']);		// 계좌상태
+				var AC_DS = $.trim(outAllAcctList[i]['AC_DS']);			// 계좌구분
+
+				if (fMode == '' || fMode == '1') {
+					if (sGjaType == '1') {
+						if (ACNO1 == acno) {
+							sReturn = true;
+							break;
+						}
+					}
+				}
+				else if (fMode == '2') {	// 이체 조회의 직접입력의 경우에만 사용됨
+					if (ACNO1 == acno) {
+						sReturn = true;
+						break;
+					}
+				}
+				else if (fMode == '3') {	// 자계좌 제외하는 valid check
+					if (sGjaType == '1') {
+						if (ACNO1 == acno && AC_STS1 != '2' && AC_DS != '3') {
+							sReturn = true;
+							break;
+						}
+					}
+				}
+				else if (fMode == '4') {	// 이체 조회의 직접입력의 경우에만 사용됨
+					if (ACNO1 == acno && AC_STS1 != '2' && AC_DS != '3') {
+						sReturn = true;
+						break;
+					}
+				}
+				else if (fMode == '5') {	// 모계좌가 비밀계좌일 경우 이체시 모계좌 인지 정당성 체크
+					if (ACNO1 == acno && AC_STS1 != '2' && AC_DS != '3') {
+						sReturn = true;
+						break;
+					} else if (AC_STS1 != '2' && AC_DS != '3') {
+						iAcctnoCnt++;
+					}
+				}
+			}
+
+			if (iAcctnoCnt > 0) {
+				for (var i = 0; i < outAllAcctList.length; i++) {
+					var AC_STS1 = $.trim(outAllAcctList[i]['AC_STS1']);		// 계좌상태
+					var AC_DS = $.trim(outAllAcctList[i]['AC_DS']);			// 계좌구분
+					if (AC_STS1 != '2' && AC_DS != '2') {
+						sReturn = true;
+						break;
+					}
+				}
+			}
+
+			if (!sReturn) {
+				if (fMode == '' || fMode == '1') {
+					if (ipcn_fIsValidInAcct.arguments.length > 3) {
+						alert(msg);
+					} else {
+						alert('입금(충전) 계좌번호가 정확하지 않습니다.');
+					}
+				}
+				else if (fMode == '2') {	// 이체 조회의 직접입력의 경우에만 사용됨
+					alert('입금(충전) 계좌번호가 정확하지 않습니다.');
+				}
+				else if (fMode == '3') {	// 자계좌 제외하는 valid check
+					if (sGjaType == '8') {
+						if (common_cfGetNewJoongJo(acno) == '2') {
+							alert('입금(충전) 계좌번호는 농협은행 계좌만 가능합니다.');
+						} else {
+							if (ipcn_fIsValidInAcct.arguments.length > 3) {
+								alert(msg);
+							} else {
+								alert('잘못된 입금(충전)계좌번호입니다.\n정확한 입금(충전)계좌를 선택하시거나 입력하세요.');
+							}
+						}
+					} else if (sGjaType == '1') {
+						if (ipcn_fIsValidInAcct.arguments.length > 3) {
+							alert(msg);
+						} else {
+							alert('잘못된 입금(충전)계좌번호입니다.\n정확한 입금(충전)계좌를 선택하시거나 입력하세요.');
+						}
+					}
+				}
+				else if (fMode == '4') {	// 이체 조회의 직접입력의 경우에만 사용됨
+					if (ipcn_fIsValidInAcct.arguments.length > 3) {
+						alert(msg);
+					} else {
+						alert('입금(충전) 계좌번호가 정확하지 않습니다.');
+					}
+				}
+				else if (fMode == '5') {	// 모계좌가 비밀계좌일 경우 이체시 모계좌 인지 정당성 체크
+					if (ipcn_fIsValidInAcct.arguments.length > 3) {
+						alert(msg);
+					} else {
+						alert('입금(충전)된 출금계좌번호입니다.\n정확한 입금(충전)계좌를 선택하시거나 입력하세요.');
+					}
+				}
+			}
+		}
+
+	function callBackError(responseJson) { 
+		sReturn = false;
+	}
+
+	return sReturn;
+}
+
+/**
+ * 환불계좌번호 유효성 체크
+ * 
+ * @param {String} mode : 계좌 타입
+ * @param {String} fMode : 
+ * @param {String} acno : 출금계좌번호
+ * @param {String} msg : alert 메시지
+ * @param {String} IgmGjaNbr : 입금계좌번호 
+ */
+function ipcn_fIsValidTrotAcct(mode, fMode, acno, msg, IgmGjaNbr) {
+	// 출금계좌리스트의 40건 이상 보유 고객은 체크로직에서 제외함
+	var sReturn = false;
+	var sGjaType = ipcn_fGjaTypeCheck(mode);  //계좌 타입 변수
+	var Igmacctno = "";
+
+	var sAcctType = common_cfGetAccountType(acno);		// 계좌 타입
+    var sGwamok = common_cfGetNewAccountGwamok(acno);	// 계좌 과목코드
+
+    if (fMode == '2' || fMode == '4') {
+    }
+    else if (fMode == '5') {
+    	Igmacctno = IgmGjaNbr;
+    }
+
+	httpSend('IPAI0011R', {'session':'true'}, callBackSuccess, callBackError, {async:false, 'useProgress' : false});
+
+	function callBackSuccess(responseJson) {
+		var outAllAcctList = responseJson['list']['IB_OUT_ALL_ACCT'];
+		var iAcctnoCnt = 0;
+
+		for (var i = 0; i < outAllAcctList.length; i++) {
+			var ACNO1 = $.trim(outAllAcctList[i]['ACNO1']);			// 계좌번호
+			var AC_STS1 = $.trim(outAllAcctList[i]['AC_STS1']);		// 계좌상태
+			var AC_DS = $.trim(outAllAcctList[i]['AC_DS']);			// 계좌구분
+
+			if (fMode == '' || fMode == '1') {
+				if (sGjaType == '1') {
+					if (ACNO1 == acno) {
+						sReturn = true;
+						break;
+					}
+				}
+			}
+			else if (fMode == '2') {	// 이체 조회의 직접입력의 경우에만 사용됨
+				if (ACNO1 == acno) {
+					sReturn = true;
+					break;
+				}
+			}
+			else if (fMode == '3') {	// 자계좌 제외하는 valid check
+				if (sGjaType == '1') {
+					if (ACNO1 == acno && AC_STS1 != '2' && AC_DS != '3') {
+						sReturn = true;
+						break;
+					}
+				}
+			}
+			else if (fMode == '4') {	// 이체 조회의 직접입력의 경우에만 사용됨
+				if (ACNO1 == acno && AC_STS1 != '2' && AC_DS != '3') {
+					sReturn = true;
+					break;
+				}
+			}
+			else if (fMode == '5') {	// 모계좌가 비밀계좌일 경우 이체시 모계좌 인지 정당성 체크
+				if (ACNO1 == acno && AC_STS1 != '2' && AC_DS != '3') {
+					sReturn = true;
+					break;
+				} else if (AC_STS1 != '2' && AC_DS != '3') {
+					iAcctnoCnt++;
+				}
+			}
+		}
+
+		if (iAcctnoCnt > 0) {
+			for (var i = 0; i < outAllAcctList.length; i++) {
+				var AC_STS1 = $.trim(outAllAcctList[i]['AC_STS1']);		// 계좌상태
+				var AC_DS = $.trim(outAllAcctList[i]['AC_DS']);			// 계좌구분
+				if (AC_STS1 != '2' && AC_DS != '2') {
+					sReturn = true;
+					break;
+				}
+			}
+		}
+
+		if (!sReturn) {
+			if (fMode == '' || fMode == '1') {
+				if (ipcn_fIsValidOutAcct.arguments.length > 3) {
+					alert(msg);
+				} else {
+					alert('환불 계좌번호가 정확하지 않습니다.');
+				}
+			}
+			else if (fMode == '2') {	// 이체 조회의 직접입력의 경우에만 사용됨
+				alert('환불 계좌번호가 정확하지 않습니다.');
+			}
+			else if (fMode == '3') {	// 자계좌 제외하는 valid check
+				if (sGjaType == '8') {
+					if (common_cfGetNewJoongJo(acno) == '2') {
+						alert('환불 계좌번호는 농협은행 계좌만 가능합니다.');
+					} else {
+						if (ipcn_fIsValidOutAcct.arguments.length > 3) {
+							alert(msg);
+						} else {
+							alert('잘못된 환불계좌번호입니다.\n정확한 환불계좌를 선택하시거나 입력하세요.');
+						}
+					}
+				} else if (sGjaType == '1') {
+					if (ipcn_fIsValidOutAcct.arguments.length > 3) {
+						alert(msg);
+					} else {
+						alert('잘못된 환불계좌번호입니다.\n정확한 환불계좌를 선택하시거나 입력하세요.');
+					}
+				}
+			}
+			else if (fMode == '4') {	// 이체 조회의 직접입력의 경우에만 사용됨
+				if (ipcn_fIsValidOutAcct.arguments.length > 3) {
+					alert(msg);
+				} else {
+					alert('환불 계좌번호가 정확하지 않습니다.');
+				}
+			}
+			else if (fMode == '5') {	// 모계좌가 비밀계좌일 경우 이체시 모계좌 인지 정당성 체크
+				if (ipcn_fIsValidOutAcct.arguments.length > 3) {
+					alert(msg);
+				} else {
+					alert('잘못된 환불계좌번호입니다.\n정확한 환불계좌를 선택하시거나 입력하세요.');
+				}
+			}
+		}
+	}
+
+	function callBackError(responseJson) { 
+		sReturn = false;
+	}
+
+	return sReturn;
+}
+
+/**
+ * 고객의 출금계좌가 농협은행인지 농·축협인지 여부 확인
+ * @return (0: 계좌 없음, 1: 농협은행 계좌만 존재, 2: 농·축협 계좌만 존재, 3: 중/조 계좌 모두 존재)
+ */
+function ipcn_fGetAccountTypeCheck() {
+	var iReturn = 0;
+
+	httpSend('IPAI0011R', {'session':'true'}, callBackSuccess, callBackError, {async:false, 'useProgress' : false});
+
+	function callBackSuccess(responseJson) {
+		var outAllAcctList = responseJson['list']['IB_OUT_ALL_ACCT'];
+		var jung = 0;
+		var ch   = 0;
+
+		for (var i = 0; i < outAllAcctList.length; i++) {
+			var ACNO1 = $.trim(outAllAcctList[i]['ACNO1']);			// 계좌번호
+
+			if (common_cfGetNewJoongJo(ACNO1) == '1') {
+				jung = 1;	// 농협은행
+			} else {
+				ch = 1;		// 농·축협
+			}
+		}
+
+		iReturn = (jung + ch);
+	}
+
+	function callBackError(responseJson) { 
+		iReturn = 0;
+	}
+
+	return iReturn;
+}
+
+/**
+ * <pre>
+ * 휴대폰인증 팝업 호출
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fMobileAuth("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $("#io_ea_mphon_rgn_no").val(obj.mphano); // 휴대폰번호 앞자리
+ *   $("#io_ea_mphon_rep_no").val(obj.mphno);  // 휴대폰번호 중간자리
+ *   $("#io_ea_mphon_sq_no").val(obj.mpsqno);  // 휴대폰번호 끝자리
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fMobileAuth(callbackFunc, popupYn) {
+	if (popupYn == "" || popupYn == null || popupYn == undefined) {
+		popupYn = "true";
+	}
+	
+	popup_cfLayerOpen('IPCN0021P', {
+		'callback':callbackFunc,
+		'popupYn':popupYn
+	});
+}
+
+/**
+ * <pre>
+ * 자주쓰는 휴대전화번호 관리
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fFreMobile("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $("#io_ea_mphon_rgn_no").val(obj.mphano); // 휴대폰번호 앞자리
+ *   $("#io_ea_mphon_rep_no").val(obj.mphno);  // 휴대폰번호 중간자리
+ *   $("#io_ea_mphon_sq_no").val(obj.mpsqno);  // 휴대폰번호 끝자리
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fFreMobile(callbackFunc) {
+	popup_cfLayerSubOpen('IPCN0111R', {'callback':callbackFunc});
+}
+
+/**
+ * <pre>
+ * 마일리지 점수 조회
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fGetMileagePoint("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(point) {
+ *   $("#MlsPit").val(point); // 마일리지 점수
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fGetMileagePoint(callbackFunc) {
+	popup_cfLayerOpen('IPCN0101P', {'callback':callbackFunc});
+}
+
+/**
+ * <pre>
+ * 자주쓰는 입금계좌
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fFreAccountList("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $("#nbnk_c").val(obj.nbnk_c);		// 입금은행코드
+ *   $("#rv_acno").val(obj.rv_acno);	// 입금계좌번호
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fFreAccountList(callbackFunc, grp_no) {
+	var params = {'callback':callbackFunc};
+	if (grp_no != null && grp_no != '' && grp_no.length > 0) {
+		params.io_sort_dsc = 'A';
+		params.io_ea_sort_sq1 = '5';
+		params.io_ea_grp_no = grp_no;
+	}
+	popup_cfLayerOpen('IPCN0051R', params);	
+}
+
+/**
+ * <pre>
+ * 자주쓰는 입금계좌(다계좌이체:동일계좌출금용)
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fFreAccountListMulti("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $("#nbnk_c").val(obj.nbnk_c);		// 입금은행코드
+ *   $("#rv_acno").val(obj.rv_acno);	// 입금계좌번호
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fFreAccountListMulti(callbackFunc, grp_no) {
+	var params = {'callback':callbackFunc};
+	if (grp_no != null && grp_no != '' && grp_no.length > 0) {
+		params.io_sort_dsc = 'A';
+		params.io_ea_sort_sq1 = '5';
+		params.io_ea_grp_no = grp_no;
+	}
+	params.view_gbn = 'ipcn0052r';
+	popup_cfLayerOpen('IPCN0051R', params);	
+}
+
+/**
+ * <pre>
+ * 고객의 농협계좌
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fNhAccountList("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $("#nbnk_c").val(obj.nbnk_c);		// 입금은행코드
+ *   $("#rv_acno").val(obj.rv_acno);	// 입금계좌번호
+ * }
+ * </code>
+ * </pre>
+ * 
+ * otherBankTabYn 추가 20200303 -> 내계좌 또는 나의농협은행계좌에서 다른은행 탭을 보여줄지 여부
+ */
+function ipcn_fNhAccountList(callbackFunc, io_ea_dp_kd, otherBankTabYn) {
+	
+	var param = {'callback' : callbackFunc, 'refresh':'true'};
+
+	param.io_ea_dp_kd 		= io_ea_dp_kd 	 || '';
+	param.otherBankTabYn 	= otherBankTabYn || '';
+	
+	popup_cfLayerOpen('IPCN0061R', param);
+}
+
+/**
+ * <pre>
+ * 고객의 농협계좌(다계좌선택)
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fNhAccountList("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $("#nbnk_c").val(obj.nbnk_c);		// 입금은행코드
+ *   $("#rv_acno").val(obj.rv_acno);	// 입금계좌번호
+ * }
+ * </code>
+ * </pre>
+ * 
+ * otherBankTabYn 추가 20200304 -> 내계좌 또는 나의농협은행계좌에서 다른은행 탭을 보여줄지 여부
+ */
+function ipcn_fNhAccountListMulti(callbackFunc, gbn, otherBankTabYn) {
+	
+	popup_cfLayerOpen('IPCN0061R', {'callback':callbackFunc, 'gbn':gbn, 'otherBankTabYn':otherBankTabYn});
+}
+
+
+/**
+ * <pre>
+ * 최근 입금계좌
+ * (예제)
+ * 1. 호출 : ipcn_fLatestAccountList("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $("#nbnk_c").val(obj.nbnk_c);		// 입금은행코드
+ *   $("#rv_acno").val(obj.rv_acno);	// 입금계좌번호
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fLatestAccountList(callbackFunc) {
+	popup_cfLayerOpen('IPCN0041R', {'callback':callbackFunc});	
+}
+
+/**
+ * <pre>
+ * 최근 입금계좌(다계좌선택)
+ * 2018-06-20: 기존 서비스의 gbn추가 (다계좌이체의 다중선택 구분값)
+ * (예제)
+ * 1. 호출 : ipcn_fLatestAccountList("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $("#nbnk_c").val(obj.nbnk_c);		// 입금은행코드
+ *   $("#rv_acno").val(obj.rv_acno);	// 입금계좌번호
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fLatestAccountListMulti(callbackFunc, gbn) {
+	popup_cfLayerOpen('IPCN0041R', {'callback':callbackFunc, 'gbn':gbn});	
+}
+
+
+
+/**
+ * <pre>
+ * 지연이체 예외계좌 조회
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fDelayTransferExceptList("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $('#rv_nbnk_c').val( obj.nbnk_c );		// 입금은행코드
+ *   $('#IgmGjaNbr').val( obj.rv_acno );	// 입금계좌번호
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fDelayTransferExceptList(callbackFunc) {
+	popup_cfLayerOpen('IPCN0191P', {'callback':callbackFunc});
+}
+
+/**
+ * <pre>
+ * 이체가능금액조회(출금계좌잔액조회)
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fAccountBalance("계좌번호", "lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(flag, PayPsbBal, minusYn, dd1_ftr_lmt3) {
+ *   if(flag) {
+ *     $('#io_led_bac_n19').val(PayPsbBal);  // 출금가능금액
+ *     $('#dd1_ftr_lmt3').val(dd1_ftr_lmt3); // 1일이체잔여한도
+ *   }
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fAccountBalance(acno, callbackFunc , callService) {
+	popup_cfLayerOpen('IPCN0121R', {'acno':acno, 'callback':callbackFunc, 'callService': (typeof callService == 'undefined') ? '' : callService});
+}
+
+/**
+ * <pre>
+ * 이체가능금액조회(출금계좌잔액조회)
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fAccountBalance("계좌번호", "lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(flag, PayPsbBal, minusYn, dd1_ftr_lmt3) {
+ *   if(flag) {
+ *     $('#io_led_bac_n19').val(PayPsbBal);  // 출금가능금액
+ *     $('#dd1_ftr_lmt3').val(dd1_ftr_lmt3); // 1일이체잔여한도
+ *   }
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fAccountBalance01(acno, callbackFunc) {
+	popup_cfLayerOpen('IPCN0122R', {'acno':acno, 'callback':callbackFunc});
+}
+
+/**
+ * 이체한도조회
+ */
+function ipcn_fTransferLimit() {
+	popup_cfLayerOpen('IPCN0131R');	
+}
+
+/**
+ * <pre>
+ * 전액입력기
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fAccountAllBalance("계좌번호", lfCallbackFunc);
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(flag, PayPsbBal, minusYn) {
+ *   if (flag) {
+ *     $('#io_led_bac_n19').val(PayPsbBal); // 원장잔액
+ *   }
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fAccountAllBalance(acno, callbackFunc) {
+    // 출금계좌번호 유효성 체크
+    if (!ipcn_fIsValidOutAcct("1", "2", acno)) {
+    	return false;
+    }
+    
+    /*###########################################################
+	 * Non ActiveX 수정 start
+	 * 이체 전액 입력시 direct 모드로 변경
+	 ###########################################################*/
+    ipcn_fDirectInputIchAmt(ipcn_fGetIchAmtId(callbackFunc));
+    /*###########################################################
+	 * Non ActiveX 수정 end
+	 * 이체 전액 입력시 direct 모드로 변경
+	 ###########################################################*/
+	httpSend('IPCN0151R', {'acno':acno, 'cmd':'01'}).done(function(responseJson){
+		var amt = $.trim(responseJson['io_dpz_dfypsb_bac_n19']);
+		var minusYn = 'N';
+		if (amt.charAt(0) == '-') {
+			amt = amt.substring(1, amt.length);
+			minusYn = 'Y';
+		}
+		amt = util_cfFrontZeroTrim(amt.split('.')[0]);
+		if (amt.length == 0) {
+			amt = '0';
+		}
+		callbackFunc(true, amt, minusYn);
+	});
+}
+
+/**
+ * <pre>
+ * 금액입력기
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fOpenMoneyInput("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(amt) {
+ *   $('#io_led_bac_n19').val(amt); // 금액
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fOpenMoneyInput(callbackFunc) {
+	 /*###########################################################
+	 * Non ActiveX 수정 start
+	 * 이체 전액 입력시 direct 모드로 변경
+	 ###########################################################*/
+	ipcn_fDirectInputIchAmt(ipcn_fGetIchAmtId(callbackFunc));
+	 /*###########################################################
+	 * Non ActiveX 수정 end
+	 * 이체 전액 입력시 direct 모드로 변경
+	 ###########################################################*/
+	popup_cfLayerOpen('IPCN0381R', {'callback':callbackFunc});	
+	
+}
+
+/*#################################################################
+ * Non-ActiveX 수정 start
+ * 이체금액을 입력하는 필드에 대한 암호화 타입을 direct 입력으로 변경해준다. 
+ #################################################################*/
+function ipcn_fDirectInputIchAmt(ichAmtId) {
+	var ichAmtEl = document.getElementById(ichAmtId);
+	if(typeof ichAmtEl !== 'undefined' ) {
+		if($('#Tk_'+ichAmtId+'_checkbox').prop('checked') == true){
+			$('#Tk_'+ichAmtId+'_checkbox').click();
+		}
+		common_cfSetDirectField(ichAmtId);
+	}
+}
+/*#################################################################
+ * Non-ActiveX 수정 end
+ * 해당 func 내부에서 이체금액을 입력하는 필드에 대한 ID값을 얻는다.
+ #################################################################*/
+
+/*#################################################################
+ * Non-ActiveX 수정 start
+ * 해당 func 내부에서 이체금액을 입력하는 필드에 대한 ID값을 얻는다.
+ #################################################################*/
+function ipcn_fGetIchAmtId(func){
+    var str_func = eval(func)+"";
+    var elementId;
+    var line = str_func.split("$");
+    for(var i=0; i < line.length; i++) {
+        if(line[i].indexOf(".val") > 0) {
+            str_func = line[i];
+            str_func = str_func.substring(str_func.indexOf("#")+1);
+            elementId = str_func.substring(0, str_func.indexOf("'"));
+        }
+    }
+    return elementId;
+}
+/*#################################################################
+ * Non-ActiveX 수정 end
+ * 해당 func 내부에서 이체금액을 입력하는 필드에 대한 ID값을 얻는다.
+ #################################################################*/
+/**
+ * 수수료안내
+ */
+function ipcn_fCommissionHelp() {
+	popup_cfLayerLoad('/content/html/ip/ar/ipar0014r.html');
+}
+
+/**
+ * 이체수수료 면제방법 안내
+ */
+function ipcn_fCommissionExamptionHelp() {
+	popup_cfLayerLoad('/content/html/ip/ar/ipar0015i.html');
+}
+
+/**
+ * 계산기
+ */
+function ipcn_fCalculator() {
+	popup_cfWindowOpen('/servlet/IPAR0017P.view', null, {'width':'395px', 'height':'460px', 'scrollbars':'no'});
+}
+
+/**
+* 자주사용하는계좌 그룹 조회
+* @param {String} objId : select box를 표시할 object ID
+* @param {String} selectId : select box의 ID
+* @param {String} selectName : select box의 NAME
+* @param {String} selectTitle : select box의 TITLE
+* @param {String} selectEvent : select box의 onchange
+* @return option value : 은행코드/입금계좌번호/출금계좌번호/이체금액
+*/
+function ipcn_fSelectFreAccountGroup(objId, selectId, selectName, selectTitle, selectEvent) {
+	if (selectEvent != null && selectEvent != '' && selectEvent.length > 0) {
+		selectEvent = 'onchange="' + selectEvent + '"';
+	}
+
+	httpSend("IPAM0091I", null, function(responseJson){
+		// success
+		var sub01 = responseJson['list']['sub01'];
+
+		var html = '<select data-type="select" id="'+selectId+'" name="'+selectName+'" title="'+selectTitle+'" '+selectEvent+'>';
+		html += '<option value="">그룹전체</option>';
+		for (var i = 0; i < sub01.length; i++) {
+			var io_ea_grp_no = $.trim(sub01[i]['EAAPAC00I0_OUT_SUB01.io_ea_grp_no']);
+			var io_ea_grp_nm = $.trim(sub01[i]['EAAPAC00I0_OUT_SUB01.io_ea_grp_nm']);
+			if (io_ea_grp_no.length > 0) {
+				html += '<option value="' + io_ea_grp_no + '">' + io_ea_grp_nm + '</option>';
+			}
+		}
+		html += '</select>';
+
+		$('#'+objId).html(html);
+	}, function(responseJson){
+		// error
+	}, {
+		'useProgress' : false
+	});
+}
+
+/**
+ * 이체 그룹 관리
+ */
+function ipcn_fTransferGroupManage(callbackFunc) {
+	popup_cfLayerOpen('IPCN0081I', {'callback':callbackFunc});
+}
+
+/**
+ * <pre>
+ * 자주쓰는 이체정보
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fFreTransferList("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $('#CgmGjaNbr').val( obj.drw_acno );	// 출금계좌번호
+ *   $('#rv_nbnk_c').val( obj.nbnk_c );		// 입금은행코드
+ *   $('#IgmGjaNbr').val( obj.rv_acno );	// 입금계좌번호
+ *   $('#IchAmt').val( obj.io_ea_tr_am6 );	// 이체금액
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fFreTransferList(callbackFunc) {
+	popup_cfLayerOpen('IPCN0161R', {'callback':callbackFunc});
+}
+
+
+/**
+ * <pre>
+* 입금은행선택
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fSelectIgmBank("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(nbnk_c) {
+ *   $('#rv_nbnk_c').val( nbnk_c );		// 입금은행코드
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fSelectIgmBank(callbackFunc, gbn) {
+	popup_cfLayerOpen('IPCN0371R', {'callback':callbackFunc, 'gbn':gbn});
+}
+
+/**
+ * 장애은행 확인
+ */
+function ipcn_fErrorBank() {
+	popup_cfLayerOpen('IPCN0141R');
+}
+
+/**
+ * 휴대폰 SMS 전송 결과 처리를 위한 데이터 저장
+ */
+var ipcn_sendSms_FORM = {
+		'sJobGbn_1' : '',		// 1:본인인증, 2:휴대폰인증
+		'sTrnGbn_1' : '',		// 1:PC사전지정 서비스, 2:휴대폰 SMS, 3:전화승인
+		'sTelNbr_12' : '',		// 전화번호
+		'sTakTelDec_1' : '',	// 1:SKT, 2:KT, 3:LGU+
+		'SmsAuthNbr_6' : '',	// SMS인증번호
+		'ChkCnt' : '0',			// 인증실패횟수
+		'ViwUnqCod_24' : ''	
+};
+
+/**
+ * 휴대폰 SMS 인증번호 전송
+ * @param  JobGbn_1    : 1:본인인증, 2:휴대폰인증
+ * @param  TrnGbn_1    : 1:PC사전지정 서비스, 2:휴대폰 SMS, 3:전화승인, 6: 인터넷 뱅킹 미회원 비밀번호 찾기, 7: 휴대폰SMS인증 (즉시이체), 8: 휴대폰SMS인증 (자동이체), 9: 휴대폰SMS인증 (예약이체, 자동이체)
+ * @param  TelNbr_12   : 전화번호
+ * @param  TakTelDec_1 : 1:SKT, 2:KT, 3:LGU+
+ */
+function ipcn_sendSms_FS(sJobGbn_1 ,sTrnGbn_1 ,sTelNbr_12 ,sTakTelDec_1, transferYn) {
+	ipcn_sendSms_FORM.sJobGbn_1 = sJobGbn_1;
+	ipcn_sendSms_FORM.sTrnGbn_1 = sTrnGbn_1;
+	ipcn_sendSms_FORM.sTelNbr_12 = sTelNbr_12;
+	ipcn_sendSms_FORM.sTakTelDec_1 = sTakTelDec_1;
+
+	var params = {
+			"transferYn"		: (transferYn || ""),
+			"io_ea_bsn_ds"		: sJobGbn_1,
+			"io_ea_tr_ds1"		: sTrnGbn_1,
+			"io_ea_telno2"		: sTelNbr_12,
+			"io_ea_mphon_cnf"	: sTakTelDec_1,
+			"io_ea_usr_ds"      : "1"   //이용자구분
+		};
+
+	httpSend("IPCN0022R", params, function(responseJson) {
+		if("1" == sJobGbn_1) { //본인인증
+			var rData = $.trim(responseJson["io_ea_attc_natv_c"]);
+			var io_ea_telno2 = $.trim(responseJson["io_hp_tel12"]);
+			//입력한전화번호와 인증처리한 전화번호가 상이한경우
+			if(io_ea_telno2 != sTelNbr_12){
+				alert("죄송합니다. 인증번호를 수신한 휴대전화로는 인증처리 불가합니다.");
+				return false;
+			}
+			
+			if (rData != null && rData != undefined && rData.length == 24) {
+				ipcn_sendSms_FORM.ViwUnqCod_24 = rData;
+				ipcn_sendSms_FORM.ChkCnt = '0';
+				alert("인증번호 전송에 성공했습니다");
+			} else {
+				alert("인증번호 전송에 실패했습니다. 다시요청해 주시기 바랍니다");
+			}
+
+		} else if("2" == sJobGbn_1) { //휴대폰 인증
+			ipcn_sendSms_FORM.SmsAuthNbr_6 = 'dummy1';
+			ipcn_sendSms_FORM.ChkCnt = '0';
+			ipcn_sendSms_FORM.ViwUnqCod_24 = ''; //본인인증 코드 초기화 2014-01-09
+			alert("인증번호 전송에 성공했습니다");
+	} else if("3" == sJobGbn_1) { //본인인증 확인
+			alert("인증번호 전송에 성공했습니다");
+	}
+});
+}
+
+/**
+ * 휴대폰 SMS 인증 Validation Check
+ * @param  oTelNbr_12     : 전화번호
+ * @param  oTakTelDec_1   : 1:SKT, 2:KT, 3:LGU+
+ * @param  osSmsAuthNbr_6 : SMS인증번호
+ */
+function ipcn_sendSms_Validate(oTelNbr_12, oTakTelDec_1, oSmsAuthNbr_6) {
+	var sTakTelDec_1 = '';
+	if ($(oTakTelDec_1).attr('type') == 'radio') {
+		sTakTelDec_1 = $('input[name='+$(oTakTelDec_1).attr('name')+']:checked').val();
+	} else {
+		sTakTelDec_1 = $(oTakTelDec_1).val();
+	}
+
+	// 사용자가 인증번호 요청을 하지 않았거나 인증번호 전송에 실패한경우
+	if (ipcn_sendSms_FORM.SmsAuthNbr_6 == "" && ipcn_sendSms_FORM.ViwUnqCod_24 == "") {
+		if(ipcn_sendSms_FORM.ChkCnt == '5') {
+			alert("인증번호 오류회수(5회)를 이미 초과했습니다.\n인증번호 재발급후 거래하시기 바랍니다.");
+			$(oSmsAuthNbr_6).val('');
+          	return false;
+        } else {
+        	alert("인증번호를 요청해주세요");
+        	$(oSmsAuthNbr_6).val('');
+          	return false;
+        }
+    }
+	
+	if(ipcn_sendSms_FORM.ViwUnqCod_24 != ""){
+		return ipcn_checkSMSVaild(oSmsAuthNbr_6, oTelNbr_12);
+	}
+	
+	// 사용자가 인증번호 입력을 하지않은경우
+	if ($(oSmsAuthNbr_6).val() == "") {
+		alert("휴대폰으로 전송받은 인증번호를 입력해주세요.");
+		$(oSmsAuthNbr_6).focus();
+		return false;
+	}
+	if ($(oSmsAuthNbr_6).val().length != 6) {
+		alert("인증번호는 6자리입니다. 다시 입력해주세요.");
+		$(oSmsAuthNbr_6).focus();
+		return false;
+	}
+
+    if (oTakTelDec_1) {
+    	//인증번호 요청후 휴대폰번호를 다시 입력 할 경우
+		if (ipcn_sendSms_FORM.sTakTelDec_1 != sTakTelDec_1) {
+        	alert("인증번호가 전송된 휴대폰과 통신사가 일치하지 않습니다. 인증번호를 다시 요청해주세요.");
+        	ipcn_sendSms_FORM.SmsAuthNbr_6 = '';
+        	$(oSmsAuthNbr_6).val('');        	
+          	return false;
+		}
+        if (ipcn_sendSms_FORM.sTelNbr_12 != $(oTelNbr_12).val()) {
+        	alert("인증번호가 전송된 휴대폰과 번호가 일치하지 않습니다. 인증번호를 다시 요청해주세요.");
+        	ipcn_sendSms_FORM.SmsAuthNbr_6 = '';
+        	$(oSmsAuthNbr_6).val('');
+          	return false;
+        }
+    }
+
+    var result = false;
+  
+	    httpSend("IPCN0022R", { "io_ea_bsn_ds" : "4", "sms_attc_no" : $(oSmsAuthNbr_6).val() }, function(responseJson) {
+	    		if ( responseJson['result'] == 'Y' ) {
+	    			result = true;
+	    		} else if ( Number(responseJson['SMS_ATTC_CHECK_COUNT']) < 5 ) {
+	    			alert("인증번호 입력 " + responseJson['SMS_ATTC_CHECK_COUNT'] + "회 오류입니다.\n인증번호 확인후 다시 입력하시기 바랍니다.\n(5회 오류시 인증번호 재발급 필요)");
+	    			$(oSmsAuthNbr_6).val('');
+	    			$(oSmsAuthNbr_6).focus();
+	    			result = false;
+	    		} else {
+	    			alert("인증번호 입력 오류회수(5회)가 초과되었습니다.\n인증번호 새로 전송받으신 후에 거래하시기 바랍니다.");
+	    			$(oSmsAuthNbr_6).val('');
+	    			return false;
+	    		}
+			}, function(data, status, xhr) {
+				common_cfUserDefinedErrorPop(data, status, xhr);
+				result = false;
+			}, {
+				async : false
+			});
+  
+	   
+    return result;
+}
+
+/**
+ * 휴대폰 본인인증 후 SMS 인증 Validation Check 
+ * @param  osSmsAuthNbr_6 : SMS인증번호
+ */
+function ipcn_checkSMSVaild(rSmsAuthNbr_6, oTelNbr_12){  // 20131223 기능 추가
+	  // 사용자가 인증번호 입력을 하지않은경우
+	  if(ipcn_sendSms_FORM.ViwUnqCod_24 == ""){
+		  alert("휴대폰으로 인증번호를 전송한 후에 거래하시기 바랍니다.");
+		  rSmsAuthNbr_6.focus();
+		  return false;
+	  }
+	  
+	  // 사용자가 인증번호 입력을 하지않은경우
+	  if(rSmsAuthNbr_6.value == ""){
+		  alert("휴대폰으로 전송받은 인증번호를 입력해주세요.");
+		  rSmsAuthNbr_6.focus();
+		  return false;
+
+	  }
+
+	  if(rSmsAuthNbr_6.value.length != 6){
+		  alert("인증번호는 6자리입니다. 다시 입력해주세요.");
+		  rSmsAuthNbr_6.focus();
+		  return false;	
+	  }
+	  
+	  if (ipcn_sendSms_FORM.sTelNbr_12 != $(oTelNbr_12).val()) {
+      	alert("인증번호가 전송된 휴대폰과 번호가 일치하지 않습니다. 인증번호를 다시 요청해주세요.");
+      	ipcn_sendSms_FORM.ViwUnqCod_24 = '';
+      	$(rSmsAuthNbr_6).val('');
+        return false;
+      }
+	  
+	  var params = {
+			  "PageGbn"      		: "TELSMS",
+			  "io_ea_attc_vnd_c"	: "801",
+			  "io_ea_attc_natv_c"	: ipcn_sendSms_FORM.ViwUnqCod_24,
+			  "sms_attc_no"			: rSmsAuthNbr_6.value,
+			  "io_ea_bsn_ds"      	: "3"
+	  };
+	  
+	  var result = false;
+	  httpSendIP("IPCN0022R", params , function(responseJson){ if($.trim(responseJson["io_ea_sms_attc_c"])=="0000"){ result=true; } }, function(data, status, xhr){
+		  //alert("휴대폰 인증에 실패했습니다. 인증번호를 확인해 주시기 바랍니다.");
+		  common_cfUserDefinedErrorPop(data, status, xhr);
+		  result=false; }, {async:false});
+	  
+	  return result;
+	  
+}
+
+
+
+
+
+/**
+ * <pre>
+ * 경조금메시지 선택
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fKyoungJoCode("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $('#efcc_ftr_c').val(obj.efcc_ftr_c);		// 경조금메시지코드
+ *   $('#efcc_ftr_nm').val(obj.efcc_ftr_nm);	// 경조금메시지명
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fKyoungJoCode(callbackFunc) {
+	popup_cfLayerOpen('IPAR0016P', {'callback':callbackFunc});
+}
+
+/**
+ * <pre>
+ * NH point 입금
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fNHPointDeposit('출금계좌번호");
+ * 2. return 함수
+ * </pre>
+ */
+function ipcn_fNHPointDeposit(drw_acno) {
+
+	if(drw_acno == ""){
+		alert("NH포인트 입금계좌가 선택되지 않았습니다.");
+		return false;
+	}
+	
+	popup_cfLayerOpen('IPCN0601P', {
+		'drw_acno' : drw_acno		
+	});
+}
+
+/**
+ * 숫자만 입력 가능하게 keydown,keypress,blur 이벤트 처리
+ * ex)iccn_fOnlyNum3Combo('.xxxx')
+ *    iccn_fOnlyNum3Combo('#xxx')
+ *    iccn_fOnlyNum3Combo('xxx')
+ * @param val
+ */
+function ipcn_fOnlyNum3Combo(val) {
+
+	//숫자체크 keydown(한번눌렸을때 체크)
+	$(val).keydown(function(event) {
+		ipcn_fHasOnlyNumDN();
+	});
+
+	//숫자체크 keypress(계속 누르고 있을때 계속체크 기능키포함)
+	/*$(val).keypress(function(event) {
+		ipcn_fOnlyNumber();
+	});*/
+
+	//숫자체크 blur(포커스를 잃어버렸을때)
+	$(val).blur(function() {
+		ipcn_fKeyCheck_num1(this);
+	});
+
+}
+
+/**
+ * 숫자만 입력 가능하게 keydown,blur 이벤트 처리한 후 Focus 이동 (보안카드)
+ * ex)iccn_fOnlyNum3Combo('.xxxx')
+ *    iccn_fOnlyNum3Combo('#xxx')
+ *    iccn_fOnlyNum3Combo('xxx')
+ * @param val
+ */
+function ipcn_fOnlyNumForSecurityCard(val) {
+
+	//숫자체크 keydown(한번눌렸을때 체크)
+	$(val).keydown(function(event) {
+		
+		if ( ipcn_fHasOnlyNumDN2(event) == true ) {
+			if ( val == "#io_ea_rsp_no1" ) {
+				io_ea_rsp_no2.focus();
+			} else if ( val == "#io_ea_rsp_no2" ) {
+				io_ea_rsp_no3.focus();
+			} else if ( val == "#io_ea_rsp_no3" ) {
+				io_ea_rsp_no4.focus();
+			}
+			return true;			
+		} else {
+			return false;
+		}
+	});
+
+	//숫자체크 blur(포커스를 잃어버렸을때)
+	$(val).blur(function() { // 숫자만 입력시
+		ipcn_fKeyCheck_num1(this);		
+	});
+
+}
+
+/**
+ * <pre>
+ * 키가 한번 눌렸을때 숫자 체크(기능키 포함). 
+ * 숫자면 리턴 아니면 러턴값없음
+ * </pre>
+ */
+function ipcn_fHasOnlyNumDN() {
+	if (typeof TK_Loading == 'function') {
+		if (TK_useTouchEnnxKey(event)) {
+			return;
+		}
+	}
+	
+	var code = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
+
+	var ctrl = window.event.ctrlKey;
+	if (ctrl && (code == 86 || code == 118)) {
+		return;
+	}
+
+	if (code != 13) {
+		event.returnValue = (code >= 48 && code <= 57) // Number
+				|| code == 8 // Backspace
+				|| code == 9 // Tab
+				|| code == 17 // Ctrl
+				|| code == 46 // Delete
+				|| (code >= 37 && code <= 40) // Cursor Key
+				|| (code >= 96 && code <= 105); // Key Pad
+	}
+
+}
+
+/**
+ * <pre>
+ * 연속으로 키가 눌렸을때 숫자 체크 
+ * 숫자면 리턴 아니면 러턴값없음
+ * </pre>
+ * 
+ */
+function ipcn_fOnlyNumber() {
+	if (typeof TK_Loading == 'function') {
+		if (TK_useTouchEnnxKey(event)) {
+			return;
+		}
+	}
+	
+	var keyCode = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
+	if (keyCode != 13) {
+		if ((keyCode > 47 && keyCode < 58)) {
+			event.returnValue = true;
+		} else {
+			event.returnValue = false;
+		}
+	}
+
+}
+
+/**
+ * <pre>
+ * 포커스를 잃어버렸을때 숫자 체크 
+ * 숫자면 리턴 아니면 alert
+ * </pre>
+ * @param Obj 	: object
+ */
+function ipcn_fKeyCheck_num1(obj) {
+	if (obj.value == "") {
+		return true;
+	}
+	var s = new String("0123456789");
+	var re_data = String(obj.value);
+	var len = re_data.length;
+	var numYn = false;
+
+	for ( var i = 0; i < len; i++) {
+		numYn = false;
+		for ( var k = 0; k < 10; k++) {
+			if (re_data.charAt(i) == s.charAt(k)) {
+				numYn = true;
+			}
+		}
+		if (!numYn) {
+			alert("숫자만 입력할 수 있습니다.");
+			obj.value = '';
+			obj.focus();
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/**
+ * <pre>
+ * 키가 한번 눌렸을때 숫자 체크(기능키 포함). 
+ * 숫자면 리턴 아니면 러턴값없음
+ * </pre>
+ */
+function ipcn_fHasOnlyNumDN2(event) {
+	if (typeof TK_Loading == 'function') {
+		if (TK_useTouchEnnxKey(event)) {
+			return;
+		}
+	}
+	
+	var flag = false;
+	var e  	 = window.event ? window.event : event;
+	var code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+
+	if (code!=13) {
+		flag =
+			( code >= 48 && code <= 57)      // Number
+			|| code == 8                     // Backspace
+			|| code == 9                     // Tab
+			|| code == 17                    // Ctrl
+			|| code == 46                    // Delete
+			|| ( code >= 37 && code <= 40)   // Cursor Key
+			|| ( code >= 96 && code <= 105); // Key Pad
+	}
+	
+	if((e.ctrlKey || e.shiftKey || e.altKey) || !flag){
+		if (e.shiftKey && code == 9) {	// shiftKey + Tab 허용
+			return true;
+		} else {
+			if(e.preventDefault){
+				e.preventDefault();
+			}else{
+				e.returnValue = false;
+			}
+			return false;
+		}
+	}else{
+		return true;
+	}
+
+}
+
+
+/**
+ * <pre>
+ * 직업검색
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fJobSearch("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $("#jobCode").val(obj.jobCode);	//직업코드
+ *   $("#jobName").val(obj.jobName);	//직업명
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fJobSearch(callbackFunc) {
+	popup_cfLayerOpen('IPCN0341R', {'callback':callbackFunc});	
+}
+
+/**
+ * <pre>
+ * 직업/직위 선택
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fJikwiCode("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $("#jobCode").val(obj.jobCode);	//직업코드
+ *   $("#jobName").val(obj.jobName);	//직업명
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fJikwiCode(callbackFunc) {
+	popup_cfLayerOpen('IPCN0351R', {'callback':callbackFunc});	
+}
+
+/**
+ * <pre>
+ * 판매사검색
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fJobSearch("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $("#valid").val(obj.valid);		//판매코드
+ *   $("#vendor").val(obj.vendor);		//판매명
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fVendorSearch(callbackFunc) {
+	popup_cfLayerOpen('IPCN0311R', {'callback':callbackFunc});
+}
+
+/**
+ * <pre>
+ * 펀드명찾기
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fJobSearch("lfCallbackFunc");
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $("#fundCode").val(obj.valid);		//판매코드
+ *   $("#fundName2").val(obj.vendor);		//판매명
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fFundNameSearch(callbackFunc) {
+	popup_cfLayerOpen('IPCN0301R', {'callback':callbackFunc});
+}
+
+/**
+ * <pre>
+ * 전자금융사기예방서비스 DIV영역 Display
+ * </pre>
+ * @param ftrAm : 이체금액
+ * @param ftrMode : 이체모드 ( 0 - 즉시이체 , 1 - 예약이체, 자동이체 )
+ * @param localeInfo : 언어정보
+ * @param callback : 콜백 함수
+ */
+function ipcn_fEfFradPvtView ( ftrAm, ftrMode, localeInfo, callback ) {
+	
+	/*
+	 * parma value 설정
+	 */
+	
+	// locale 정보 구함
+	if ( ( localeInfo == null ) || ( $.trim ( localeInfo ) == "" ) || ( localeInfo == undefined ) ) {
+		localeInfo = 'ko_KR';
+	} 	
+	// JSON데이터 구성
+	var paramValue = { ftrAm : ftrAm ,
+			           ftrMode : ftrMode ,
+		               localeInfo : localeInfo };
+			
+	/*
+	 * 전자금융사기예방서비스  navigate
+	 */	
+	return $("#EF_FP_VIEW").navigate((localeInfo == 'ko_KR' ? 'IPCNI100S' : 'PGCNI100S'), paramValue, {method:'post'}).done(function(data,status,xhr){
+		if (callback != null && callback != undefined && typeof(callback) == 'function') {
+			callback(data,status,xhr);
+		}
+	});
+}
+
+/**
+ * <pre>
+ * 전자금융사기예방을 위해 휴대폰을 통한 본인인증
+ * </pre>
+ * @param formID : 전자금융사기예방 휴대폰인증 속한 Form ID
+ * @param localeInfo : 언어정보
+ * @return true/false : 휴대폰인증 체크결과 ( 전자금융사기예방신고가 필요없는 경우 true값 리턴 )
+ */
+function ipcn_fEfFradPvtAttc ( formID, localeInfo ) {
+	
+	/*
+	 * 변수 선언 및 값받기
+	 */
+	var ef_fp_need_yn = $.trim ( $("#EF_FP_NEED_YN").text() ); // 전자금융사기예방신고 필요여부	
+	var fs_phone_view_flag = $("#FS_PHONE_VIEW_FLAG").val(); // 전화(ARS)인증 사용여부
+	var checkValue = false; // 전자금융사기예방 휴대폰인증 체크결과
+	var frm = document.getElementById(formID);
+	var ef_fp_hp_attcno_input;
+	var $field = $('#EF_FP_HP_ATTCNO_INPUT');
+	
+	/*
+	 * 전자금융사기예방신고 필요없는 경우 true 리턴
+	 */
+	if ( ef_fp_need_yn != "Y" ) {		
+		return true;
+	}
+	
+	/*
+	 * 전화ARS인증 서비스일 경우
+	 */
+	if ( fs_phone_view_flag == "T" ) {
+		alert( common_cfGetMessage("I0599") );
+		return false;
+	}
+	
+	// locale 정보 구함
+	if ( ( localeInfo == null ) || ( $.trim ( localeInfo ) == "" ) || ( localeInfo == undefined ) ) {
+		localeInfo = 'ko_KR';
+	} 	
+	
+	/*
+	 * Validation Rule 체크
+	 */
+	
+	/*
+	 * 휴대폰인증번호 입력 유효성 체크로직 호출
+	 * param1  휴대폰ID
+     * param2 통신사ID - "" ( 여기서는 없음 )
+     * param3 사용자입력 SMS인증번호ID
+	 */
+	if (localeInfo == 'ko_KR') {
+		if ( !ipcn_sendSms_Validate ( frm.EF_FP_HPNO , "" , frm.EF_FP_HP_ATTCNO_INPUT ) ) {
+			return false;
+		}
+	} else {
+		if ( !pgcn_sendSms_Validate ( frm.EF_FP_HPNO , "" , frm.EF_FP_HP_ATTCNO_INPUT ) ) {
+			return false;
+		}
+	}
+	return true;
+}	
+
+/**
+ * <pre>
+ * 펀드 기준일 정보안내
+ * </pre>
+ * @param wrs_c : 상품코드
+ */
+function ipcn_fFundBasicDateInfo(wrs_c) {
+	popup_cfLayerOpen('IPIT0091P', {
+		'wrs_c' : wrs_c,
+		'bsn_dsc' : '01'
+	});
+	return false;
+}
+
+/**
+ * <pre>
+ * 암호화된 필드 비교(PWD1 == PWD2)
+ * - 첫번째 필드 : NHBComConstants.CHECK_PASSWORD
+ * - 두번쨰 필드 : NHBComConstants.CHECK_PASSWORD_CONFIRM
+ * </pre>
+ * @param formID
+ * @returns {Boolean}
+ */
+function ipcn_fDoPwdCheck(formID){
+	var checkResult = false;
+	httpSend(
+			"IPCN1000I", 
+			$('#'+formID),
+			function ( responseJson ) { // CallBack Success
+				checkResult = responseJson["checkResult"];
+		
+				if(checkResult == 'true'){
+					checkResult = true;
+				}else{
+					checkResult = false;
+				}
+			},
+			function(data, status, xhr){
+				common_cfUserDefinedErrorPop(data,status,xhr);				
+			},
+			{ async : false, useProgress:false } 
+	) ;
+	
+	return checkResult;
+}
+
+/**
+ * 글로벌 링크
+ */
+function ipcn_fGlobalLink(menuLink) {
+	if (menuLink == 'IP') { // 개인뱅킹
+		// 로그인되어 있으면, 로그아웃된다는 메시지 처리
+		
+		var url = common_cfGetDomain('IP00');
+		if(window['PERSONALADDRESS'] && window['PERSONALADDRESS'] != ''){
+			url += '/' + window['PERSONALADDRESS'] + ".nh"; 
+		}
+		
+		if (window["startTime"] != undefined && window["startTime"] != null) {
+			navigate('IPCN0001R');
+		} else {
+			document.location.href = url;
+		}
+		
+		document.cookie = "LinkIP=Y; path=/";
+		
+	} else if (menuLink == 'IC') { // 기업뱅킹
+		window.open(common_cfGetDomain('IC00'), '_blank');
+	} else if (menuLink == 'MCPS') { // 퇴직연금
+		window.open(common_cfGetDomain('PS00'), '_blank');
+	} else if (menuLink == 'ESCROW') { // NH에스크로
+		window.open(common_cfGetDomain('ES00'), '_blank');
+	} else if (menuLink == 'LOTTO') { // 로또복권당첨
+		common_navigateToContent('/ip/nl/ipnl1081c.thtml');
+	} else if (menuLink == 'BRANCHINFO') { // 영업점안내
+		window.open('http://nonghyup.ttmap.co.kr/main.jsp', 'branchinfo_popup', 'width=1100px, height=800px, scrollbars=yes');
+	} else if (menuLink == 'ECR') { // 전자민원접수
+		window.open('http://www.nonghyup.com/Complaint/ComplaintIndex.aspx', '_blank');
+	} else if (menuLink == 'IPPH') { // 국민주택기금
+		common_navigateToContent('/ip/ph/IPPH0001M.thtml');
+	} else if (menuLink == 'IPNB') { // 은행소개
+		window.open('http://www.nhbank.com', '_blank');
+	} else if (menuLink == 'IPAL') { // 농축협소개
+		common_navigateToContent('/ip/al/IPAL0001M.thtml',{'menu_id':'IPAL'},{'domainCode':'IP03','target':'_blank'});
+	} else if (menuLink == 'IPPB') { // 로얄로드PB
+		common_navigateToContent('/ip/pb/IPPB0001M.thtml');
+	} else if (menuLink == 'IPCC') { // 카드
+		common_navigateToContent('/ip/cc/IPCC0001M.thtml',null,{'domainCode':'CC00'});
+	}
+}
+
+/**
+ * <pre>
+ * e마케팅 영역 출력
+ * </pre>
+ * @param dp : e마케팅 html을 표시할 div ID
+ * @param PSN_FNC_WRS_C : e마케팅 html에 입력할 상품코드
+ * @param banner_html : e마케팅 오른쪽 배너 영역에 표시할 html
+ */
+function ipcn_fSetECRM(dp, PSN_FNC_WRS_C, banner_html) {
+	// e마케팅 영역
+	common_ecrm(dp, PSN_FNC_WRS_C, function(data){
+		// success
+		var dataJSON = null;
+		try {
+			if (data["rec_result"] == "") {
+				//console.log('배너 호출 에러');
+				return false;
+			}
+			dataJSON = $.parseJSON(data["rec_result"]);
+		} catch (e) {}
+
+		if (dataJSON == null || dataJSON == undefined ||
+				dataJSON['dp'] == null || dataJSON['dp'] == undefined ||
+				dataJSON['dp']['scenarioResultList'] == null || dataJSON['dp']['scenarioResultList'] == undefined ||
+				dataJSON['dp']['scenarioResultList'].length == 0) {
+			// 내용 없음
+			//console.log('배너 내용 없음');
+			return;
+		}
+
+		// 데이터 파싱
+		var status = dataJSON['status'];	// 상태값
+		var item_value    = dataJSON['dp']['scenarioResultList'][0]['itemList']['items'][0]['basisInfo']['basisList'][0]['value'];	// ITEM_VALUE
+		var item_name     = dataJSON['dp']['scenarioResultList'][0]['itemList']['items'][0]['basisInfo']['basisList'][1]['value'];	// ITEM_NAME
+		var bnr_type      = dataJSON['dp']['scenarioResultList'][0]['itemList']['items'][0]['basisInfo']['basisList'][2]['value'];	// 배너 유형(960002 : 캠페인(이벤트)형, 960003 : 단일상품추천형)
+		var msg_ttl       = dataJSON['dp']['scenarioResultList'][0]['itemList']['items'][0]['basisInfo']['basisList'][3]['value'];	// 메시지 제목
+		var msg_con       = dataJSON['dp']['scenarioResultList'][0]['itemList']['items'][0]['basisInfo']['basisList'][4]['value'];	// 메시지 내용
+		var prd_cd        = dataJSON['dp']['scenarioResultList'][0]['itemList']['items'][0]['basisInfo']['basisList'][5]['value'];	// 상품 코드
+		var prd_cd_name   = dataJSON['dp']['scenarioResultList'][0]['itemList']['items'][0]['basisInfo']['basisList'][6]['value'];	// 상품 명
+		var prd_m_cate_cd = dataJSON['dp']['scenarioResultList'][0]['itemList']['items'][0]['basisInfo']['basisList'][7]['value'];	// 상품 중분류 코드
+		var img_url       = dataJSON['dp']['scenarioResultList'][0]['itemList']['items'][0]['basisInfo']['basisList'][8]['value'];	// 이미지 URL
+		var link_url      = dataJSON['dp']['scenarioResultList'][0]['itemList']['items'][0]['basisInfo']['basisList'][9]['value'];	// 링크 URL
+		var bank_type     = dataJSON['dp']['scenarioResultList'][0]['itemList']['items'][0]['basisInfo']['basisList'][10]['value'];	// 은행 유형
+		var link_type     = dataJSON['dp']['scenarioResultList'][0]['itemList']['items'][0]['basisInfo']['basisList'][11]['value'];	// 링크 유형 구분(T:text, I:image)
+		var loggingUrl    = dataJSON['dp']['scenarioResultList'][0]['loggingUrl'];
+
+		// 배경이미지 파싱
+		if (img_url == null || img_url == undefined || img_url == '') {
+			img_url = '/images/IP/global/bg_emkt_unit.gif';
+		}
+
+		// 상세페이지 링크 생성
+		var sDetailLink = "";
+		if (bnr_type == "960003") { // 상품추천 - 상세페이지 링크 생성
+			switch (prd_cd.substring(0,1)) {
+				case '1': // 예금
+					sDetailLink = "common_toSFGateway('SFSD0130R', {'detailPsnFncWrsC':'"+prd_cd+"', 'SF_NAAC_DS_DTLC' : '"+ bank_type +"' , 'listServiceId':'SFSD0130R'});"; break;
+				case '2': // 신탁
+					sDetailLink = "common_toSFGateway('SFST0020R', {'detailPsnFncWrsC':'"+prd_cd+"', 'SF_NAAC_DS_DTLC' : '"+ bank_type +"' ,'listServiceId':'SFST0020R'});"; break;
+				case '4': // 대출
+					sDetailLink = "common_toSFGateway('SFSL0120R', {'detailPsnFncWrsC':'"+prd_cd+"', 'SF_NAAC_DS_DTLC' : '"+ bank_type +"' ,'listServiceId':'SFSL0120R'});"; break;
+				case '5': // 펀드
+					sDetailLink = "common_toSFGateway('SFSI0100R', {'psnFncWrsC' : '"+ prd_cd +"' , 'detailPsnFncWrsC':'"+prd_cd+"', 'SF_NAAC_DS_DTLC' : '"+ bank_type +"' ,'listServiceId':'SFSI0180R'});"; break;
+				case '6': // 외환
+					sDetailLink = "common_toSFGateway('SFSZ0080R', {'psnFncWrsC' : '"+ prd_cd +"' , 'detailPsnFncWrsC':'"+prd_cd+"', 'SF_NAAC_DS_DTLC' : '"+ bank_type +"' ,'listServiceId':'SFSF0611'});"; break;
+				case '7': // 방카슈랑스
+					sDetailLink = "common_toSFGateway('SFSB0020R', {'detailPsnFncWrsC':'"+prd_cd+"', 'SF_NAAC_DS_DTLC' : '"+ bank_type +"' ,'listServiceId':'SFSB0020R'});"; break;
+				case '9': // 카드
+					sDetailLink = "navigate('"+common_cfGetDomain('CC00')+"/servlet/IPCC2021R', {'cd_wrs_sqno':'"+prd_cd+"', 'listUrl':'IPCC2010I', 'menu_id':'IPCC0302'});"; break;
+				default: break;
+			}
+			sDetailLink += "ipcn_fLoggingECRM('" + loggingUrl + "&click=1&itemValue=" + item_value + "');";
+		} else if(bnr_type == "960009") {
+			sDetailLink = "navigate('" + link_url + "');";
+			sDetailLink += "ipcn_fLoggingECRM('" + loggingUrl + "&click=1&itemValue=" + itemValue + "');";
+		}
+
+		// 화면에 출력
+		var html = '';
+		if (link_type && link_type.toUpperCase() == 'I') {
+			html += '\n	<div style="float:left;">';
+			if (bnr_type == "960003" || bnr_type == "960009") { // 상품추천
+				html += '\n	<a href="#none" onclick="' + sDetailLink + 'return false;"><img src="'+ img_url + '" width="355px" height="109px" alt="e 마케팅 배너" /></a>';
+			} else { // 이벤트
+				html += '\n	<a href="' + link_url + '" onclick="ipcn_fLoggingECRM(\'' + loggingUrl + '&click=1&itemValue=' + item_value + '\');"><img src="'+ img_url + '" width="355px" height="109px" alt="e 마케팅배너" /></a>';
+			}
+			html += '\n	</div>';
+		} else {
+			html += '\n	<div class="unit" style="background:url(' + img_url + ') no-repeat;">';
+			html += '\n	<h2>' + msg_ttl + '</h2>';
+			if (bnr_type == "960003" || bnr_type == "960009") { // 상품추천
+				html += '\n	<a href="#none" onclick="' + sDetailLink + 'return false;">'+ msg_con + '</a>';
+			} else { // 이벤트
+				html += '\n	<a href="' + link_url + '" onclick="ipcn_fLoggingECRM(\'' + loggingUrl + '&click=1&itemValue=' + item_value + '\');">'+ msg_con + '</a>';
+			}
+			html += '\n	</div>';
+		}
+		html += '\n <span id="emarketing_banner_html"></span>';
+		$('#'+dp).empty().append(html);
+
+		if (banner_html == null || banner_html == undefined) {
+			switch (dp) {
+			case 'so_accoutn_banner': banner_html = '/content/html/ip/common/lnquiry_mbanner_t01.html'; break;
+			case 'so_transfer_banner': banner_html = '/content/html/ip/common/transfer_mbanner_t01.html'; break;
+			case 'so_deposit_banner': banner_html = '/content/html/ip/common/deposit_mbanner_t01.html'; break;
+			case 'so_loan_banner': banner_html = '/content/html/ip/common/transfer_mbanner_t01.html'; break;
+			case 'so_bill_banner': banner_html = '/content/html/ip/common/transfer_mbanner_t01.html'; break;
+			default: banner_html = '/content/html/ip/common/lnquiry_mbanner_t01.html'; break;
+			}
+		}
+		if (banner_html != null && banner_html != undefined && banner_html != '' && banner_html.length > 0) {
+			// e마케팅 오른쪽 배너 영역 html을 읽어온다.
+			$('#emarketing_banner_html').load(banner_html).error(function(){});
+		}
+
+		// 로그URL 실행
+		ipcn_fLoggingECRM(loggingUrl);
+
+	}, function(){
+		// fail
+		//console.log('e마케팅 읽기 오류');
+		return;
+	});
+}
+
+/**
+ * e마케팅 로깅URL 실행
+ */
+function ipcn_fLoggingECRM(loggingUrl) {
+	if (loggingUrl != null && loggingUrl != undefined && loggingUrl != '') {
+		$('<img id="ecrmLoggingFrame" src="' + loggingUrl + '" width="0" height="0" style="display:none;" />').appendTo('body');
+		setTimeout(function(){
+			$('#ecrmLoggingFrame').remove();
+		}, 2000);
+	}
+}
+
+function ipcn_fLoanCal() {
+	popup_cfWindowOpen('/servlet/IPMM3141I.view', null, {'width':'867px', 'height':'682px', 'scrollbars':'yes'});
+}
+
+/**
+ * 개인뱅킹 공인인증센터 이동 
+ */
+function ipcn_fGoIPCA(sUrl){
+    if(common_cfGetDeviceType() == 'NORMAL') {
+        common_navigateToContent('/ip/ca/IPCA0001M.thtml',{'menu_id':'IPCA01'});
+    } else {
+        navigate("IPCA9999S", null);
+    }
+}
+
+
+/**
+ * 개인 UMS 미가입자 포워딩
+ */
+
+function ipcn_fForwardUMSMember(serviceId) {
+	 	navigate(serviceId, null).fail(function(data, status, xhr) {
+	 		
+	 		alert("회원가입후 이용하세요.");
+	 		navigate('IPUM0010S');
+	 			
+	 		/*
+	 		var errorCode 	= xhr.getResponseHeader('ERROR_CODE');
+	 		var errorMsg 	= xhr.getResponseHeader('ERROR_MESSAGE');
+	 		errorMsg = decodeURIComponent(errorMsg);
+	 		errorMsg = errorMsg.split('+').join(' ');
+	 		
+	 		var rtnServiceID = "리턴페이지 URL";
+	 		var errObject = 
+	 		{
+	 			errMsg : errorMsg
+	 			, errorCode : errorCode
+	 			, orgErrorCode : xhr.getResponseHeader('ORG_ERROR_CODE')
+	 			, errPrgName : xhr.getResponseHeader('ERROR_PROGRAM_NAME')
+	 			, errPrgLine : xhr.getResponseHeader('ERROR_PROGRAM_LINE')
+	 			, errSvrInfo : xhr.getResponseHeader('ERROR_SERVER_INFO')
+	 			, guid : xhr.getResponseHeader('BACKEND_CHANNEL_GUID')
+	 			, rmsSvc : xhr.getResponseHeader('RMS_SVC_C')
+	 			, apSvrNm : xhr.getResponseHeader('EXE_NODE_NO')
+	 			, preServiceId : xhr.getResponseHeader('PREVIOUS_SERVICE_ID')
+	 			, returnServiceId : rtnServiceID
+	 			, serviceId : xhr.getResponseHeader('service')
+	 		};
+	 		
+	 		showErrorLayerPop(errObject);
+	 		*/
+	 	});
+	 }
+
+/**
+ * <pre>
+ * 고객의 외환계좌 팝업
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fNhEfAccountList("lfCallbackFunc");	// lfCallbackFunc : 되돌아갈 펑션명
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $("#nbnk_c").val(obj.nbnk_c);		// 입금은행코드
+ *   $("#rv_acno").val(obj.rv_acno);	// 입금계좌번호
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fNhEfAccountList(callbackFunc) {
+	popup_cfLayerOpen('IPEF0571P', {'callback':callbackFunc, 'refresh':'true'});
+}
+
+/**
+ * <pre>
+ * 나의 농협 퇴직연금계좌 팝업
+ * 
+ * (예제)
+ * 1. 호출 : ipcn_fNhRtAccountList("lfCallbackFunc");	// lfCallbackFunc : 되돌아갈 펑션명
+ * 2. return 함수
+ * <code>
+ * function lfCallbackFunc(obj) {
+ *   $("#nbnk_c").val(obj.nbnk_c);	// 입금은행코드
+ *   $("#acno").val(obj.acno);		// 퇴직연금계좌번호
+ * }
+ * </code>
+ * </pre>
+ */
+function ipcn_fNhRtAccountList(callbackFunc) {
+	popup_cfLayerOpen('IPAR0071P', {'callback':callbackFunc, 'refresh':'true'});
+}
+
+
+/**
+ * <pre>
+ * 추가인증(전화 ARS) 대상 서비스에서 인증버튼 활성화
+ * </pre>
+ */
+function ipcn_cfAddCertArsDisplay(option){
+	$('#ADD_CERT_ARS_VIEW').navigate('IPCNI200S',option);
+}
+
+/**
+ * <pre>
+ * 추가인증(전화 ARS) 통과 여부 확인
+ * </pre>
+ */
+function ipcn_cfCheckAddCertARS(){
+	var add_cert_ars_yn = $('#ADD_CERT_ARS_YN').val();
+	if(add_cert_ars_yn != 'Y'){
+		alert(common_cfGetMessage("I0599"));
+		
+		return false;
+	}
+	return true;
+}
+
+/**
+ * <pre>
+ * 수수료면제내역조회
+ * </pre>
+ */
+function ipcn_fSearchExamtionFee(drw_acno,ichamt){
+	popup_cfLayerOpen('IPCN0015P' ,{'drw_acno':drw_acno , 'IchAmt':ichamt});
+}
+
+/**
+ * <pre>
+ * PC정보조회 팝업 호출
+ * </pre>
+ */
+function ipcn_fCallPCInfoView(){
+	popup_cfLayerOpen('IPCNA305P');
+}
+
+
+/**
+ * <pre>
+ * 오픈뱅킹 수수료면제내역조회
+ * </pre>
+ */
+function ipcn_fSearchExamtionFeeOb(drw_acno,ichamt){ 
+	popup_cfLayerOpen('IPOB0015P' ,{'drw_acno':drw_acno , 'IchAmt':ichamt});
+}
+
+/**
+ * <pre>
+ * 오픈뱅킹 충전팝업 호출  
+ * </pre>
+ */
+function ipcn_fCallOpenBankAdd(drw_acno,callbackFunc){ 
+	if (drw_acno == null || drw_acno == '') {
+		alert('입금계좌번호를 다시 확인해 주십시오.');
+    	return false;
+	}
+	// 충전하기 입금계좌 예외
+	var IgmGjaNbr = format_cfOnlyNumFormat(drw_acno);			// 입금계좌 번호
+	var sAcctType = common_cfGetAccountType(IgmGjaNbr);			// 입금계좌 타입
+	var AcctGbn = common_cfGetNewAccountGwamok(IgmGjaNbr);	    // 입금계좌 과목코드
+    
+	if (IgmGjaNbr.length < 10 || IgmGjaNbr.length > 14) {
+		alert('입금계좌번호를 다시 확인해 주십시오.');
+    	return false;
+	}
+	if (sAcctType == '7' || sAcctType == '8' || sAcctType == '9' || sAcctType == '6' || sAcctType == '999') {
+    	alert('입력하신 계좌는 충전이 불가한 계좌입니다.\계좌번호를 확인하시길  바랍니다.');
+        return false;
+	}
+	if (AcctGbn == '003' || AcctGbn == '044' || AcctGbn == '053' ||
+		AcctGbn == '793' || AcctGbn == '090' || AcctGbn == '033' ||
+		AcctGbn == '031' || AcctGbn == '035' || AcctGbn == '036' || AcctGbn == '038' || 
+		AcctGbn == '043' || AcctGbn == '046' || AcctGbn == '079' || 
+		AcctGbn == '081' || AcctGbn == '086' || AcctGbn == '087' || AcctGbn == '088' || 
+		AcctGbn == '091' || AcctGbn == '092' || AcctGbn == '093' ||
+		AcctGbn == '999') {
+    	alert('입력하신 계좌는 충전이 불가한 계좌입니다.\계좌번호를 확인하시길  바랍니다.');
+    	return false;
+	}
+	
+	// 충전하기 팝업 실행
+	popup_cfLayerOpen('IPOB0161I', {'drw_acno':drw_acno, 'callback':callbackFunc}, '', 'openBankPop').fail(function(data, status, xhr) {
+		var errorCode = xhr.getResponseHeader('ERROR_CODE');
+		var returnServiceId = xhr.getResponseHeader('RETURN_SERVICE_ID');
+		var prams = {
+				'callback':callbackFunc,
+				'drw_acno':drw_acno,
+				'returnServiceId':returnServiceId
+		};
+		if(errorCode == "IPOB00008"){	// 재동의 예외처리
+			popup_cfLayerOpen('IPOB0005P', prams);
+		}else {
+			common_cfUserDefinedErrorPop(data, status, xhr);
+		}
+	});
+}

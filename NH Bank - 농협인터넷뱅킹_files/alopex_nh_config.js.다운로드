@@ -1,0 +1,222 @@
+navigateConfig('generateUrl', function(path) {
+	if(path.toLowerCase().indexOf('/servlet/') == -1){
+		return '/servlet/' + path + '.view';
+	}else{
+		return path + '.view';
+	}
+});
+navigateConfig('generateFragmentUrl', function(path) {
+	if(path.toLowerCase().indexOf('/servlet/') == -1){
+		return '/servlet/' + path + '.frag';
+	}else{
+		return path + '.frag';
+	}
+});
+navigateConfig('defaultMethod', 'POST');
+
+navigateConfig('validateResponse', function(data, status, xhr) {
+
+	// content navigate 실행 후, scroll Top으로 이동
+	var targetId = $(this.targetElement).attr("id");
+	if(targetId == "content" || targetId == "result_list"){
+		$(window).scrollTop(0);
+	}
+
+	//=================== 보안 TOKEN 기능 ==========================
+	window["SESSION_TOKEN"] = xhr.getResponseHeader('SESSION_TOKEN');
+	window["TOKEN"] = xhr.getResponseHeader('TOKEN');
+
+	navigateConfig('additionalParam', {'SESSION_TOKEN' : window["SESSION_TOKEN"], 'TOKEN' : window["TOKEN"]});
+	navigateConfig('commonHeaders', {'SESSION_TOKEN' : window["SESSION_TOKEN"], 'TOKEN' : window["TOKEN"]});
+	httpSendConfig('commonHeaders', {'SESSION_TOKEN' : window["SESSION_TOKEN"], 'TOKEN' : window["TOKEN"]});
+	//=================== 보안 TOKEN 기능 ==========================
+
+	var errflag = xhr.getResponseHeader('ERROR_CODE');
+	if(errflag === undefined || errflag === null || errflag === 'undefined' || typeof errflag != typeof '') {
+		return true; //success
+	}
+	return false; //fail
+});
+
+httpSendConfig('generateUrl', function(service) {
+	if(service.toLowerCase().indexOf('/servlet/') == -1){
+		return '/servlet/' + service + '.cmd';
+	}else{
+		return service + '.cmd';
+	}
+});
+
+httpSendConfig('validateResponse', function(data, status, xhr) {
+	
+	//=================== 보안 TOKEN 기능 ==========================
+	window["SESSION_TOKEN"] = xhr.getResponseHeader('SESSION_TOKEN');
+	window["TOKEN"] = xhr.getResponseHeader('TOKEN');
+	
+	navigateConfig('additionalParam', {'SESSION_TOKEN' : window["SESSION_TOKEN"], 'TOKEN' : window["TOKEN"]});
+	navigateConfig('commonHeaders', {'SESSION_TOKEN' : window["SESSION_TOKEN"], 'TOKEN' : window["TOKEN"]});
+	httpSendConfig('commonHeaders', {'SESSION_TOKEN' : window["SESSION_TOKEN"], 'TOKEN' : window["TOKEN"]});
+	//=================== 보안 TOKEN 기능 ==========================
+	
+	var errflag = xhr.getResponseHeader('ERROR_CODE');
+	if(errflag === undefined || errflag === null || errflag === 'undefined' || typeof errflag != typeof '') {
+		return true; //success
+	}
+	return false; //fail
+});
+
+httpSendConfig('defaultError', function(responseJson, status, xhr){
+	var resultMessage = responseJson['resultMessage'];
+	var errObject = {
+		errMsg : resultMessage,
+		errorCode : xhr.getResponseHeader('ERROR_CODE'),
+		orgErrorCode : xhr.getResponseHeader('ORG_ERROR_CODE'),
+		errPrgName : xhr.getResponseHeader('ERROR_PROGRAM_NAME'),
+		errPrgLine : xhr.getResponseHeader('ERROR_PROGRAM_LINE'),
+		errSvrInfo : xhr.getResponseHeader('ERROR_SERVER_INFO'),
+		guid : xhr.getResponseHeader('BACKEND_CHANNEL_GUID'),
+		rmsSvc : xhr.getResponseHeader('RMS_SVC_C'),
+		apSvrNm : xhr.getResponseHeader('EXE_NODE_NO'),
+		preServiceId : xhr.getResponseHeader('PREVIOUS_SERVICE_ID'),
+		returnServiceId : xhr.getResponseHeader('RETURN_SERVICE_ID'),
+		serviceId : xhr.getResponseHeader('service')
+	};
+	
+	showErrorLayerPop(errObject);
+});
+
+navigateConfig('defaultSuccess', function(data, status, xhr){
+	// success
+});
+
+navigateConfig('defaultError', function(data, status, xhr){
+	var errorCode = xhr.getResponseHeader('ERROR_CODE');
+	var errorMsg = xhr.getResponseHeader('ERROR_MESSAGE');
+	errorMsg = decodeURIComponent(errorMsg);
+	errorMsg = errorMsg.split('+').join(' ');
+	var orgErrorCode = $.trim(xhr.getResponseHeader('ORG_ERROR_CODE'));
+
+	if (orgErrorCode != 'NA11012') { // 보안카드,OTP 인증에러 예외처리
+		var errObject = {
+			errMsg : errorMsg,
+			errorCode : xhr.getResponseHeader('ERROR_CODE'),
+			orgErrorCode : xhr.getResponseHeader('ORG_ERROR_CODE'),
+			errPrgName : xhr.getResponseHeader('ERROR_PROGRAM_NAME'),
+			errPrgLine : xhr.getResponseHeader('ERROR_PROGRAM_LINE'),
+			errSvrInfo : xhr.getResponseHeader('ERROR_SERVER_INFO'),
+			guid : xhr.getResponseHeader('BACKEND_CHANNEL_GUID'),
+			rmsSvc : xhr.getResponseHeader('RMS_SVC_C'),
+			apSvrNm : xhr.getResponseHeader('EXE_NODE_NO'),
+			preServiceId : xhr.getResponseHeader('PREVIOUS_SERVICE_ID'),
+			returnServiceId : xhr.getResponseHeader('RETURN_SERVICE_ID'),
+			serviceId : xhr.getResponseHeader('service')
+		};
+		
+		showErrorLayerPop(errObject);
+	} else {
+		$("#content").html('');
+		$("#content").html(data);
+	}	
+});
+
+navigateConfig('useProgress', true);
+
+navigateConfig('startProgress', function (frag, callback){
+	
+	var isFragLoad = true;
+	if(frag && frag.tagName){
+		isFragLoad = false;	
+	}
+	
+	if(window["continueLogin"] != undefined && window["continueLogin"] != null) {
+		
+		if(isFragLoad){
+			continueLogin();
+		} else {
+			if(autoCd) clearTimeout(autoCd);
+		}
+	}
+
+	if(window["continueSessionTimer"] != undefined && window["continueSessionTimer"] != null) {
+		continueSessionTimer();
+	}
+
+	
+	if(isFragLoad){
+		common_showInitLodingBar();
+	} else {
+		setTimeout(common_showInitLodingBar);
+	}
+	
+	//반드시 가장 마지막에 수행
+	if(callback != undefined){
+		callback();
+	}
+});
+
+navigateConfig('endProgress', function (frag, callback){
+	
+	var isFragLoad = true;
+	if(frag && frag.tagName){
+		isFragLoad = false;	
+	}
+	
+	if(window["continueLogin"] != undefined && window["continueLogin"] != null) {
+
+		if(isFragLoad){
+			continueLogin();
+		} else {
+			if(autoCd) clearTimeout(autoCd);
+		}
+		
+	}
+	
+	if(window["continueSessionTimer"] != undefined && window["continueSessionTimer"] != null) {
+		continueSessionTimer();
+	}
+	
+	if(frag != null || window.browser == 'safari' || window.browser == 'opera' || window.browser == 'mobile'){
+		common_closeInitLodingBar();
+	}
+	
+	//반드시 가장 마지막에 수행
+	if(callback != undefined){
+		callback();
+	}
+});
+
+httpSendConfig('useProgress', true);
+
+httpSendConfig('startProgress', function (callback){
+	if(window["continueLogin"] != undefined && window["continueLogin"] != null) {
+		continueLogin();
+	}
+	
+	if(window["continueSessionTimer"] != undefined && window["continueSessionTimer"] != null) {
+		continueSessionTimer();
+	}
+	
+	common_showInitLodingBar();
+	
+	//반드시 가장 마지막에 수행
+	if(callback != undefined){
+		callback();
+	}
+	
+});
+
+httpSendConfig('endProgress', function (callback){
+	if(window["continueLogin"] != undefined && window["continueLogin"] != null) {
+		continueLogin();
+	}
+
+	if(window["continueSessionTimer"] != undefined && window["continueSessionTimer"] != null) {
+		continueSessionTimer();
+	}
+
+	common_closeInitLodingBar();
+	
+	//반드시 가장 마지막에 수행
+	if(callback != undefined){
+		callback();
+	}
+});
