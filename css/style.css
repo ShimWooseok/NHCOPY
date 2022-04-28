@@ -31,14 +31,13 @@
     padding: 0;
 }
   .con{
-    width : 1100px;
+    width : 980px;
     margin : 0 auto; 
   }
   /* 스타일 */
 
 .header-wrap{
     width: 100%;
-    background-color: skyblue;
 }
 
 .header-top{
@@ -50,10 +49,51 @@
   padding-top: 20px;
   box-sizing: border-box;
 }
-.header-nav{
-  width: 100%;
-  height: 52px;
-  background-color: red;
+.header-top > .logo-box{
+  margin-top: 5px;
+}
+.header-top > .i-menu{
+  margin-left: 20px;
+}
+.header-top > .i-menu > li{
+  padding-right: 10px;
+  padding-left: 10px;
+  margin-right: 5px;
+  font-size: 16px;
+  font-weight: bold;
+}
+.header-top > .i-menu > li > .ip{
+
+}
+.header-top > .i-menu > li > .ip > li {
+  width: 56px;
+  height: 33px;
+  /* background-color: #ddd; */
+  text-align: center;
+  line-height: 33px;
+  cursor: pointer;
+}
+.header-top > .i-menu > li > .ip > .no1{
+  background-color: blue;
+  color: white;
+  border : 1px solid #ddd;
+  border-top-right-radius: 50%;
+  
+  border-bottom-left-radius: 50%;
+}
+.header-top > .i-menu > li > .ip > .no2{
+  border : 1px solid #ddd;
+  border-top-right-radius: 50%;
+
+}
+.header-wrap > .header-top > .i-menu > li > .ic > li {
+  margin-right: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+  text-align: center;
+  line-height: 33px;
+  padding-right: 10px;
+  padding-left: 10px;
 }
 .global-menu{
     position: absolute;
@@ -62,11 +102,11 @@
     height: 32px;
     border: 1px solid #bbb;
     z-index: 30;
-    box-sizing:  border-box;
+    box-sizing: border-box;
     padding: 10px 20px;
     font-size: 13px;
     cursor: pointer;
-    background-color: #fff;
+    background-color: #f8f8f8;
 }
 .global-menu > li > ul{
   display: none;
@@ -85,15 +125,14 @@
   position: absolute;
   top: 0;
   left: 0;
-    width: 119px;
-    font-size: 13px;
-    color: #3b4147;
-    cursor: pointer;
-    padding: 5px 0px 4px 20px;
-    font-weight: 300;
-    /* font-family: 'Noto Sans KR',sans-serif; */
-    padding-right: 20px;
-    text-decoration: none;
+  width: 119px;
+  font-size: 13px;
+  color: #3b4147;
+  cursor: pointer;
+  padding: 5px 0px 4px 20px;
+  padding-right: 20px;
+  text-decoration: none;
+  background-color: #f8f8f8;
 }
 .global-menu.active > li > ul{
   display: block;
@@ -112,4 +151,32 @@
 }
 .icon > li{
   margin: 0 10px 0 10px;
+}
+
+.header-nav{
+  width: 100%;
+  height: 52px;
+  background-color: #ddd;
+}
+.box{
+  width: 100%;
+  height: 2500px;
+  background-color: #fee;
+}
+
+.btn-top{
+  width: 75px;
+  height: 75px;
+  position: fixed;
+  top : 50%;
+  right: 100px;
+}
+.btn-sp{
+  width: 90px;
+  height: 90px;
+  background-color: white;
+  position: fixed;
+  top : 60%;
+  right: 95px;
+  box-shadow: 0 0 10px 1px;
 }
