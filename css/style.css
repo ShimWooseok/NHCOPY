@@ -78,13 +78,13 @@
   color: white;
   border : 1px solid #ddd;
   border-top-right-radius: 50%;
-  
   border-bottom-left-radius: 50%;
 }
 .header-top > .i-menu > li > .ip > .no2{
   border : 1px solid #ddd;
   border-top-right-radius: 50%;
 
+  border-left: 1px solid white;
 }
 .header-wrap > .header-top > .i-menu > li > .ic > li {
   margin-right: 10px;
@@ -171,12 +171,17 @@
   top : 50%;
   right: 100px;
 }
-.btn-sp{
-  width: 90px;
-  height: 90px;
+.btn-sp {
+  width: 80px;
+  height: 80px;
   background-color: white;
   position: fixed;
   top : 60%;
-  right: 95px;
-  box-shadow: 0 0 10px 1px;
+  right: 102px;
+  box-shadow: 0 0px 10px gray;
+  border-top-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  text-align: center;
+  line-height: 90px;
+  font-size: 14px;
 }
