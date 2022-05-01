@@ -7,9 +7,14 @@
     <title>Document</title>
     <!-- 제이쿼리 자리 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js" integrity="sha512-XtmMtDEcNz2j7ekrtHvOVR4iwwaD6o/FUJe6+Zq+HgcCsk3kj4uSQQR8weQ2QVj1o0Pk6PwYLohm206ZzNfubg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.css" integrity="sha512-6lLUdeQ5uheMFbWm3CP271l14RsX1xtx+J5x2yeIDkkiBpeVTNhTqijME7GgRKKi6hCqovwCoBTlRBEC20M8Mg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.css" integrity="sha512-wR4oNhLBHf7smjy0K4oqzdWumd+r5/+6QO/vDda76MW5iug4PT7v86FoEkySIJft3XA0Ae6axhIvHrqwm793Nw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 
     <!-- 외부 js자리 // 웹폰트 자리 // 폰트어썸 링크 자리 시작 -->
-    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+
     <!-- 외부 js자리 // 웹폰트 자리 // 폰트어썸 링크 자리 끝 -->
 
 
@@ -21,54 +26,117 @@
 <body>
     <div class="header-wrap">
         <div class="header-top row">
-            <div class="logo-box cell">
-                <img src="./img/ssvv/logo_new.jpg" alt="">
-            </div>
-            <ul class = "i-menu cell row">
-                <li class="cell">
-                    <ul class = "ip row">
-                        <li class="cell no1"><a href="#">개인</a></li>
-                        <li class="cell no2"><a href="#">큰글</a></li>
-                    </ul>
-                </li>
-                <li class="cell">
-                    <ul class = "ic row">
-                        <li class="cell">기업</li>
-                        <li class="cell">카드</li>
-                    </ul>
-                </li>
-            </ul>
-            <ul class = "global-menu cell-r">
-                <li>
-                    <a href="#">Language</a>
-                <ul>
-                    <li>English</li>
-                    <li>日本語</li>
-                    <li>中國語</li>
-                    <li>Vietnam</li>
-                    <li>ไทย</li>
-                    <li>Indonesia</li>
-                    <li>Россия</li>
-                    <li>МОНГОЛ</li>
-                    <li>Cambodia</li>
-                    <li>business(Eng)</li>
-                    <li>AboutNHBank</li>
+            <div class="header-menu">
+                <div class="logo-box cell">
+                    <img src="./img/ssvv/logo_new.jpg" alt="">
+                </div>
+                <ul class = "i-menu cell row">
+                    <li class="cell">
+                        <ul class = "ip row">
+                            <li class="cell no1"><a href="#">개인</a></li>
+                            <li class="cell no2"><a href="#">큰글</a></li>
+                        </ul>
+                    </li>
+                    <li class="cell">
+                        <ul class = "ic row">
+                            <li class="cell">기업</li>
+                            <li class="cell">카드</li>
+                        </ul>
+                    </li>
                 </ul>
-                </li>
+                <ul class = "global-menu cell-r">
+                    <li>
+                        <a href="#">Language</a>
+                    <ul>
+                        <li>English</li>
+                        <li>日本語</li>
+                        <li>中國語</li>
+                        <li>Vietnam</li>
+                        <li>ไทย</li>
+                        <li>Indonesia</li>
+                        <li>Россия</li>
+                        <li>МОНГОЛ</li>
+                        <li>Cambodia</li>
+                        <li>business(Eng)</li>
+                        <li>AboutNHBank</li>
+                    </ul>
+                    </li>
+    
+                </ul>
+                <ul class="icon cell-r row">
+                    <li class="cell"><a href="#"><img src="./img/ssvv/ico_favorite_off.gif" alt=""></a> </li>
+                    <li class="cell"><a href="#"><img src="./img/ssvv/btn-set.png" alt=""></a></li>
+                    <li class="cell"><a href="#"><img src="./img/ssvv/btn_header_search.gif" alt=""></a></li>
+                </ul>
+            </div>
+            
+            <div class="header-login con row">
+                <ul class="log-in-box row cell">
+                    <li class="cell n"><span>로그인</span></li>
+                    <li class="cell s"><span>인증센터</span></li>
+                </ul>
+                <ul class="cell-r row menu">
+                    <li class="cell"><a href="#">외환</a></li>
+                    <li class="cell"><a href="#">퇴직연금</a></li>
+                    <li class="cell"><a href="#">보안센터</a></li>
+                    <li class="cell"><a href="#">고객센터</a></li>
+                </ul>
 
-            </ul>
-            <ul class="icon cell-r row">
-                <li class="cell"><a href="#"><img src="./img/ssvv/ico_favorite_off.gif" alt=""></a> </li>
-                <li class="cell"><a href="#"><img src="./img/ssvv/btn-set.png" alt=""></a></li>
-                <li class="cell"><a href="#"><img src="./img/ssvv/btn_header_search.gif" alt=""></a></li>
-            </ul>
+            </div>
+            
+
         </div>
-        <div class="header-nav">
-            sldjslkjdjhfkjd
+
+
+
+
+        <div class="header-nav-wrap">
+            <ul class="header-nav con row">
+                <li class="cell"><a href="#">조회</a></li>
+                <li class="cell"><a href="#">이체</a></li>
+                <li class="cell"><a href="#">공과금</a></li>
+                <li class="cell"><a href="#">뱅킹관리</a></li>
+                <li class="cell"><a href="#">라운지</a></li>
+                <li class="cell"><a href="#">금융상품몰</a></li>
+                <li class="cell"><a href="#">오픈뱅킹</a></li>
+                <!-- <li class="cell"><a href="#">????</a></li> -->
+            </ㅕ>
         </div>
     </div>
 
-    <div class="box"></div>
+    <div class="big-bg">
+        <div class="main-content">
+            <div class="bg-blue"></div>
+            <div class="content-main-img-box">
+                <img src="./img/ssvv/img_main_slideTxt.png" alt="">
+            </div>
+            <div class="slider-wrap">
+                <div class="slider">
+                    <div class="content">
+                        <img src="./img/ssvv/img_main_slide06.png" alt="">
+                    </div>
+                    <div class="content">
+                        <img src="./img/ssvv/img_main_slide03.png" alt="">
+                    </div>
+                </div>
+
+                <div class="slider-btn-wrap">
+                    <div class="slider-btn">
+                        <div class="dots ">
+                            <div class="dot dot1 "></div>
+                            <div class="dot dot2 "></div>
+                        </div>
+                        <div class="state-btn ">
+                            <div class="play"></div>
+                            <div class="pause"> </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 
     <div class="btn-top">
