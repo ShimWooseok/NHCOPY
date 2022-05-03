@@ -1,5 +1,10 @@
 $(document).ready(function(){
 
+  $('.slider').slick({
+    autoplay : true ,
+    autoplaySpeed : 1000 ,
+  });
+
 
     $(".global-menu").click(function(){
 
@@ -17,15 +22,41 @@ $(document).ready(function(){
         },300)
       })
 
-      $(document).ready(function(){
-        $('.slider').slick({
-          autoplay : true ,
-          autoplaySpeed : 2000 ,
-        });
-      });
+      $(".prev-btn").click(function(){
+        $(".slider").slick("slickPrev")
+      })
+      $(".next-btn").click(function(){
+        $(".slider").slick("slickNext")
+      })
 
+      $(".play").click(function(){
+        $(".play").removeClass("active")
+        $(".pause").addClass("active")
+        $(".slider").slick("slickPlay")
+      })
+      $(".pause").click(function(){
+        $(".play").addClass("active")
+        $(".pause").removeClass("active")
+        $(".slider").slick("slickPause")
+      })
+      $(".dot").click(function(){
+        let num = $(this).index()
 
+        $(".slider").slick('slickGoTo' , num)
+      })
 
+      $('.slider').on('beforeChange', function(event, slick, currentSlide, nextSlide){
+        console.log("비포체인지");
+          $(".dots > .dot").eq(nextSlide).addClass("active")    
+          $(".dots > .dot").eq(nextSlide).siblings().removeClass("active")
+      })
+
+      $("li").mouseover(function(){
+        $(this).addClass("active")
+      })
+      $("li").mouseleave(function(){
+        $("li").removeClass("active")
+      })
 
     // 끝
 })
