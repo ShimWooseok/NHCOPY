@@ -229,10 +229,12 @@
   margin-right: 0;
 }
 /* header 끝 */
+
+/* big-bg 시작 */
 .big-bg{
   width: 100%;
-  height: 100vh;
-  background-color: #ddf;
+  height: 600px;
+  background-color: #fdd;
 }
 .big-bg > .main-content{
   width: 100%;
@@ -407,8 +409,145 @@
   box-sizing: border-box;
   text-align: center;
 }
+/* big-bg 끝 */
+
+/* big-bg 2 시작 */
+.big-bg2{
+  max-width: 100%;
+  height: auto;
+  background-color: #e9ecf2;
+}
+.big-bg2 > .content-box{
+  height: 1500px;
+  /* background-color: #dfd; */
+  margin: 0 auto;
+}
+.big-bg2 > .content-box > p{
+  padding-top: 100px;
+  text-align: center;
+  font-size: 40px;
+  font-weight: bold;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.big-bg2 > .content-box > ul {
+  height: 52px;
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 20px;
+  text-align: center;
+}
+
+.big-bg2 > .content-box > ul > li{
+  margin-right: 10px;
+  margin-left: 10px;
+  width: auto;
+  height: 52px; 
+  line-height: 52px;
+  padding-right: 40px;
+  padding-left: 40px;
+}
+.big-bg2 > .content-box > ul > li:hover{
+  background-color: yellow;
+}
+.big-bg2 > .content-box > ul > li.active{
+  background-color: yellow;
+}
+
+.big-bg2 > .content-box > .tab-box > .tab{
+  width: 1020px;
+  height: 904px;
+  background-color: #ddd;
+  margin-top: 50px;
+}
+
+.big-bg2 > .content-box > .tab-box > .total-box{
+  display: none;
+}
+.big-bg2 > .content-box > .tab-box > .event-box{
+  display: none;
+}
+.big-bg2 > .content-box > .tab-box > .product-box{
+  display: none;
+}
+.big-bg2 > .content-box > .tab-box > .tab.active{
+  display: block;
+}
+
+.big-bg2 > .content-box > .tab-box > .total-box{
+  
+}
+.big-bg2 > .content-box > .tab-box > .total-box > .box-1{
+  width: 310px;
+  height: 100%;
+  background-color: cyan;
+  margin-right: 45px;
+}
+.big-bg2 > .content-box > .tab-box > .total-box > .box-1 > .inner-box1{
+  width: 310px;
+  height: 548px;
+  background-color: green;
+}
+.big-bg2 > .content-box > .tab-box > .total-box > .box-1 > .inner-box1 > .img-box{
+  width: 100%;
+  height: 50px;
+}
+.big-bg2 > .content-box > .tab-box > .total-box > .box-1 > .inner-box1 > .img-box
+> img{
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+.big-bg2 > .content-box > .tab-box > .total-box > .box-1 > .inner-box2{
+  width: 310px;
+  height: 316px;
+  background-color: blue;
+  margin-top: 40px;
+}
+.big-bg2 > .content-box > .tab-box > .total-box > .box-2{
+  width: 310px;
+  height: 100%;
+  background-color: purple;
+  margin-right: 45px;
+}
+.big-bg2 > .content-box > .tab-box > .total-box > .box-2 > .inner-box1{
+  width: 310px;
+  height: 316px;
+  background-color: orange;
+
+}
+.big-bg2 > .content-box > .tab-box > .total-box > .box-2 > .inner-box2{
+  width: 310px;
+  height: 508px;
+  background-color: pink;
+  margin-top: 35px;
+}
+.big-bg2 > .content-box > .tab-box > .total-box > .box-3{
+  width: 310px;
+  height: 100%;
+  background-color: salmon;
+  margin-right: 0;
+}
+
+.big-bg2 > .content-box > .tab-box > .total-box > .box-3 > .inner-box1{
+  width: 310px;
+  height: 548px;
+  background-color: green;
+}
+.big-bg2 > .content-box > .tab-box > .total-box > .box-3 > .inner-box2{
+  width: 310px;
+  height: 316px;
+  background-color: blue;
+  margin-top: 40px;
+}
+/* big-bg 2 끝 */
 
 
+
+
+/* 고정버튼 시작 */
 .btn-top{
   width: 75px;
   height: 75px;
@@ -430,3 +569,4 @@
   line-height: 90px;
   font-size: 14px;
 }
+/* 고정버튼 끝 */

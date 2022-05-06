@@ -2,7 +2,7 @@ $(document).ready(function(){
 
   $('.slider').slick({
     autoplay : true ,
-    autoplaySpeed : 1000 ,
+    autoplaySpeed : 1 ,
   });
 
 
@@ -10,9 +10,6 @@ $(document).ready(function(){
 
         $(".global-menu").toggleClass("active")
 
-
-
-     
     })
 
     $(".btn-top").click(function(){
@@ -51,11 +48,24 @@ $(document).ready(function(){
           $(".dots > .dot").eq(nextSlide).siblings().removeClass("active")
       })
 
-      $("li").mouseover(function(){
+      $(".list-box > ul >li").mouseover(function(){
         $(this).addClass("active")
       })
-      $("li").mouseleave(function(){
-        $("li").removeClass("active")
+      $(".list-box > ul >li").mouseleave(function(){
+        $(".list-box > ul >li").removeClass("active")
+      })
+
+      $(".big-bg2 > .content-box > ul > li").click(function(){
+
+        let thisNum = $(this).index();
+
+        $(".big-bg2 > .content-box > ul > li").eq(thisNum).addClass("active")
+        $(this).siblings().removeClass("active")
+
+      })
+
+      $(".big-bg2 > .content-box > ul > li").click(function(){
+        $(this).removeClass("active")
       })
 
     // 끝
