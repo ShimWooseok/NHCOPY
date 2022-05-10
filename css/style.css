@@ -241,6 +241,17 @@
 }
 /* header 끝 */
 
+/* depth-2-wrap 시작 */
+.depth-2-wrap{
+  position: absolute;
+  top: 164px;
+  width: 100%;
+  height: 650px;
+  background-color: white;
+  box-shadow: 0 30px 30px gray;
+}
+/* depth-2-wrap 끝 */
+
 /* big-bg 시작 */
 .big-bg{
   width: 100%;
@@ -395,22 +406,40 @@
   margin-left: 30px;
   z-index: 99;
 }
-.list-box > ul > li.active{
+
+.list-box > ul > li.active:nth-child(-n+4){
   width: 129px;
   height: 160px;
-  text-align: center;
   background-image: url(../img/ssvv/bg_quickbank_hover.png);
+  background-repeat: no-repeat;
+  margin-right: 0;
+  margin-left: 0;
   color: white;
-  
+  box-sizing: border-box;
+  padding: 30px;
 }
+.list-box > ul > li.active:nth-child(n+5):nth-child(-n+8){
+  width: 129px;
+  height: 160px;
+  background-image: url(../img/ssvv/bg_quickbank_hover.png);
+  background-repeat: no-repeat;
+  margin-right: 0;
+  margin-left: 0;
+  color: white;
+  box-sizing: border-box;
+  padding: 30px;
+}
+
+
 .list-box > ul > li > .img-box{
   width: 60px;
   height: 60px;
   margin: 0 auto;
-  margin-bottom: 10px;
-  padding-top: 8px;
   box-sizing: border-box;
+  padding-left: 0px;
 }
+
+
 .big-bg > .main-content >.inside-slide > .list-box{
   width: 1200px;
   height: 140px;
@@ -420,6 +449,10 @@
   box-sizing: border-box;
   text-align: center;
 }
+
+
+
+
 /* big-bg 끝 */
 
 /* big-bg 2 시작 */
