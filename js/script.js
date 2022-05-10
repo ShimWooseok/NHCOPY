@@ -49,15 +49,30 @@ $(document).ready(function(){
           $(".dots > .dot").eq(nextSlide).siblings().removeClass("active")
       })
 
+      
 
+      $(".big-bg > .main-content > .inside-slide > .list-box > ul > li").mouseover(function(){
 
-      $(".list-box > ul > li").mouseover(function(){
         $(this).addClass("active")
+    
       })
 
-      $(".list-box > ul >li").mouseleave(function(){
-        $(".list-box > ul >li").removeClass("active")
+      $(".big-bg > .main-content > .inside-slide > .list-box > ul > li").mouseleave(function(){
+
+        $(this).removeClass("active")
       })
+
+
+
+
+  
+      
+
+
+
+
+
+
 
 
 
@@ -136,9 +151,6 @@ $(document).ready(function(){
           $(".site-box > .two").removeClass("active")
         }
        
-
-
-
 
       })
 
