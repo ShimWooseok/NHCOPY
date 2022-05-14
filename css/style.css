@@ -460,60 +460,126 @@ transform: translateY(-50%);
 }
 
 
-.list-box > ul{
-width: 1000px;
-margin: 0 auto;
-height: 140px;
-display: flex;
-justify-content: center;
-align-items:center;
+.big-bg > .main-content >.inside-slide > .list-box{
+  width: 1200px;
+  height: 140px;
+  background-color: white;
+  border-top-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  box-sizing: border-box;
+  text-align: center;
+  font-family: 'Noto Sans KR', sans-serif;
+ }
+
+.big-bg > .main-content >.inside-slide > .list-box > ul{
+height: 100%;
+padding-left: 90px;
 }
-.list-box > ul > li{
-margin-right: 30px;
-margin-left: 30px;
-z-index: 99;
+
+.big-bg > .main-content >.inside-slide > .list-box > ul > li{
+width: 129px;
+height: 100%;
+box-sizing: border-box;
+padding: 30px;
+cursor: pointer;
 }
-.list-box > ul > li.active{
-  opacity: 0;
-  visibility: hidden;
+.big-bg > .main-content >.inside-slide > .list-box > ul > li > .img-box > .one2{
+  display: none;
 }
-.list-box > ul > li:hover{
-  cursor: pointer;
-  }
+.big-bg > .main-content >.inside-slide > .list-box > ul > li:nth-child(n+1):nth-child(-n+4):hover>.img-box > .one1 {
+  display: none;
+}
+.big-bg > .main-content >.inside-slide > .list-box > ul > li:nth-child(n+1):nth-child(-n+4):hover>.img-box>.one2{
+  display: block;
+  padding-left: 10px;
+}
+.big-bg > .main-content >.inside-slide > .list-box > ul > li > .one2{
+  display: none;
+}
+.big-bg > .main-content >.inside-slide > .list-box > ul > li:nth-child(n+5):nth-child(-n+8):hover > .img-box {
+  display: none;
+}
+.big-bg > .main-content >.inside-slide > .list-box > ul > li:nth-child(n+5):nth-child(-n+8):hover > .one2{
+  display: block;
+}
+.big-bg > .main-content >.inside-slide > .list-box > ul > li:nth-child(n+1):nth-child(-n+4).active{
+  width: 129px;
+  height: 160px;
+  background-image: url(../img/ssvv/bg_quickbank_hover.png);
+  color: #ffffff;
+}
+.big-bg > .main-content >.inside-slide > .list-box > ul > li:nth-child(n+5):nth-child(-n+7).active{
+  width: 143px;
+  height: 185px;
+  background-image: url(../img/ssvv/bg_quickbank_nh.png);
+  color: #ffffff;
+}
+.big-bg > .main-content >.inside-slide > .list-box > ul > li:nth-child(n+5):nth-child(-n+7).active > .txt-box{
 
 
-.list-box > ul > li > .img-box{
-width: 60px;
+  margin-top: 40px;
+
+}
+.big-bg > .main-content >.inside-slide > .list-box > ul > li:nth-child(8).active{
+  position: absolute;
+  top : 62.5%;
+  right : 4.5%;
+  height: 302px;
+  background-image: url(../img/ssvv/bg_fastbank_hover.png);
+  color: #ffffff;
+  width: 169px;
+}
+.big-bg > .main-content >.inside-slide > .list-box > ul > li:nth-child(8).active > .img-box > img{
+
+  display: none;
+
+}
+.big-bg > .main-content >.inside-slide > .list-box > ul > li:nth-child(8).active > ul {
+  margin-top: 0px;
+}
+.big-bg > .main-content >.inside-slide > .list-box > ul > li:nth-child(8).active > ul > li{
+  margin-bottom: 10px;
+}
+.big-bg > .main-content >.inside-slide > .list-box > ul > li:nth-child(8).active > .txt-box{
+
+  margin-top: 40px;
+
+}
+
+
+
+.big-bg > .main-content >.inside-slide > .list-box > ul > li > .img-box{
+width: 100%;
 height: 60px;
 margin: 0 auto;
 box-sizing: border-box;
 padding-left: 0px;
 }
 
-
-.big-bg > .main-content >.inside-slide > .list-box{
-width: 1200px;
-height: 140px;
-background-color: white;
-border-top-right-radius: 10px;
-border-bottom-left-radius: 10px;
-box-sizing: border-box;
-text-align: center;
+.big-bg > .main-content >.inside-slide > .list-box >  ul > li >  ul{
+  margin-right: 0;
+  width: 100px;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
-
-.big-bg > .main-content > .inside-slide > .hidden-list-box{
-  position: absolute;
-  top: 75%;
-  width: 100%;
-  height: 200px;
-  background-color: red;
-  opacity: 0.4;  
+.big-bg > .main-content >.inside-slide > .list-box >  ul > li >  ul > li{
+  
+  width: 240px;
+  text-align: left;
+  padding: 0;
+  margin-bottom: 5px;
+  
+  font-family: 'Noto Sans KR', sans-serif;
 }
-.big-bg > .main-content > .inside-slide > .hidden-list-box > .hidden-content-box{
-  width: 129px;
-  height: 160px;
-  background-image: url(../img/ssvv/bg_quickbank_hover.png);
+
+.big-bg > .main-content >.inside-slide > .list-box >  ul > li >  ul > li:hover{
+  color: yellow;
+}
+.big-bg > .main-content >.inside-slide > .list-box >  ul > li >  ul > li:hover > img{
+  filter : drop-shadow(0 0 0 yellow); 
+}
+.big-bg > .main-content >.inside-slide > .list-box >  ul > li >  ul > li > img{
+  margin-left: 10px;
 }
 
 

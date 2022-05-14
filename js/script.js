@@ -51,22 +51,42 @@ $(document).ready(function(){
 
       
 
-      $(".big-bg > .main-content > .inside-slide > .list-box > ul > li").mouseover(function(){
-
-        $(this).addClass("active")
-    
-      })
-
-      $(".big-bg > .main-content > .inside-slide > .list-box > ul > li").mouseleave(function(){
-
-        $(this).removeClass("active")
-      })
 
 
 
 
   
       
+
+
+
+
+      
+      $(".big-bg > .main-content > .inside-slide > .list-box > ul > li").mouseover(function(){
+       
+        let indexNum = $(this).index()
+       
+        $(".big-bg > .main-content > .inside-slide > .list-box > ul > li").eq(indexNum).addClass("active")
+     
+
+        
+        
+
+      })
+
+      $(".big-bg > .main-content > .inside-slide > .list-box > ul > li").mouseleave(function(){
+
+        
+        let indexNum = $(this).index()
+        
+        $(".big-bg > .main-content > .inside-slide > .list-box > ul > li").eq(indexNum).removeClass("active")
+
+     
+        
+
+
+
+      })
 
 
 
