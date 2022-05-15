@@ -43,6 +43,7 @@ $(document).ready(function(){
         $(".slider").slick('slickGoTo' , num)
       })
 
+      
       $('.slider').on('beforeChange', function(event, slick, currentSlide, nextSlide){
         console.log("비포체인지");
           $(".dots > .dot").eq(nextSlide).addClass("active")    
@@ -67,10 +68,7 @@ $(document).ready(function(){
         let indexNum = $(this).index()
        
         $(".big-bg > .main-content > .inside-slide > .list-box > ul > li").eq(indexNum).addClass("active")
-     
 
-        
-        
 
       })
 
@@ -81,15 +79,42 @@ $(document).ready(function(){
         
         $(".big-bg > .main-content > .inside-slide > .list-box > ul > li").eq(indexNum).removeClass("active")
 
-     
-        
-
-
 
       })
 
 
 
+
+
+
+      $(".header-wrap > .header-nav-wrap > .header-nav > li").mouseover(function(){
+        
+        let num = $(this).index()
+
+        $(".hidden-wrap > .depth-2-wrap > .content").eq(num).addClass("active")
+        $(".hidden-wrap > .depth-2-wrap > .content").eq(num).siblings().removeClass("active")
+
+      })
+
+      
+
+   
+
+      $(".hidden-wrap > .depth-2-wrap > .content").mouseleave(function(){
+
+        let num = $(this).index()
+        $(".hidden-wrap > .depth-2-wrap > .content").eq(num).removeClass("active")
+
+
+
+      })
+
+      $(".header-wrap > .header-top").mouseover(function(){
+        let num = $(this).index()
+        $(".hidden-wrap > .depth-2-wrap > .content").removeClass("active")
+
+      })
+ 
 
 
 
